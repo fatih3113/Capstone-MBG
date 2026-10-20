@@ -17,8 +17,8 @@ class _MainPageState extends State<MainPage> {
   static const List<_NavItem> _navItems = [
     _NavItem(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home_rounded, path: '/home'),
     _NavItem(label: 'Scan', icon: Icons.qr_code_scanner_outlined, activeIcon: Icons.qr_code_scanner_rounded, path: '/scan'),
-    _NavItem(label: 'Menu MBG', icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu_rounded, path: '/menu'),
-    _NavItem(label: 'Riwayat', icon: Icons.history_outlined, activeIcon: Icons.history_rounded, path: '/history'),
+    _NavItem(label: 'Menu', icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu_rounded, path: '/menu'),
+    _NavItem(label: 'Report', icon: Icons.bar_chart_outlined, activeIcon: Icons.bar_chart_rounded, path: '/report'),
     _NavItem(label: 'Profil', icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded, path: '/profile'),
   ];
 

@@ -20,23 +20,42 @@ async function main() {
   });
   console.log('✅ School created:', school.name);
 
-  // ─── DEMO USER ───────────────────────────────────────────────────────
+  // ─── DEMO USERS (admin + student) ────────────────────────────────────
   const passwordHash = await bcrypt.hash('password123', 12);
-  const user = await prisma.user.upsert({
+
+  // Admin pengelola MBG
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@mbg.test' },
-    update: {},
+    update: { role: 'admin' },
     create: {
       name: 'Admin MBG',
       email: 'admin@mbg.test',
       passwordHash,
+      role: 'admin',
       schoolId: school.id,
-      class_: '6A',
-      gender: 'L',
-      age: 12,
       schoolLevel: 'SD',
     },
   });
-  console.log('✅ Demo user created:', user.email);
+  console.log('✅ Admin user:', adminUser.email, '/ role: admin');
+
+  // Siswa demo
+  const studentUser = await prisma.user.upsert({
+    where: { email: 'siswa@mbg.test' },
+    update: {},
+    create: {
+      name: 'Budi Santoso',
+      email: 'siswa@mbg.test',
+      passwordHash,
+      role: 'student',
+      schoolId: school.id,
+      class_: '8A',
+      gender: 'L',
+      age: 14,
+      schoolLevel: 'SMP',
+    },
+  });
+  console.log('✅ Student user:', studentUser.email, '/ role: student');
+  const user = studentUser;
 
   // ─── FOODS + NUTRITION ───────────────────────────────────────────────
   const foods = [
@@ -114,7 +133,9 @@ async function main() {
   console.log('✅ Weekly MBG menu seeded (Senin - Jumat)');
 
   console.log('\n✨ Seeding selesai!');
-  console.log('🔑 Demo login: admin@mbg.test / password123');
+  console.log('🔑 Admin login  : admin@mbg.test  / password123  (role: admin)');
+  console.log('🔑 Siswa login  : siswa@mbg.test  / password123  (role: student)');
+  console.log('🌐 Dashboard    : http://localhost:5500  (buka admin-dashboard/index.html via Live Server atau langsung di browser)');
 }
 
 main()

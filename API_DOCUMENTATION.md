@@ -1026,6 +1026,133 @@ model Nutrition {
 
 ---
 
+## 📊 Report MBG — Permintaan Menu, Rating, & Feedback
+
+> Semua endpoint ini memerlukan header `Authorization: Bearer <token>`
+
+### POST /reports/menu-requests
+Siswa mengusulkan menu baru.
+
+**Body:**
+```json
+{ "menuName": "Soto Ayam", "reason": "Bergizi dan disukai siswa" }
+```
+
+**Response:**
+```json
+{ "success": true, "message": "Usulan menu berhasil dikirim", "data": { "id": "...", "status": "received" } }
+```
+
+### GET /reports/menu-requests/my
+Riwayat usulan menu milik siswa yang sedang login.
+
+### GET /reports/menu-requests/grouped
+Usulan menu yang dikelompokkan berdasarkan nama (terpopuler).
+
+### GET /reports/menu-requests *(admin only)*
+Semua usulan menu. Query: `?status=received&search=soto&page=1&limit=20`
+
+### PATCH /reports/menu-requests/:id/status *(admin only)*
+Update status dan catatan admin.
+
+**Body:**
+```json
+{ "status": "approved", "adminNote": "Akan dimasukkan bulan depan" }
+```
+Status valid: `received | reviewing | considered | approved | rejected`
+
+### GET /reports/menu-requests/export *(admin only)*
+Unduh CSV semua usulan menu. Query: `?startDate=2025-01-01&endDate=2025-12-31`
+
+---
+
+### POST /reports/food-ratings
+Siswa memberikan rating makanan favorit.
+
+**Body:**
+```json
+{ "foodName": "Ayam Goreng", "rating": 5, "reason": "Sangat enak!" }
+```
+Rating: bilangan bulat 1–5.
+
+### GET /reports/food-ratings/my
+Riwayat rating makanan milik siswa yang login.
+
+### GET /reports/food-ratings/ranking
+Ranking makanan favorit. Query: `?startDate=&endDate=&limit=10`
+
+**Response:**
+```json
+[{ "rank": 1, "foodName": "Ayam Goreng", "voteCount": 45, "avgRating": 4.8 }]
+```
+
+### GET /reports/food-ratings *(admin only)*
+Semua data rating. Query: `?startDate=&endDate=&page=&limit=`
+
+### GET /reports/food-ratings/export *(admin only)*
+Unduh CSV. Query: `?startDate=&endDate=`
+
+---
+
+### POST /reports/food-feedbacks
+Siswa mengirim feedback makanan (penilaian sensorik + status konsumsi).
+
+**Body:**
+```json
+{
+  "foodName": "Nasi Goreng",
+  "tasteRating": 4,
+  "textureRating": 3,
+  "aromaRating": 5,
+  "portionRating": 4,
+  "satisfactionRating": 4,
+  "consumptionStatus": "habis",
+  "suggestion": "Porsinya bisa ditambah"
+}
+```
+
+> ⚠️ `consumptionStatus` adalah **pilihan pengguna** (`habis | sebagian | hampir_tidak`),
+> bukan pengukuran berat sisa makanan yang sebenarnya.
+
+### GET /reports/food-feedbacks/my
+Riwayat feedback milik siswa yang login.
+
+### GET /reports/food-feedbacks/summary *(admin only)*
+Ringkasan: distribusi konsumsi, sentimen makanan, makanan paling sering dilaporkan hampir tidak dimakan.
+
+### GET /reports/food-feedbacks *(admin only)*
+Semua data feedback. Query: `?startDate=&endDate=&foodName=&page=&limit=`
+
+### GET /reports/food-feedbacks/export *(admin only)*
+Unduh CSV feedback.
+
+---
+
+## 🛠 Admin Dashboard
+
+> Semua endpoint ini memerlukan role `admin` pada akun.
+
+### GET /admin/dashboard
+Ringkasan seluruh data untuk dashboard admin.
+Query: `?startDate=&endDate=`
+
+**Response mencakup:**
+- `summary`: total usulan, rating, feedback, scan, rata-rata rating
+- `menuRequestsByStatus`: distribusi status usulan
+- `consumptionSummary`: distribusi status konsumsi (pilihan pengguna)
+- `topFavorites`: top 5 makanan favorit
+- `recentScans`: 10 scan gizi terbaru
+
+### GET /admin/nutrition-reports
+Laporan hasil scan gizi. Query: `?startDate=&endDate=&akgTarget=&page=&limit=`
+
+> ⚠️ Semua nilai gizi adalah **estimasi** berdasarkan data komposisi pangan (TKPI/referensi internal), bukan analisis laboratorium.
+
+### GET /admin/nutrition-reports/export
+Unduh CSV laporan gizi. Query: `?startDate=&endDate=`
+
+---
+
 > **Dibuat untuk:** Project Capstone — MBG Nutrition
 > **Tanggal:** Oktober 2026
 > **Stack:** Express.js · Prisma · PostgreSQL · Flutter · JWT

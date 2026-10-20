@@ -2,7 +2,7 @@ class ApiConstants {
   ApiConstants._();
 
   // Base URL - replace with actual backend URL
-  static const String baseUrl = 'https://api.mbg-nutrition.example.com';
+  static const String baseUrl = 'http://localhost:3000';
   static const String apiVersion = '/api/v1';
   static const String apiBase = baseUrl + apiVersion;
 
@@ -67,4 +67,23 @@ class ApiConstants {
 
   // Cloud Storage
   static const String uploadImage = '/storage/upload';
+
+  // Report endpoints (siswa)
+  static const String menuRequests = '/reports/menu-requests';
+  static const String menuRequestsMy = '/reports/menu-requests/my';
+  static const String menuRequestsGrouped = '/reports/menu-requests/grouped';
+  static const String foodRatings = '/reports/food-ratings';
+  static const String foodRatingsMy = '/reports/food-ratings/my';
+  static const String foodRatingsRanking = '/reports/food-ratings/ranking';
+  static const String foodFeedbacks = '/reports/food-feedbacks';
+  static const String foodFeedbacksMy = '/reports/food-feedbacks/my';
+
+  // Admin endpoints
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminNutritionReports = '/admin/nutrition-reports';
+  static const String adminMenuRequestsAll = '/reports/menu-requests';
+  static const String adminMenuRequestStatus = '/reports/menu-requests/{id}/status';
+  static const String adminFoodRatingsAll = '/reports/food-ratings';
+  static const String adminFeedbacksAll = '/reports/food-feedbacks';
+  static const String adminFeedbackSummary = '/reports/food-feedbacks/summary';
 }

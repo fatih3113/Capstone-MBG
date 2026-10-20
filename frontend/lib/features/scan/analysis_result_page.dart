@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/constants/mbg_akg_constants.dart';
 import '../../data/models/evaluation_model.dart';
 import '../../providers/scan_provider.dart';
 import '../../shared/widgets/custom_button.dart';
@@ -19,14 +20,19 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnim;
 
+  // ─── AKG MBG Dropdown state ──────────────────────────────────────────────
+  MbgSasaran? _selectedSasaran;
+
   @override
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 700));
+        vsync: this, duration: const Duration(milliseconds: 700));
     _fadeAnim = CurvedAnimation(
-      parent: _fadeController, curve: Curves.easeIn);
+        parent: _fadeController, curve: Curves.easeIn);
     _fadeController.forward();
+    // Default: SMP/MTs
+    _selectedSasaran = MbgAkgConstants.findById('smp_mts');
   }
 
   @override
@@ -88,6 +94,10 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                     _buildNutritionSection(result),
                     const SizedBox(height: 20),
 
+                    // ─── AKG MBG Dropdown ─────────────────────────────────
+                    _buildAkgMbgSection(result),
+                    const SizedBox(height: 20),
+
                     // Skor sensorik
                     if (sensory != null) ...[
                       _buildSensorySection(sensory, result),
@@ -123,7 +133,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                             label: 'Lihat Statistik',
                             onPressed: () => context.push('/stats'),
                             icon: const Icon(Icons.bar_chart_rounded,
-                              color: Colors.white, size: 18),
+                                color: Colors.white, size: 18),
                           ),
                         ),
                       ],
@@ -138,6 +148,322 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
       ),
     );
   }
+
+  // ─── AKG MBG Section ──────────────────────────────────────────────────────
+
+  Widget _buildAkgMbgSection(NutritionAnalysisResult result) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLighter,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.school_rounded,
+                    color: AppColors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text('Perbandingan dengan AKG MBG',
+                    style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.primary)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Dropdown utama
+          _buildSasaranDropdown(
+            label: 'Sasaran Jenjang Sekolah',
+            options: MbgAkgConstants.sasaranUtama,
+          ),
+          const SizedBox(height: 10),
+
+          // Dropdown tambahan
+          _buildSasaranDropdown(
+            label: 'Sasaran Tambahan (opsional)',
+            options: MbgAkgConstants.sasaranTambahan,
+            isOptional: true,
+          ),
+          const SizedBox(height: 16),
+
+          // Tabel perbandingan
+          if (_selectedSasaran != null) ...[
+            _buildComparisonTable(result, _selectedSasaran!),
+            const SizedBox(height: 12),
+          ],
+
+          // Disclaimer
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+            ),
+            child: Text(
+              MbgAkgConstants.disclaimer,
+              style: AppTextStyles.caption.copyWith(
+                  color: AppColors.warning, fontStyle: FontStyle.italic),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            MbgAkgConstants.dataSource,
+            style: AppTextStyles.caption.copyWith(
+                color: AppColors.textHint, fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSasaranDropdown({
+    required String label,
+    required List<MbgSasaran> options,
+    bool isOptional = false,
+  }) {
+    final bool isSelectedInThisGroup =
+        options.any((s) => s.id == _selectedSasaran?.id);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          initialValue: isSelectedInThisGroup ? _selectedSasaran!.id : null,
+          isExpanded: true,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.cardBorder),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.cardBorder),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.primary),
+            ),
+          ),
+          hint: Text(
+            isOptional ? 'Pilih (opsional)' : 'Pilih jenjang sasaran',
+            style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textHint),
+          ),
+          items: options
+              .map((s) => DropdownMenuItem(
+                    value: s.id,
+                    child: Text(s.label,
+                        style: AppTextStyles.bodySmall),
+                  ))
+              .toList(),
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _selectedSasaran = MbgAkgConstants.findById(val);
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComparisonTable(
+      NutritionAnalysisResult result, MbgSasaran sasaran) {
+    final rows = [
+      _ComparisonRow(
+        label: 'Energi',
+        unit: 'kkal',
+        actual: result.estimatedCalories,
+        min: sasaran.energiMin,
+        max: sasaran.energiMax,
+        status: sasaran.compareEnergy(result.estimatedCalories),
+        color: AppColors.calories,
+        emoji: '🔥',
+      ),
+      _ComparisonRow(
+        label: 'Protein',
+        unit: 'g',
+        actual: result.estimatedProtein,
+        min: sasaran.proteinMin,
+        max: sasaran.proteinMax,
+        status: sasaran.compareProtein(result.estimatedProtein),
+        color: AppColors.protein,
+        emoji: '💪',
+      ),
+      _ComparisonRow(
+        label: 'Lemak',
+        unit: 'g',
+        actual: result.estimatedFat,
+        min: sasaran.lemakMin,
+        max: sasaran.lemakMax,
+        status: sasaran.compareLemak(result.estimatedFat),
+        color: AppColors.fat,
+        emoji: '🧈',
+      ),
+      _ComparisonRow(
+        label: 'Karbohidrat',
+        unit: 'g',
+        actual: result.estimatedCarbs,
+        min: sasaran.karbohidratMin,
+        max: sasaran.karbohidratMax,
+        status: sasaran.compareKarbohidrat(result.estimatedCarbs),
+        color: AppColors.carbs,
+        emoji: '🌾',
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Target AKG MBG: ${sasaran.label}',
+          style: AppTextStyles.titleSmall.copyWith(color: AppColors.primary),
+        ),
+        const SizedBox(height: 10),
+        // Header tabel
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.primaryLighter,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              const Expanded(
+                flex: 3,
+                child: Text('Gizi', style: AppTextStyles.caption),
+              ),
+              const Expanded(
+                flex: 2,
+                child: Text('Hasil Scan', style: AppTextStyles.caption,
+                    textAlign: TextAlign.center),
+              ),
+              const Expanded(
+                flex: 3,
+                child: Text('Target AKG', style: AppTextStyles.caption,
+                    textAlign: TextAlign.center),
+              ),
+              const Expanded(
+                flex: 3,
+                child: Text('Status', style: AppTextStyles.caption,
+                    textAlign: TextAlign.center),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        ...rows.map((row) => _buildComparisonRow(row)),
+      ],
+    );
+  }
+
+  Widget _buildComparisonRow(_ComparisonRow row) {
+    Color statusColor;
+    IconData statusIcon;
+    switch (row.status) {
+      case 'within':
+        statusColor = AppColors.success;
+        statusIcon = Icons.check_circle_rounded;
+        break;
+      case 'below':
+        statusColor = AppColors.warning;
+        statusIcon = Icons.arrow_downward_rounded;
+        break;
+      case 'above':
+        statusColor = AppColors.error;
+        statusIcon = Icons.arrow_upward_rounded;
+        break;
+      default:
+        statusColor = AppColors.textSecondary;
+        statusIcon = Icons.remove_rounded;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                Text(row.emoji, style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 6),
+                Text(row.label,
+                    style: AppTextStyles.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '${row.actual.toStringAsFixed(1)} ${row.unit}',
+              style: AppTextStyles.bodySmall.copyWith(color: row.color),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              '${row.min.toStringAsFixed(0)}–${row.max.toStringAsFixed(0)} ${row.unit}',
+              style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(statusIcon, color: statusColor, size: 14),
+                const SizedBox(width: 3),
+                Flexible(
+                  child: Text(
+                    row.status.akgStatusLabel,
+                    style: AppTextStyles.caption.copyWith(
+                        color: statusColor, fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Existing sections (unchanged) ────────────────────────────────────────
 
   Widget _buildSuccessBanner(ScanProvider scan) {
     return Stack(
@@ -174,11 +500,11 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.analytics_rounded,
-                      color: Colors.white, size: 14),
+                        color: Colors.white, size: 14),
                     const SizedBox(width: 6),
                     Text('Analisis Lengkap',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: Colors.white)),
+                        style: AppTextStyles.labelSmall.copyWith(
+                            color: Colors.white)),
                   ],
                 ),
               ),
@@ -194,11 +520,11 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.save_rounded,
-                        color: Colors.white, size: 14),
+                          color: Colors.white, size: 14),
                       const SizedBox(width: 6),
                       Text('Tersimpan',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: Colors.white)),
+                          style: AppTextStyles.labelSmall.copyWith(
+                              color: Colors.white)),
                     ],
                   ),
                 ),
@@ -214,54 +540,56 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Makanan Teridentifikasi',
-          style: AppTextStyles.headlineSmall),
+            style: AppTextStyles.headlineSmall),
         const SizedBox(height: 10),
         ...scan.predictions.map((pred) => Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.cardBorder),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40, height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLighter,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(child: Text('🍽️',
-                  style: TextStyle(fontSize: 20))),
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.cardBorder),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(pred.foodName, style: AppTextStyles.titleSmall),
-                    Text('Keyakinan: ${pred.confidencePercent}',
-                      style: AppTextStyles.caption.copyWith(
-                        color: pred.isHighConfidence
-                            ? AppColors.success : AppColors.warning)),
-                  ],
-                ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLighter,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(child: Text('🍽️',
+                        style: TextStyle(fontSize: 20))),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(pred.foodName, style: AppTextStyles.titleSmall),
+                        Text('Keyakinan: ${pred.confidencePercent}',
+                            style: AppTextStyles.caption.copyWith(
+                                color: pred.isHighConfidence
+                                    ? AppColors.success
+                                    : AppColors.warning)),
+                      ],
+                    ),
+                  ),
+                  if (pred.calories != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('${pred.calories!.toStringAsFixed(0)} kcal',
+                            style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.calories)),
+                        Text(
+                            '${pred.protein?.toStringAsFixed(1) ?? '-'}g protein',
+                            style: AppTextStyles.caption),
+                      ],
+                    ),
+                ],
               ),
-              if (pred.calories != null)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('${pred.calories!.toStringAsFixed(0)} kcal',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.calories)),
-                    Text('${pred.protein?.toStringAsFixed(1) ?? '-'}g protein',
-                      style: AppTextStyles.caption),
-                  ],
-                ),
-            ],
-          ),
-        )),
+            )),
       ],
     );
   }
@@ -273,14 +601,16 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
         const Row(
           children: [
             Icon(Icons.local_fire_department_rounded,
-              color: AppColors.calories, size: 20),
+                color: AppColors.calories, size: 20),
             SizedBox(width: 8),
-            const Text('Estimasi Kandungan Gizi',
-              style: AppTextStyles.headlineSmall),
+            Text('Estimasi Kandungan Gizi',
+                style: AppTextStyles.headlineSmall),
           ],
         ),
         const SizedBox(height: 4),
-        const Text('Dihitung berdasarkan jenis makanan dan porsi yang dikonsumsi',
+        const Text(
+          'Dihitung berdasarkan jenis makanan dan berat/porsi yang dikonsumsi. '
+          'Nilai ini adalah estimasi, bukan hasil analisis laboratorium.',
           style: AppTextStyles.bodySmall),
         const SizedBox(height: 14),
         GridView.count(
@@ -341,15 +671,15 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
         const Row(
           children: [
             Icon(Icons.star_rate_rounded,
-              color: AppColors.warning, size: 20),
+                color: AppColors.warning, size: 20),
             SizedBox(width: 8),
-            const Text('Skor Sensorik', style: AppTextStyles.headlineSmall),
+            Text('Skor Sensorik', style: AppTextStyles.headlineSmall),
           ],
         ),
         const SizedBox(height: 4),
         Text('Indikator penerimaan makanan (bukan kandungan gizi)',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary)),
+            style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary)),
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(16),
@@ -391,10 +721,10 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('🧂 Tingkat Asin: ${sensory.saltLevel}',
-                          style: AppTextStyles.bodySmall),
+                            style: AppTextStyles.bodySmall),
                         const SizedBox(height: 4),
                         Text('🍬 Tingkat Manis: ${sensory.sweetLevel}',
-                          style: AppTextStyles.bodySmall),
+                            style: AppTextStyles.bodySmall),
                       ],
                     ),
                   ),
@@ -402,11 +732,11 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('Skor Rata-rata',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.textSecondary)),
+                          style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textSecondary)),
                       Text('${result.tasteScore.toStringAsFixed(1)}/5.0',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.warning)),
+                          style: AppTextStyles.titleMedium.copyWith(
+                              color: AppColors.warning)),
                     ],
                   ),
                 ],
@@ -426,9 +756,9 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
         const Row(
           children: [
             Icon(Icons.restaurant_rounded,
-              color: AppColors.primary, size: 20),
+                color: AppColors.primary, size: 20),
             SizedBox(width: 8),
-            const Text('Data Konsumsi', style: AppTextStyles.headlineSmall),
+            Text('Data Konsumsi', style: AppTextStyles.headlineSmall),
           ],
         ),
         const SizedBox(height: 14),
@@ -463,7 +793,6 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                 ],
               ),
               const SizedBox(height: 14),
-              // Progress bar konsumsi
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -471,11 +800,11 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Persentase Dikonsumsi',
-                        style: AppTextStyles.bodySmall),
+                          style: AppTextStyles.bodySmall),
                       Text(
-                        '${result.consumptionPercentage.toStringAsFixed(0)}%',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary)),
+                          '${result.consumptionPercentage.toStringAsFixed(0)}%',
+                          style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.primary)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -486,30 +815,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                       minHeight: 10,
                       backgroundColor: AppColors.cardBorder,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        _getConsumptionColor(result.consumptionPercentage)),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Persentase Sisa',
-                        style: AppTextStyles.bodySmall),
-                      Text(
-                        '${result.leftoverPercentage.toStringAsFixed(0)}%',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.warning)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: result.leftoverPercentage / 100,
-                      minHeight: 10,
-                      backgroundColor: AppColors.cardBorder,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.warning),
+                          _getConsumptionColor(result.consumptionPercentage)),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -520,7 +826,8 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                             ? Icons.check_circle_rounded
                             : Icons.cancel_rounded,
                         color: consumption.isFinished
-                            ? AppColors.success : AppColors.error,
+                            ? AppColors.success
+                            : AppColors.error,
                         size: 16,
                       ),
                       const SizedBox(width: 6),
@@ -529,8 +836,9 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                             ? 'Makanan dihabiskan ✓'
                             : 'Makanan tidak dihabiskan',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: consumption.isFinished
-                              ? AppColors.success : AppColors.error),
+                            color: consumption.isFinished
+                                ? AppColors.success
+                                : AppColors.error),
                       ),
                     ],
                   ),
@@ -553,34 +861,37 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
       ScanProvider scan, NutritionAnalysisResult result) {
     final recs = <String>[];
 
-    // Rekomendasi berdasarkan sensorik
     if (result.tasteScore < 3) {
-      recs.add('Kualitas rasa dinilai kurang. Feedback ini dapat diteruskan ke pengelola dapur MBG.');
+      recs.add(
+          'Kualitas rasa dinilai kurang. Feedback ini dapat diteruskan ke pengelola dapur MBG.');
     }
     if (result.textureScore < 3) {
-      recs.add('Tekstur makanan perlu diperbaiki. Proses memasak dan penyajian perlu diperhatikan.');
+      recs.add(
+          'Tekstur makanan perlu diperbaiki. Proses memasak dan penyajian perlu diperhatikan.');
     }
     if (result.aromaScore < 3) {
-      recs.add('Aroma makanan kurang menarik. Hal ini dapat memengaruhi selera makan.');
+      recs.add(
+          'Aroma makanan kurang menarik. Hal ini dapat memengaruhi selera makan.');
     }
-
-    // Rekomendasi berdasarkan konsumsi
     if (result.consumptionPercentage < 50) {
-      recs.add('Hanya ${result.consumptionPercentage.toStringAsFixed(0)}% makanan dikonsumsi. Perlu investigasi penyebab sisa makanan yang tinggi.');
+      recs.add(
+          'Hanya ${result.consumptionPercentage.toStringAsFixed(0)}% makanan dikonsumsi. Perlu investigasi penyebab sisa makanan yang tinggi.');
     } else if (result.consumptionPercentage >= 90) {
-      recs.add('Makanan dihabiskan dengan baik (${result.consumptionPercentage.toStringAsFixed(0)}%). Program MBG berjalan efektif!');
+      recs.add(
+          'Makanan dihabiskan dengan baik (${result.consumptionPercentage.toStringAsFixed(0)}%). Program MBG berjalan efektif!');
     }
-
-    // Rekomendasi berdasarkan gizi
-    if (result.estimatedCalories < 400) {
-      recs.add('Estimasi kalori yang diserap masih rendah. Pertimbangkan menambah porsi atau variasi menu.');
+    if (result.estimatedCalories < 100) {
+      recs.add(
+          'Estimasi kalori yang diserap masih sangat rendah. Pertimbangkan menambah porsi atau variasi menu.');
     }
-    if (result.estimatedProtein < 10) {
-      recs.add('Asupan protein estimasi masih rendah. Lauk protein hewani/nabati perlu ditingkatkan.');
+    if (result.estimatedProtein < 5) {
+      recs.add(
+          'Asupan protein estimasi masih rendah. Lauk protein hewani/nabati perlu ditingkatkan.');
     }
 
     if (recs.isEmpty) {
-      recs.add('Konsumsi menu MBG hari ini berjalan dengan baik. Pertahankan kebiasaan makan sehat!');
+      recs.add(
+          'Konsumsi menu MBG hari ini berjalan dengan baik. Pertahankan kebiasaan makan sehat!');
     }
 
     return Container(
@@ -598,35 +909,36 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           Row(
             children: [
               const Icon(Icons.psychology_rounded,
-                color: AppColors.primary, size: 20),
+                  color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text('Analisis Cerdas', style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.primary)),
+              Text('Analisis Cerdas',
+                  style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.primary)),
             ],
           ),
           const SizedBox(height: 12),
           ...recs.map((rec) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.circle, size: 6, color: AppColors.primary),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(rec,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textPrimary, height: 1.5)),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.circle, size: 6, color: AppColors.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(rec,
+                          style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textPrimary, height: 1.5)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
           const SizedBox(height: 4),
           Text(
             '⚠️ Informasi ini bukan diagnosis medis. Data sensorik adalah indikator penerimaan makanan, '
             'bukan pengganti data kandungan gizi.',
             style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
-              fontStyle: FontStyle.italic),
+                color: AppColors.textSecondary,
+                fontStyle: FontStyle.italic),
           ),
         ],
       ),
@@ -634,7 +946,31 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
   }
 }
 
-// ─── Sub-widgets ───────────────────────────────────────────────────────────────
+// ─── Data helper ──────────────────────────────────────────────────────────────
+
+class _ComparisonRow {
+  final String label;
+  final String unit;
+  final double actual;
+  final double min;
+  final double max;
+  final String status;
+  final Color color;
+  final String emoji;
+
+  const _ComparisonRow({
+    required this.label,
+    required this.unit,
+    required this.actual,
+    required this.min,
+    required this.max,
+    required this.status,
+    required this.color,
+    required this.emoji,
+  });
+}
+
+// ─── Sub-widgets ──────────────────────────────────────────────────────────────
 
 class _NutritionEstimateCard extends StatelessWidget {
   final String emoji;
@@ -666,14 +1002,17 @@ class _NutritionEstimateCard extends StatelessWidget {
             children: [
               Text(emoji, style: const TextStyle(fontSize: 18)),
               const SizedBox(width: 6),
-              Text(label, style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary)),
+              Text(label,
+                  style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary)),
             ],
           ),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.titleMedium.copyWith(color: color)),
-          Text('Estimasi', style: AppTextStyles.caption.copyWith(
-            color: AppColors.textHint, fontSize: 10)),
+          Text(value,
+              style: AppTextStyles.titleMedium.copyWith(color: color)),
+          Text('Estimasi',
+              style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textHint, fontSize: 10)),
         ],
       ),
     );
@@ -706,26 +1045,29 @@ class _SensoryScoreRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: AppTextStyles.bodyMedium),
-              Text(sublabel, style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary)),
+              Text(sublabel,
+                  style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary)),
               const SizedBox(height: 4),
               Row(
-                children: List.generate(5, (i) => Padding(
-                  padding: const EdgeInsets.only(right: 2),
-                  child: Icon(
-                    i < score.round()
-                        ? Icons.star_rounded
-                        : Icons.star_outline_rounded,
-                    color: i < score.round() ? color : AppColors.cardBorder,
-                    size: 14,
-                  ),
-                )),
+                children: List.generate(
+                    5,
+                    (i) => Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Icon(
+                            i < score.round()
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            color: i < score.round() ? color : AppColors.cardBorder,
+                            size: 14,
+                          ),
+                        )),
               ),
             ],
           ),
         ),
         Text('${score.toStringAsFixed(1)}/5',
-          style: AppTextStyles.labelSmall.copyWith(color: color)),
+            style: AppTextStyles.labelSmall.copyWith(color: color)),
       ],
     );
   }
@@ -758,13 +1100,14 @@ class _ConsumptionStatCard extends StatelessWidget {
         children: [
           Text(emoji, style: const TextStyle(fontSize: 20)),
           const SizedBox(height: 4),
-          Text(label, style: AppTextStyles.caption.copyWith(
-            color: AppColors.textSecondary)),
+          Text(label,
+              style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary)),
           const SizedBox(height: 2),
           Text(value,
-            style: AppTextStyles.titleSmall.copyWith(color: color),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis),
+              style: AppTextStyles.titleSmall.copyWith(color: color),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis),
         ],
       ),
     );

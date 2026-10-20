@@ -13,6 +13,8 @@ import predictionRoutes from './routes/prediction.routes';
 import scanHistoryRoutes from './routes/scan-history.routes';
 import schoolRoutes from './routes/school.routes';
 import statsRoutes from './routes/stats.routes';
+import reportRoutes from './routes/report.routes';
+import adminRoutes from './routes/admin.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
 
@@ -65,6 +67,8 @@ app.use(`${API_PREFIX}/predictions`, predictionRoutes);
 app.use(`${API_PREFIX}/scan-history`, scanHistoryRoutes);
 app.use(`${API_PREFIX}/schools`, schoolRoutes);
 app.use(`${API_PREFIX}/stats`, statsRoutes);
+app.use(`${API_PREFIX}/reports`, reportRoutes);
+app.use(`${API_PREFIX}/admin`, adminRoutes);
 
 // ─── 404 HANDLER ─────────────────────────────────────────────────────
 app.use('*', (req, res) => {

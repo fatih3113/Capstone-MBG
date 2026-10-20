@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rahasia123
+      POSTGRES_DB: mbg_nutrition_db
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mbg_nutrition_db"]
+      interval: 5s
+      retries: 10
+
+  backend-dashboard:
+    build: ./backend-dashboard
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:rahasia123@db:5432/mbg_nutrition_db?schema=public
+      JWT_SECRET_DASHBOARD: ganti_dengan_secret_acak_panjang
+      JWT_EXPIRES_IN: 8h
+      ALLOWED_ORIGINS: http://192.168.56.101:3001
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend-dashboard:
+    build:
+      context: ./frontend-dashboard
+      args:
+        VITE_API_URL: http://192.168.56.101:4000/api/v1
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+
+volumes:
+  pgdata:
