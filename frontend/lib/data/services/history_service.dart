@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
@@ -6,6 +7,15 @@ import '../models/scan_history_model.dart';
 import '../models/prediction_model.dart';
 import '../models/evaluation_model.dart';
 import '../dummy/dummy_data.dart';
+
+/// Ekstrak pesan error dari backend Dio response
+String _backendError(Object e, [String fallback = 'Terjadi kesalahan. Coba lagi.']) {
+  if (e is DioException) {
+    final data = e.response?.data;
+    if (data is Map) return data['message']?.toString() ?? fallback;
+  }
+  return fallback;
+}
 
 /// Service for scan history operations
 class HistoryService {
@@ -41,7 +51,7 @@ class HistoryService {
         message: body['message'] as String? ?? 'Berhasil',
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengambil riwayat scan.'));
     }
   }
 
@@ -96,7 +106,7 @@ class HistoryService {
         (data) => ScanHistoryModel.fromJson(data),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal menyimpan hasil scan.'));
     }
   }
 
@@ -117,7 +127,7 @@ class HistoryService {
         (data) => ScanHistoryModel.fromJson(data),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengambil detail scan.'));
     }
   }
 }

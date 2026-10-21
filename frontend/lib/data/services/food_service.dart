@@ -6,7 +6,7 @@ import '../models/nutrition_model.dart';
 import '../dummy/dummy_data.dart';
 
 class FoodService {
-  static const bool _useMock = true;
+  static const bool _useMock = false;
 
   Future<ApiResponse<List<FoodModel>>> getAllFoods() async {
     if (_useMock) {

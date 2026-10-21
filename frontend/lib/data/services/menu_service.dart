@@ -5,7 +5,7 @@ import '../models/mbg_menu_model.dart';
 import '../dummy/dummy_data.dart';
 
 class MenuService {
-  static const bool _useMock = true;
+  static const bool _useMock = false;
 
   Future<ApiResponse<List<MbgMenuModel>>> getWeeklyMenu({
     String? schoolId,

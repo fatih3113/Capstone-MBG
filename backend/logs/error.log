@@ -1,0 +1,589 @@
+2026-10-21 10:24:35 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:27:19 [error]: [POST] /api/v1/scan-history/save - 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:9
+    at async Proxy._transactionWithCallback (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async ScanHistoryController.saveScan (D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:85:20)
+2026-10-21 10:27:23 [error]: [GET] /api/v1/stats/daily - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getDailyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:20)
+2026-10-21 10:27:23 [error]: [GET] /api/v1/stats/summary - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async Promise.all (index 1)
+    at async StatsController.getSummary (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:103:40)
+2026-10-21 10:27:23 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:27:23 [error]: [GET] /api/v1/nutrition/recommendation - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async NutritionController.getNutritionRecommendation (D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:25)
+2026-10-21 10:31:53 [error]: [POST] /api/v1/scan-history/save - 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:9
+    at async Proxy._transactionWithCallback (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async ScanHistoryController.saveScan (D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:85:20)
+2026-10-21 10:32:10 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:32:10 [error]: [GET] /api/v1/stats/daily - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getDailyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:20)
+2026-10-21 10:32:10 [error]: [GET] /api/v1/stats/summary - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async Promise.all (index 1)
+    at async StatsController.getSummary (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:103:40)
+2026-10-21 10:32:10 [error]: [GET] /api/v1/nutrition/recommendation - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async NutritionController.getNutritionRecommendation (D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:25)
+2026-10-21 10:44:32 [error]: [POST] /api/v1/scan-history/save - 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:9
+    at async Proxy._transactionWithCallback (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async ScanHistoryController.saveScan (D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:85:20)
+2026-10-21 10:44:35 [error]: [GET] /api/v1/stats/daily - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getDailyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:20)
+2026-10-21 10:44:35 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:44:35 [error]: [GET] /api/v1/nutrition/recommendation - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async NutritionController.getNutritionRecommendation (D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:25)
+2026-10-21 10:44:35 [error]: [GET] /api/v1/stats/summary - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async Promise.all (index 1)
+    at async StatsController.getSummary (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:103:40)
+2026-10-21 10:45:24 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:45:49 [error]: [POST] /api/v1/scan-history/save - 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:9
+    at async Proxy._transactionWithCallback (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async ScanHistoryController.saveScan (D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:85:20)
+2026-10-21 10:45:53 [error]: [GET] /api/v1/stats/daily - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:48
+
+  17 const today = new Date();
+  18 today.setHours(0, 0, 0, 0);
+  19 
+→ 20 const data = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getDailyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:20:20)
+2026-10-21 10:45:53 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:45:53 [error]: [GET] /api/v1/nutrition/recommendation - 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:53
+
+  123 // Ambil data hari ini untuk membandingkan
+  124 const today = new Date();
+  125 today.setHours(0, 0, 0, 0);
+→ 126 const todayData = await prisma.dailyNutrition.findUnique(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async NutritionController.getNutritionRecommendation (D:\Project-Capstone\backend\src\controllers\nutrition.controller.ts:126:25)
+2026-10-21 10:45:53 [error]: [GET] /api/v1/stats/summary - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:105:31
+
+  102 
+  103 const [totalScans, weeklyData] = await Promise.all([
+  104   prisma.scanHistory.count({ where: { userId } }),
+→ 105   prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async Promise.all (index 1)
+    at async StatsController.getSummary (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:103:40)
+2026-10-21 10:50:36 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 10:52:25 [error]: [GET] /api/v1/stats/weekly - 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.dailyNutrition.findMany()` invocation in
+D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:48
+
+  37 const sevenDaysAgo = new Date();
+  38 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  39 
+→ 40 const data = await prisma.dailyNutrition.findMany(
+The column `daily_nutrition.calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async StatsController.getWeeklyStats (D:\Project-Capstone\backend\src\controllers\stats.controller.ts:40:20)
+2026-10-21 11:00:55 [error]: [POST] /api/v1/scan-history/save - 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `tx.dailyNutrition.upsert()` invocation in
+D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:33
+
+  115 const today = new Date();
+  116 today.setHours(0, 0, 0, 0);
+  117 
+→ 118 await tx.dailyNutrition.upsert(
+The column `calories_target` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:118:9
+    at async Proxy._transactionWithCallback (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async ScanHistoryController.saveScan (D:\Project-Capstone\backend\src\controllers\scan-history.controller.ts:85:20)

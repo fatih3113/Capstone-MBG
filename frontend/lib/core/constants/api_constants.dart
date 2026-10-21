@@ -1,10 +1,23 @@
 class ApiConstants {
   ApiConstants._();
 
-  // Base URL - replace with actual backend URL
-  static const String baseUrl = 'http://localhost:3000';
+  // ── Base URL ────────────────────────────────────────────────────────────────
+  // Pakai USB + ADB reverse port forwarding:
+  //   Jalankan sekali di terminal PC:
+  //   > adb reverse tcp:3000 tcp:3000
+  //   Setelah itu, 'localhost:3000' di device = backend di PC kamu.
+  //
+  // Kalau TANPA ADB (Wi-Fi biasa), ganti ke IP Wi-Fi PC:
+  //   return 'http://192.168.0.113:$_port';
+  static const String _port = '3000';
+
+  static String get baseUrl {
+    // Dengan ADB reverse, semua platform pakai localhost
+    return 'http://localhost:$_port';
+  }
+
   static const String apiVersion = '/api/v1';
-  static const String apiBase = baseUrl + apiVersion;
+  static String get apiBase => baseUrl + apiVersion;
 
   // Timeout
   static const int connectTimeout = 30000; // ms

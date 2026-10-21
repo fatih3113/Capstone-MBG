@@ -10,6 +10,9 @@ import { MenuRequestsModule } from './menu-requests/menu-requests.module';
 import { FoodRatingsModule } from './food-ratings/food-ratings.module';
 import { FoodFeedbacksModule } from './food-feedbacks/food-feedbacks.module';
 import { NutritionReportsModule } from './nutrition-reports/nutrition-reports.module';
+import { DistributionModule } from './distribution/distribution.module';
+import { FoodsModule } from './foods/foods.module';
+import { SchoolsModule } from './schools/schools.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { NutritionReportsModule } from './nutrition-reports/nutrition-reports.mo
     FoodRatingsModule,
     FoodFeedbacksModule,
     NutritionReportsModule,
+    DistributionModule,
+    FoodsModule,
+    SchoolsModule,
   ],
   providers: [
     // Global rate-limit guard

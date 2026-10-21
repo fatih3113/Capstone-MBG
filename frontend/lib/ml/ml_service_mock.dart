@@ -21,22 +21,24 @@ class MLServiceMock implements MLService {
 
   /// Food classes that the model can identify
   /// These match the MBG food categories
+  // UUID diambil langsung dari tabel Food di PostgreSQL
+  // Jika seed ulang, update ID ini sesuai output: npx ts-node src/database/seed.ts
   static const List<Map<String, String>> _foodClasses = [
-    {'id': 'f1', 'name': 'Nasi Putih'},
-    {'id': 'f2', 'name': 'Ayam Goreng'},
-    {'id': 'f3', 'name': 'Telur Rebus'},
-    {'id': 'f4', 'name': 'Ikan Goreng'},
-    {'id': 'f5', 'name': 'Tempe Goreng'},
-    {'id': 'f6', 'name': 'Tahu Goreng'},
-    {'id': 'f7', 'name': 'Sayur Bayam'},
-    {'id': 'f8', 'name': 'Sayur Wortel'},
-    {'id': 'f9', 'name': 'Pisang'},
-    {'id': 'f10', 'name': 'Jeruk'},
-    {'id': 'f11', 'name': 'Susu Putih'},
-    {'id': 'f12', 'name': 'Mie Goreng'},
-    {'id': 'f13', 'name': 'Perkedel Kentang'},
-    {'id': 'f14', 'name': 'Tumis Kangkung'},
-    {'id': 'f15', 'name': 'Semangka'},
+    {'id': '74891118-6318-4fe2-a4fc-a03b406a6ad9', 'name': 'Nasi Putih'},
+    {'id': 'e1714fae-c4f5-4d2c-84cf-f2430c86693f', 'name': 'Ayam Goreng'},
+    {'id': '93ac6c1a-582a-4693-970b-dfbb1e191647', 'name': 'Telur Rebus'},
+    {'id': 'b1224052-a069-4624-a69c-200616c637e6', 'name': 'Ikan Goreng'},
+    {'id': '95879199-bae9-4750-a87a-9b284402e8ca', 'name': 'Tempe Goreng'},
+    {'id': '78af0063-1b19-406f-b519-1e70d185ab26', 'name': 'Tahu Goreng'},
+    {'id': '6fbd2918-acd9-4df0-a1ca-3a43237148f3', 'name': 'Sayur Bayam'},
+    {'id': '914cb058-b968-49aa-b959-3264b53f46bf', 'name': 'Sayur Wortel'},
+    {'id': '2a88909a-48e5-40e6-9b2e-03aad0837ec0', 'name': 'Pisang'},
+    {'id': 'a36d1548-b04b-453e-9373-787f752b230f', 'name': 'Jeruk'},
+    {'id': '85b47441-6491-4116-8418-5c7e41b9a283', 'name': 'Susu Putih'},
+    {'id': 'bed28f47-5a69-4630-b5f9-c1a0e09bde72', 'name': 'Mie Goreng'},
+    {'id': '982fda0b-5910-486a-95c7-67427a3e2ebf', 'name': 'Perkedel Kentang'},
+    {'id': '23083b4f-26ed-4b34-8a59-b4dd94d1b1e9', 'name': 'Tumis Kangkung'},
+    {'id': 'd8702ef2-cd88-4ac7-94b1-a47921892e45', 'name': 'Semangka'},
   ];
 
   @override

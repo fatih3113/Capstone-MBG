@@ -144,3 +144,73 @@ export interface NutritionStats {
   avgFat: number;
   disclaimer: string;
 }
+
+// ── Distribusi MBG ──────────────────────────────────────────────────────
+export interface DistributionSummary {
+  totalMenuSchedules: number;
+  totalSchoolsCovered: number;
+  totalFoodItems: number;
+  dateRange: { earliest: string | null; latest: string | null };
+}
+
+export interface SchoolTopFood {
+  name: string;
+  category: string;
+  count: number;
+}
+
+export interface SchoolDistribution {
+  schoolId: string;
+  schoolName: string;
+  level: string;
+  city: string | null;
+  menuCount: number;
+  recentDates: string[];
+  topFoods: SchoolTopFood[];
+}
+
+export interface DistributionMenuItem {
+  name: string;
+  category: string;
+  portionGram: number;
+}
+
+export interface DistributionRecord {
+  id: string;
+  date: string;
+  dayName: string;
+  school: { name: string; level: string; city: string | null };
+  foods: DistributionMenuItem[];
+}
+
+export interface School {
+  id: string; name: string; level: string;
+  address: string | null; city: string | null;
+}
+
+export interface FoodOption {
+  id: string; name: string; category: string;
+}
+
+// ── CRUD Makanan ──────────────────────────────────────────────────────
+export interface FoodNutrition {
+  id: string; foodId: string;
+  calories: number; protein: number; carbs: number; fat: number; fiber: number;
+  sugar: number; sodium: number; calcium: number; iron: number;
+  vitaminC: number; vitaminA: number;
+  portionGram: number; cookingMethod: string | null; dataSource: string;
+}
+
+export interface FoodItem {
+  id: string; name: string; category: string;
+  description: string | null; imageUrl: string | null; isActive: boolean;
+  nutrition: FoodNutrition | null;
+}
+
+// ── CRUD Sekolah ───────────────────────────────────────────────────
+export interface SchoolItem {
+  id: string; name: string; level: string;
+  address: string | null; city: string | null;
+  _count: { mbgMenus: number };
+}
+

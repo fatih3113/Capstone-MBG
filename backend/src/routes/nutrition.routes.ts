@@ -5,6 +5,9 @@ import { NutritionController } from '../controllers/nutrition.controller';
 const router = Router();
 const ctrl = new NutritionController();
 
+// GET /api/v1/nutrition?food_ids=id1,id2,...  (dipakai Flutter scan)
+router.get('/', authMiddleware, ctrl.getNutritionByFoodIds);
+
 // GET /api/v1/nutrition/food/:foodId
 router.get('/food/:foodId', authMiddleware, ctrl.getNutritionByFood);
 

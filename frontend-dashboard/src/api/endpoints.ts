@@ -5,6 +5,8 @@ import type {
   FoodRanking, FoodRatingRecord,
   FeedbackSummary, FeedbackRecord,
   NutritionReport, NutritionStats,
+  DistributionSummary, SchoolDistribution, DistributionRecord,
+  School, FoodOption, FoodItem, SchoolItem,
   PaginatedResponse,
 } from '@/types/api.types';
 
@@ -77,3 +79,82 @@ export const nutritionReportsApi = {
   }) =>
     apiClient.get<{ success: boolean; data: PaginatedResponse<NutritionReport> }>('/nutrition-reports', { params }),
 };
+
+// ── Distribusi MBG ke Sekolah ─────────────────────────────────
+export const distributionApi = {
+  summary: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get<{ success: boolean; data: DistributionSummary }>('/distribution/summary', { params }),
+
+  perSchool: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get<{ success: boolean; data: SchoolDistribution[] }>('/distribution/per-school', { params }),
+
+  timeline: (params?: {
+    startDate?: string; endDate?: string; page?: number; limit?: number;
+  }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<DistributionRecord> }>('/distribution/timeline', { params }),
+
+  // ── Helpers dropdown ─────────────────────────────────────────
+  getSchools: () =>
+    apiClient.get<{ success: boolean; data: School[] }>('/distribution/schools'),
+
+  getFoods: () =>
+    apiClient.get<{ success: boolean; data: FoodOption[] }>('/distribution/foods'),
+
+  // ── CRUD ─────────────────────────────────────────────────────
+  createSchedule: (body: {
+    schoolId: string; date: string;
+    items: { foodId: string; portionGram: number }[];
+  }) =>
+    apiClient.post<{ success: boolean; message: string; data: any }>('/distribution/schedule', body),
+
+  updateSchedule: (id: string, body: {
+    schoolId?: string; date?: string;
+    items?: { foodId: string; portionGram: number }[];
+  }) =>
+    apiClient.put<{ success: boolean; message: string; data: any }>(`/distribution/schedule/${id}`, body),
+
+  deleteSchedule: (id: string) =>
+    apiClient.delete<{ success: boolean; message: string }>(`/distribution/schedule/${id}`),
+};
+
+// ── Makanan (Foods CRUD) ────────────────────────────────────────────
+export const foodsApi = {
+  categories: () =>
+    apiClient.get<{ success: boolean; data: string[] }>('/foods/categories'),
+
+  list: (params?: {
+    category?: string; search?: string; isActive?: string; page?: number; limit?: number;
+  }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<FoodItem> }>('/foods', { params }),
+
+  findOne: (id: string) =>
+    apiClient.get<{ success: boolean; data: FoodItem }>(`/foods/${id}`),
+
+  create: (body: Partial<FoodItem> & { nutrition?: Record<string, number | string> }) =>
+    apiClient.post<{ success: boolean; message: string; data: FoodItem }>('/foods', body),
+
+  update: (id: string, body: Partial<FoodItem> & { nutrition?: Record<string, number | string> }) =>
+    apiClient.put<{ success: boolean; message: string; data: FoodItem }>(`/foods/${id}`, body),
+
+  toggle: (id: string) =>
+    apiClient.patch<{ success: boolean; message: string; data: FoodItem }>(`/foods/${id}/toggle`),
+
+  delete: (id: string) =>
+    apiClient.delete<{ success: boolean; message: string }>(`/foods/${id}`),
+};
+
+// ── Sekolah (Schools CRUD) ───────────────────────────────────
+export const schoolsApi = {
+  list: (params?: { search?: string; level?: string; page?: number; limit?: number }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<SchoolItem> }>('/schools', { params }),
+
+  create: (body: { name: string; level: string; address?: string; city?: string }) =>
+    apiClient.post<{ success: boolean; message: string; data: SchoolItem }>('/schools', body),
+
+  update: (id: string, body: { name?: string; level?: string; address?: string; city?: string }) =>
+    apiClient.put<{ success: boolean; message: string; data: SchoolItem }>(`/schools/${id}`, body),
+
+  delete: (id: string) =>
+    apiClient.delete<{ success: boolean; message: string }>(`/schools/${id}`),
+};
+

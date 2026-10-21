@@ -56,10 +56,14 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // Token expired - clear local session
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(AppConstants.keyToken);
-      await prefs.remove(AppConstants.keyUser);
+      // Hanya hapus sesi jika 401 bukan dari endpoint login (login salah password ≠ sesi expired)
+      final path = err.requestOptions.path;
+      final isLoginEndpoint = path.contains('/auth/login') || path.contains('/auth/register');
+      if (!isLoginEndpoint) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(AppConstants.keyToken);
+        await prefs.remove(AppConstants.keyUser);
+      }
     }
     handler.next(err);
   }

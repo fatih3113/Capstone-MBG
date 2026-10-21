@@ -44,6 +44,7 @@ class ScanProvider extends ChangeNotifier {
   List<NutritionModel> _nutritionResults = [];
   NutritionModel _totalNutrition = NutritionModel.zero();
   String? _errorMessage;
+  String? _saveError;      // Error saat simpan ke DB (non-fatal)
   String _statusMessage = '';
   bool _isSaved = false;
 
@@ -60,6 +61,7 @@ class ScanProvider extends ChangeNotifier {
   List<NutritionModel> get nutritionResults => _nutritionResults;
   NutritionModel get totalNutrition => _totalNutrition;
   String? get errorMessage => _errorMessage;
+  String? get saveError => _saveError;
   String get statusMessage => _statusMessage;
   bool get isSaved => _isSaved;
   SensoryData? get sensoryData => _sensoryData;
@@ -185,8 +187,15 @@ class ScanProvider extends ChangeNotifier {
         consumption: _consumptionData!,
       );
 
-      // Simpan ke riwayat
-      await _saveToHistory(userId);
+      // Simpan ke riwayat database
+      try {
+        await _saveToHistory(userId);
+        debugPrint('[ScanProvider] ✅ Scan berhasil disimpan ke database');
+      } catch (saveErr) {
+        _saveError = saveErr.toString();
+        debugPrint('[ScanProvider] ⚠️ Gagal simpan ke DB: $saveErr');
+        // Non-fatal: user tetap bisa lihat hasil analisis
+      }
 
       _status = ScanStatus.done;
       _statusMessage = 'Analisis gizi selesai!';
@@ -200,7 +209,7 @@ class ScanProvider extends ChangeNotifier {
 
   Future<void> _saveToHistory(String userId) async {
     if (_selectedImage == null || _analysisResult == null) return;
-    await _historyService.saveScan(
+    final result = await _historyService.saveScan(
       userId: userId,
       imageFile: _selectedImage!,
       predictions: _predictions,
@@ -212,6 +221,9 @@ class ScanProvider extends ChangeNotifier {
       sensoryData: _sensoryData,
       consumptionData: _consumptionData,
     );
+    if (!result.success) {
+      throw Exception(result.message);
+    }
     _isSaved = true;
   }
 
@@ -226,6 +238,7 @@ class ScanProvider extends ChangeNotifier {
     _consumptionData = null;
     _analysisResult = null;
     _errorMessage = null;
+    _saveError = null;
     _statusMessage = '';
     _isSaved = false;
     notifyListeners();

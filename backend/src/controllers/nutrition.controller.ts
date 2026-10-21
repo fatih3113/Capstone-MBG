@@ -8,6 +8,31 @@ const prisma = new PrismaClient();
 export class NutritionController {
 
   /**
+   * GET /nutrition?food_ids=id1,id2,...
+   * Ambil data gizi untuk beberapa food sekaligus (dipakai oleh Flutter scan)
+   */
+  getNutritionByFoodIds = async (req: JwtRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { food_ids } = req.query as Record<string, string>;
+      if (!food_ids) {
+        res.status(400).json(ApiResponse.error('Parameter food_ids wajib diisi', 400));
+        return;
+      }
+
+      const ids = food_ids.split(',').map((id) => id.trim()).filter(Boolean);
+
+      const nutritions = await prisma.nutrition.findMany({
+        where: { foodId: { in: ids } },
+        include: { food: { select: { id: true, name: true, category: true } } },
+      });
+
+      res.json(ApiResponse.success(nutritions));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * GET /nutrition/food/:foodId
    * Ambil data gizi berdasarkan foodId
    */

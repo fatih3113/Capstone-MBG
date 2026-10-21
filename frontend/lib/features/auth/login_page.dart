@@ -197,32 +197,6 @@ class _LoginPageState extends State<LoginPage>
                           color: Colors.white, size: 18),
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // Demo hint
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryLighter,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.secondary.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline,
-                            color: AppColors.secondary, size: 16),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Demo: Gunakan email apa saja + password ≥ 6 karakter',
-                              style: AppTextStyles.caption.copyWith(
-                                color: AppColors.secondary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     const SizedBox(height: 32),
 
                     // Register link

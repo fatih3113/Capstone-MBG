@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../core/constants/app_constants.dart';
@@ -11,7 +12,7 @@ import '../dummy/dummy_data.dart';
 /// Uses mock data when USE_MOCK = true.
 /// Toggle to false and set real base URL for production.
 class AuthService {
-  static const bool _useMock = true; // Toggle for production
+  static const bool _useMock = false; // Toggle for production
 
   // ─── LOGIN ────────────────────────────────────────────────────────
   Future<ApiResponse<Map<String, dynamic>>> login({
@@ -25,9 +26,29 @@ class AuthService {
         ApiConstants.login,
         data: {'email': email, 'password': password},
       );
-      return ApiResponse.fromJson(response.data, (data) => data as Map<String, dynamic>);
+      final apiResponse = ApiResponse.fromJson(
+        response.data,
+        (data) => data as Map<String, dynamic>,
+      );
+      // Simpan token ke SharedPreferences agar request berikutnya terautentikasi
+      if (apiResponse.success && apiResponse.data != null) {
+        final token = apiResponse.data!['token'] as String?;
+        if (token != null && token.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(AppConstants.keyToken, token);
+        }
+      }
+      return apiResponse;
+    } on DioException catch (e) {
+      // Ambil pesan error dari response backend jika ada
+      final backendMessage = e.response?.data is Map
+          ? (e.response!.data as Map)['message'] as String?
+          : null;
+      return ApiResponse.error(
+        message: backendMessage ?? e.message ?? 'Login gagal. Periksa email dan password.',
+      );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: 'Terjadi kesalahan. Silakan coba lagi.');
     }
   }
 

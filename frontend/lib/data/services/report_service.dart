@@ -1,7 +1,17 @@
+import 'package:dio/dio.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_response.dart';
 import '../models/report_models.dart';
+
+/// Ekstrak pesan error dari backend Dio response
+String _backendError(Object e, [String fallback = 'Terjadi kesalahan. Coba lagi.']) {
+  if (e is DioException) {
+    final data = e.response?.data;
+    if (data is Map) return data['message']?.toString() ?? fallback;
+  }
+  return fallback;
+}
 
 /// Service untuk semua fitur Report MBG:
 /// - Permintaan Menu
@@ -9,7 +19,7 @@ import '../models/report_models.dart';
 /// - Feedback Makanan & Status Konsumsi
 class ReportService {
   // Toggle ke false untuk koneksi API nyata
-  static const bool _useMock = true;
+  static const bool _useMock = false;
 
   // ═══════════════════════════════════════════════
   // MENU REQUESTS
@@ -46,7 +56,7 @@ class ReportService {
         (data) => MenuRequestModel.fromJson(data as Map<String, dynamic>),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengirim usulan menu.'));
     }
   }
 
@@ -65,7 +75,7 @@ class ReportService {
             .toList(),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengambil riwayat usulan.'));
     }
   }
 
@@ -110,7 +120,7 @@ class ReportService {
         (data) => FoodRatingModel.fromJson(data as Map<String, dynamic>),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal menyimpan rating.'));
     }
   }
 
@@ -138,7 +148,7 @@ class ReportService {
             .toList(),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengambil ranking.'));
     }
   }
 
@@ -157,7 +167,7 @@ class ReportService {
             .toList(),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengambil rating.'));
     }
   }
 
@@ -217,7 +227,7 @@ class ReportService {
         (data) => FoodFeedbackModel.fromJson(data as Map<String, dynamic>),
       );
     } catch (e) {
-      return ApiResponse.error(message: e.toString());
+      return ApiResponse.error(message: _backendError(e, 'Gagal mengirim feedback.'));
     }
   }
 

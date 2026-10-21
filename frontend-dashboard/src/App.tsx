@@ -7,6 +7,9 @@ import MenuRequestsPage from '@/pages/MenuRequestsPage';
 import FoodRatingsPage from '@/pages/FoodRatingsPage';
 import FeedbackPage from '@/pages/FeedbackPage';
 import NutritionPage from '@/pages/NutritionPage';
+import DistributionPage from '@/pages/DistributionPage';
+import FoodsPage from '@/pages/FoodsPage';
+import SchoolsPage from '@/pages/SchoolsPage';
 
 export default function App() {
   return (
@@ -23,6 +26,9 @@ export default function App() {
             <Route path="food-ratings" element={<FoodRatingsPage />} />
             <Route path="feedback" element={<FeedbackPage />} />
             <Route path="nutrition" element={<NutritionPage />} />
+            <Route path="distribution" element={<DistributionPage />} />
+            <Route path="foods" element={<FoodsPage />} />
+            <Route path="schools" element={<SchoolsPage />} />
           </Route>
 
           {/* Fallback */}
