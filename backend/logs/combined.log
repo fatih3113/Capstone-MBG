@@ -630,3 +630,13 @@ The column `calories_target` does not exist in the current database.
 2026-10-21 11:03:15 [info]: User logged in: siswa@mbg.test
 2026-10-21 11:50:07 [info]: 🚀 MBG Nutrition API running on port 3000
 2026-10-21 11:50:07 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-25 09:54:13 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-25 09:54:13 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-25 09:58:44 [info]: New user registered: fatih@gmail.com
+2026-10-25 09:58:55 [info]: User logged in: fatih@gmail.com
+2026-10-25 09:59:38 [info]: User logged in: fatih@gmail.com
+2026-10-25 10:03:45 [info]: User logged in: fatih@gmail.com
+2026-10-25 10:10:49 [info]: New user registered: fatihmubarok850@gmail.com
+2026-10-25 10:11:08 [info]: User logged in: fatihmubarok850@gmail.com
+2026-10-25 11:05:06 [info]: New user registered: fatihmubarok3113@gmail.com
+2026-10-25 11:05:24 [info]: User logged in: fatihmubarok3113@gmail.com

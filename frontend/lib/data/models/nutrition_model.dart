@@ -34,22 +34,31 @@ class NutritionModel {
   });
 
   factory NutritionModel.fromJson(Map<String, dynamic> json) {
+    // Backend (Prisma) mengirim camelCase (foodId, vitaminC, ...) dan nama
+    // makanan ada di json['food']['name']. Format snake_case tetap didukung.
+    double num0(dynamic v) => (v as num?)?.toDouble() ?? 0;
+    final food = json['food'] as Map<String, dynamic>?;
+
     return NutritionModel(
       id: json['id']?.toString() ?? '',
-      foodId: json['food_id']?.toString() ?? '',
-      foodName: json['food_name'] as String? ?? '',
-      calories: (json['calories'] as num?)?.toDouble() ?? 0,
-      protein: (json['protein'] as num?)?.toDouble() ?? 0,
-      carbs: (json['carbs'] as num?)?.toDouble() ?? 0,
-      fat: (json['fat'] as num?)?.toDouble() ?? 0,
-      fiber: (json['fiber'] as num?)?.toDouble() ?? 0,
-      sugar: (json['sugar'] as num?)?.toDouble() ?? 0,
-      sodium: (json['sodium'] as num?)?.toDouble() ?? 0,
-      calcium: (json['calcium'] as num?)?.toDouble() ?? 0,
-      iron: (json['iron'] as num?)?.toDouble() ?? 0,
-      vitaminC: (json['vitamin_c'] as num?)?.toDouble() ?? 0,
-      vitaminA: (json['vitamin_a'] as num?)?.toDouble() ?? 0,
-      portionGram: (json['portion_gram'] as num?)?.toDouble() ?? 100,
+      foodId: (json['food_id'] ?? json['foodId'] ?? food?['id'])?.toString() ?? '',
+      foodName: (json['food_name'] ?? json['foodName'] ?? food?['name'])
+              as String? ??
+          '',
+      calories: num0(json['calories']),
+      protein: num0(json['protein']),
+      carbs: num0(json['carbs']),
+      fat: num0(json['fat']),
+      fiber: num0(json['fiber']),
+      sugar: num0(json['sugar']),
+      sodium: num0(json['sodium']),
+      calcium: num0(json['calcium']),
+      iron: num0(json['iron']),
+      vitaminC: num0(json['vitamin_c'] ?? json['vitaminC']),
+      vitaminA: num0(json['vitamin_a'] ?? json['vitaminA']),
+      portionGram: (json['portion_gram'] ?? json['portionGram']) != null
+          ? num0(json['portion_gram'] ?? json['portionGram'])
+          : 100,
     );
   }
 

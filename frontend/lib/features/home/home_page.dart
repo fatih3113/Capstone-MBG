@@ -123,24 +123,29 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${_getGreeting()},',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: Colors.white70),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '$userName 👋',
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: Colors.white),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${_getGreeting()},',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: Colors.white70),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$userName 👋',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 12),
               GestureDetector(
                 onTap: () => context.go('/profile'),
                 child: Container(
