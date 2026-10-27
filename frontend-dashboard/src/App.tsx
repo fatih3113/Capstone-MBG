@@ -3,13 +3,13 @@ import { AuthProvider } from '@/hooks/useAuth';
 import Layout from '@/components/layout/Layout';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
-import MenuRequestsPage from '@/pages/MenuRequestsPage';
+import MenuRequestsPage from '@/pages/menu-requests';
 import FoodRatingsPage from '@/pages/FoodRatingsPage';
 import FeedbackPage from '@/pages/FeedbackPage';
 import NutritionPage from '@/pages/NutritionPage';
-import DistributionPage from '@/pages/DistributionPage';
-import FoodsPage from '@/pages/FoodsPage';
-import SchoolsPage from '@/pages/SchoolsPage';
+import DistributionPage from '@/pages/distribution';
+import FoodsPage from '@/pages/foods';
+import SchoolsPage from '@/pages/schools';
 
 export default function App() {
   return (
