@@ -13,6 +13,8 @@ import 'data/services/history_service.dart';
 import 'data/services/menu_service.dart';
 import 'data/services/stats_service.dart';
 import 'providers/nutrition_provider.dart';
+import 'providers/sppg_provider.dart';
+import 'data/services/sppg_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +57,11 @@ class MbgNutritionApp extends StatelessWidget {
         // Nutrition Stats
         ChangeNotifierProvider(
           create: (_) => NutritionProvider(StatsService()),
+        ),
+
+        // SPPG (untuk dropdown wilayah di halaman Register)
+        ChangeNotifierProvider(
+          create: (_) => SppgProvider(SppgService()),
         ),
       ],
       child: Consumer<ThemeProvider>(

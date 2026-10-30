@@ -11,6 +11,12 @@ class UserModel {
   final String? schoolLevel; // SD, SMP, SMA, SMK
   final DateTime createdAt;
 
+  // SPPG info (dari login response)
+  final String? sppgId;
+  final String? sppgName;
+  final String? provinsi;
+  final String? kabupatenKota;
+
   const UserModel({
     required this.id,
     required this.name,
@@ -23,6 +29,10 @@ class UserModel {
     this.profileImageUrl,
     this.schoolLevel,
     required this.createdAt,
+    this.sppgId,
+    this.sppgName,
+    this.provinsi,
+    this.kabupatenKota,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +50,10 @@ class UserModel {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),
+      sppgId: json['sppg_id'] as String?,
+      sppgName: json['sppg_name'] as String?,
+      provinsi: json['provinsi'] as String?,
+      kabupatenKota: json['kabupaten_kota'] as String?,
     );
   }
 
@@ -56,6 +70,10 @@ class UserModel {
       'profile_image_url': profileImageUrl,
       'school_level': schoolLevel,
       'created_at': createdAt.toIso8601String(),
+      'sppg_id': sppgId,
+      'sppg_name': sppgName,
+      'provinsi': provinsi,
+      'kabupaten_kota': kabupatenKota,
     };
   }
 
@@ -71,6 +89,10 @@ class UserModel {
     String? profileImageUrl,
     String? schoolLevel,
     DateTime? createdAt,
+    String? sppgId,
+    String? sppgName,
+    String? provinsi,
+    String? kabupatenKota,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -84,6 +106,10 @@ class UserModel {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       schoolLevel: schoolLevel ?? this.schoolLevel,
       createdAt: createdAt ?? this.createdAt,
+      sppgId: sppgId ?? this.sppgId,
+      sppgName: sppgName ?? this.sppgName,
+      provinsi: provinsi ?? this.provinsi,
+      kabupatenKota: kabupatenKota ?? this.kabupatenKota,
     );
   }
 

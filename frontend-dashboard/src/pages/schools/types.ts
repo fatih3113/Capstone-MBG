@@ -3,6 +3,7 @@ export interface SchoolForm {
   level: string;
   address: string;
   city: string;
+  sppgId: string;
 }
 
 export const emptySchoolForm = (): SchoolForm => ({
@@ -10,6 +11,7 @@ export const emptySchoolForm = (): SchoolForm => ({
   level: '',
   address: '',
   city: '',
+  sppgId: '',
 });
 
 export const LEVELS = ['SD', 'SMP', 'SMA', 'SMK', 'Posyandu', 'Puskesmas', 'Lainnya'];

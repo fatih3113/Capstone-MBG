@@ -31,6 +31,10 @@ export const validateRegister = [
     .optional()
     .isInt({ min: 5, max: 100 })
     .withMessage('Umur harus antara 5-100 tahun'),
+  body('sppg_id')
+    .optional()
+    .isUUID()
+    .withMessage('Format sppg_id tidak valid'),
 ];
 
 export const validateSaveScan = [

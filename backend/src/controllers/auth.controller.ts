@@ -23,13 +23,26 @@ export class AuthController {
         return;
       }
 
-      const { name, email, password, school_id, class: className, gender, age } = req.body;
+      const { name, email, password, school_id, sppg_id, class: className, gender, age } = req.body;
 
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
         res.status(409).json(ApiResponse.error('Email sudah terdaftar', 409));
         return;
+      }
+
+      // Validasi sppg_id jika disertakan
+      if (sppg_id) {
+        const sppg = await prisma.sppg.findUnique({ where: { id: sppg_id } });
+        if (!sppg) {
+          res.status(422).json(ApiResponse.error('SPPG tidak ditemukan', 422));
+          return;
+        }
+        if (!sppg.isActive) {
+          res.status(422).json(ApiResponse.error('SPPG yang dipilih sudah tidak aktif', 422));
+          return;
+        }
       }
 
       // Hash password
@@ -42,6 +55,7 @@ export class AuthController {
           email,
           passwordHash,
           schoolId: school_id,
+          sppgId: sppg_id,
           class_: className,
           gender,
           age: age ? parseInt(age) : null,
@@ -76,7 +90,10 @@ export class AuthController {
       // Find user
       const user = await prisma.user.findUnique({
         where: { email },
-        include: { school: { select: { name: true } } },
+        include: {
+          school: { select: { name: true } },
+          sppg: { select: { nama: true, provinsi: true, kabupatenKota: true } },
+        },
       });
 
       if (!user) {
@@ -107,6 +124,10 @@ export class AuthController {
         gender: user.gender,
         age: user.age,
         school_level: user.schoolLevel,
+        sppg_id: user.sppgId,
+        sppg_name: user.sppg?.nama ?? null,
+        provinsi: user.sppg?.provinsi ?? null,
+        kabupaten_kota: user.sppg?.kabupatenKota ?? null,
       };
 
       logger.info(`User logged in: ${email}`);

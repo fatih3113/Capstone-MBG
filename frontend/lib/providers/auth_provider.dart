@@ -66,6 +66,7 @@ class AuthProvider extends ChangeNotifier {
     required String password,
     String? gender,
     int? age,
+    String? sppgId,
   }) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
@@ -77,6 +78,7 @@ class AuthProvider extends ChangeNotifier {
       password: password,
       gender: gender,
       age: age,
+      sppgId: sppgId,
     );
 
     if (response.success) {

@@ -10,6 +10,7 @@ import NutritionPage from '@/pages/NutritionPage';
 import DistributionPage from '@/pages/distribution';
 import FoodsPage from '@/pages/foods';
 import SchoolsPage from '@/pages/schools';
+import SppgRegionsPage from '@/pages/SppgRegionsPage';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="distribution" element={<DistributionPage />} />
             <Route path="foods" element={<FoodsPage />} />
             <Route path="schools" element={<SchoolsPage />} />
+            <Route path="sppg" element={<SppgRegionsPage />} />
           </Route>
 
           {/* Fallback */}

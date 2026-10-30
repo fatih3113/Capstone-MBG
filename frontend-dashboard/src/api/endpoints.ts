@@ -7,6 +7,7 @@ import type {
   NutritionReport, NutritionStats,
   DistributionSummary, SchoolDistribution, DistributionRecord,
   School, FoodOption, FoodItem, SchoolItem,
+  SppgItem, SppgRegionSummary, SppgOption,
   PaginatedResponse,
 } from '@/types/api.types';
 
@@ -151,10 +152,44 @@ export const schoolsApi = {
   create: (body: { name: string; level: string; address?: string; city?: string }) =>
     apiClient.post<{ success: boolean; message: string; data: SchoolItem }>('/schools', body),
 
-  update: (id: string, body: { name?: string; level?: string; address?: string; city?: string }) =>
+  update: (id: string, body: { name?: string; level?: string; address?: string; city?: string; sppgId?: string | null }) =>
     apiClient.put<{ success: boolean; message: string; data: SchoolItem }>(`/schools/${id}`, body),
 
   delete: (id: string) =>
     apiClient.delete<{ success: boolean; message: string }>(`/schools/${id}`),
 };
 
+// ── SPPG (Wilayah SPPG) ──────────────────────────────────────────────
+export const sppgApi = {
+  list: (params?: {
+    search?: string; provinsi?: string; kabupatenKota?: string;
+    isActive?: string; page?: number; limit?: number;
+  }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<SppgItem> }>('/sppg', { params }),
+
+  findOne: (id: string) =>
+    apiClient.get<{ success: boolean; data: SppgItem }>(`/sppg/${id}`),
+
+  regionsSummary: () =>
+    apiClient.get<{ success: boolean; data: SppgRegionSummary }>('/sppg/regions/summary'),
+
+  provinsiDetail: (provinsi: string) =>
+    apiClient.get<{ success: boolean; data: SppgItem[] }>(`/sppg/regions/${encodeURIComponent(provinsi)}`),
+
+  create: (body: {
+    nama: string; kode?: string; provinsi: string; kabupatenKota: string;
+    kecamatan: string; kelurahanDesa: string; alamat?: string;
+    latitude?: number; longitude?: number; isActive?: boolean;
+  }) =>
+    apiClient.post<{ success: boolean; message: string; data: SppgItem }>('/sppg', body),
+
+  update: (id: string, body: Partial<{
+    nama: string; kode: string; provinsi: string; kabupatenKota: string;
+    kecamatan: string; kelurahanDesa: string; alamat: string;
+    latitude: number; longitude: number; isActive: boolean;
+  }>) =>
+    apiClient.patch<{ success: boolean; message: string; data: SppgItem }>(`/sppg/${id}`, body),
+
+  delete: (id: string) =>
+    apiClient.delete<{ success: boolean; message: string }>(`/sppg/${id}`),
+};

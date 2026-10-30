@@ -99,4 +99,8 @@ class ApiConstants {
   static const String adminFoodRatingsAll = '/reports/food-ratings';
   static const String adminFeedbacksAll = '/reports/food-feedbacks';
   static const String adminFeedbackSummary = '/reports/food-feedbacks/summary';
+
+  // SPPG endpoints (publik — digunakan saat register)
+  static const String sppg = '/sppg';
+  static const String sppgRegions = '/sppg/regions';
 }

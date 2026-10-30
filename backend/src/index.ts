@@ -15,6 +15,7 @@ import schoolRoutes from './routes/school.routes';
 import statsRoutes from './routes/stats.routes';
 import reportRoutes from './routes/report.routes';
 import adminRoutes from './routes/admin.routes';
+import sppgRoutes from './routes/sppg.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
 
@@ -69,6 +70,7 @@ app.use(`${API_PREFIX}/schools`, schoolRoutes);
 app.use(`${API_PREFIX}/stats`, statsRoutes);
 app.use(`${API_PREFIX}/reports`, reportRoutes);
 app.use(`${API_PREFIX}/admin`, adminRoutes);
+app.use(`${API_PREFIX}/sppg`, sppgRoutes);
 
 // ─── 404 HANDLER ─────────────────────────────────────────────────────
 app.use('*', (req, res) => {

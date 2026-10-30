@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { schoolsApi } from '@/api/endpoints';
+import { useState, useEffect } from 'react';
+import { schoolsApi, sppgApi } from '@/api/endpoints';
 import { X, Check } from 'lucide-react';
 import { LEVELS, emptySchoolForm } from './types';
 import type { SchoolForm } from './types';
+import type { SppgItem } from '@/types/api.types';
 
 interface SchoolCreateProps {
   onSuccess: () => void;
@@ -13,12 +14,24 @@ export default function SchoolCreate({ onSuccess, onClose }: SchoolCreateProps) 
   const [form, setForm] = useState<SchoolForm>(emptySchoolForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [sppgOptions, setSppgOptions] = useState<SppgItem[]>([]);
+
+  useEffect(() => {
+    sppgApi.list({ isActive: 'true', limit: 100 })
+      .then((r) => { if (r.data.success) setSppgOptions(r.data.data.records); })
+      .catch(() => {});
+  }, []);
 
   const handleSave = async () => {
     if (!form.name.trim() || !form.level) { setError('Nama dan jenjang wajib diisi.'); return; }
     setSaving(true); setError('');
     try {
-      const body = { name: form.name, level: form.level, address: form.address || undefined, city: form.city || undefined };
+      const body = {
+        name: form.name, level: form.level,
+        address: form.address || undefined,
+        city: form.city || undefined,
+        sppgId: form.sppgId || undefined,
+      };
       const res = await schoolsApi.create(body);
       if (!res.data.success) { setError(res.data.message); setSaving(false); return; }
       onSuccess();
@@ -64,6 +77,19 @@ export default function SchoolCreate({ onSuccess, onClose }: SchoolCreateProps) 
             <label className="form-label" htmlFor="sch-city">Kota / Kabupaten</label>
             <input id="sch-city" className="form-input" value={form.city} placeholder="cth. Jakarta Selatan"
               onChange={(e) => setForm({ ...form, city: e.target.value })} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="sch-sppg">SPPG (opsional)</label>
+            <select id="sch-sppg" className="form-input" value={form.sppgId}
+              onChange={(e) => setForm({ ...form, sppgId: e.target.value })}>
+              <option value="">— Tidak terhubung ke SPPG —</option>
+              {sppgOptions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nama} — {s.kabupatenKota}, {s.provinsi}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="modal__footer">

@@ -211,6 +211,84 @@ export interface FoodItem {
 export interface SchoolItem {
   id: string; name: string; level: string;
   address: string | null; city: string | null;
+  sppgId: string | null;
+  sppg: { id: string; nama: string; provinsi: string; kabupatenKota: string } | null;
   _count: { mbgMenus: number };
 }
 
+// ── SPPG ─────────────────────────────────────────────────────────
+export interface SppgItem {
+  id: string;
+  kode: string | null;
+  nama: string;
+  provinsi: string;
+  kabupatenKota: string;
+  kecamatan: string;
+  kelurahanDesa: string;
+  alamat: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count: { users: number; schools: number };
+}
+
+export interface SppgSummaryStats {
+  totalSppg: number;
+  totalProvinsi: number;
+  totalKabupaten: number;
+  totalSiswa: number;
+}
+
+export interface SppgListItem {
+  id: string;
+  kode: string | null;
+  nama: string;
+  kecamatan: string;
+  kelurahanDesa: string;
+  alamat: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  jumlahSekolah: number;
+  jumlahSiswaTerdaftar: number;
+  jumlahScan: number;
+  rataRataRating: number | null;
+  distribusiKonsumsi: Record<string, number>;
+}
+
+export interface SppgKecamatan {
+  kecamatan: string;
+  sppgList: SppgListItem[];
+  jumlahSppg: number;
+}
+
+export interface SppgKabupaten {
+  kabupatenKota: string;
+  kecamatanList: SppgKecamatan[];
+  jumlahSppg: number;
+  jumlahSekolah: number;
+  jumlahSiswaTerdaftar: number;
+}
+
+export interface SppgProvinsi {
+  provinsi: string;
+  kabupatenList: SppgKabupaten[];
+  jumlahSppg: number;
+  jumlahSekolah: number;
+  jumlahSiswaTerdaftar: number;
+}
+
+export interface SppgRegionSummary {
+  summary: SppgSummaryStats;
+  wilayah: SppgProvinsi[];
+}
+
+export interface SppgOption {
+  id: string;
+  kode: string | null;
+  nama: string;
+  provinsi: string;
+  kabupatenKota: string;
+  kecamatan: string;
+}
