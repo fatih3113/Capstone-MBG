@@ -16,6 +16,7 @@ import statsRoutes from './routes/stats.routes';
 import reportRoutes from './routes/report.routes';
 import adminRoutes from './routes/admin.routes';
 import sppgRoutes from './routes/sppg.routes';
+import notificationRoutes from './routes/notification.routes'; // ← BARU
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
 
@@ -24,19 +25,54 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_PREFIX = '/api/v1';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// ─── CORS ─────────────────────────────────────────────────────────────
+// Daftar origin tambahan dari .env, contoh:
+// ALLOWED_ORIGINS=https://app-anda.com,https://dashboard-anda.com
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+// Flutter Web memakai port acak saat development, jadi semua localhost diizinkan
+// (hanya di luar production).
+const localhostRegex = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Request tanpa origin (Postman, curl, aplikasi mobile) → izinkan
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (!isProduction && localhostRegex.test(origin)) return callback(null, true);
+
+    logger.warn(`CORS ditolak untuk origin: ${origin}`);
+    return callback(null, false); // tidak melempar error → respons tetap rapi
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
 
 // ─── SECURITY MIDDLEWARE ──────────────────────────────────────────────
-app.use(helmet());
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-  credentials: true,
-}));
+// CORS dipasang paling awal agar preflight (OPTIONS) selalu terjawab
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+app.use(
+  helmet({
+    // Agar gambar di /uploads bisa dimuat dari origin lain (Flutter/dashboard)
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: isProduction ? 100 : 1000, // lebih longgar saat development
   message: { success: false, message: 'Terlalu banyak permintaan, coba lagi nanti.' },
+  skip: (req) => req.method === 'OPTIONS', // preflight tidak dihitung
 });
 app.use(limiter);
 
@@ -71,6 +107,7 @@ app.use(`${API_PREFIX}/stats`, statsRoutes);
 app.use(`${API_PREFIX}/reports`, reportRoutes);
 app.use(`${API_PREFIX}/admin`, adminRoutes);
 app.use(`${API_PREFIX}/sppg`, sppgRoutes);
+app.use(`${API_PREFIX}/notifications`, notificationRoutes); // ← BARU
 
 // ─── 404 HANDLER ─────────────────────────────────────────────────────
 app.use('*', (req, res) => {

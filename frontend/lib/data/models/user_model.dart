@@ -1,3 +1,5 @@
+import '../../core/constants/allergy_constants.dart';
+
 class UserModel {
   final String id;
   final String name;
@@ -17,6 +19,12 @@ class UserModel {
   final String? provinsi;
   final String? kabupatenKota;
 
+  // Alergi makanan (hanya untuk pemilik akun)
+  // allergyFilled = false → belum diisi; true + allergies kosong → "Tidak ada alergi"
+  final List<String> allergies;
+  final String? allergyOther;
+  final bool allergyFilled;
+
   const UserModel({
     required this.id,
     required this.name,
@@ -33,6 +41,9 @@ class UserModel {
     this.sppgName,
     this.provinsi,
     this.kabupatenKota,
+    this.allergies = const [],
+    this.allergyOther,
+    this.allergyFilled = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -54,6 +65,13 @@ class UserModel {
       sppgName: json['sppg_name'] as String?,
       provinsi: json['provinsi'] as String?,
       kabupatenKota: json['kabupaten_kota'] as String?,
+      // Data lama (cache / akun lama) tidak punya field ini → anggap belum diisi
+      allergies: (json['allergies'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      allergyOther: json['allergy_other'] as String?,
+      allergyFilled: json['allergy_filled'] as bool? ?? false,
     );
   }
 
@@ -74,6 +92,9 @@ class UserModel {
       'sppg_name': sppgName,
       'provinsi': provinsi,
       'kabupaten_kota': kabupatenKota,
+      'allergies': allergies,
+      'allergy_other': allergyOther,
+      'allergy_filled': allergyFilled,
     };
   }
 
@@ -93,6 +114,8 @@ class UserModel {
     String? sppgName,
     String? provinsi,
     String? kabupatenKota,
+    List<String>? allergies,
+    bool? allergyFilled,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -110,7 +133,60 @@ class UserModel {
       sppgName: sppgName ?? this.sppgName,
       provinsi: provinsi ?? this.provinsi,
       kabupatenKota: kabupatenKota ?? this.kabupatenKota,
+      // allergyOther ikut terbawa; untuk mengubahnya (termasuk menjadi null)
+      // gunakan withAllergy().
+      allergies: allergies ?? this.allergies,
+      allergyOther: allergyOther,
+      allergyFilled: allergyFilled ?? this.allergyFilled,
     );
+  }
+
+  /// Salinan dengan data alergi baru. `allergyOther` boleh null
+  /// (misalnya saat "Lainnya" tidak lagi dipilih). Otomatis menandai sudah diisi.
+  UserModel withAllergy({
+    required List<String> allergies,
+    String? allergyOther,
+  }) {
+    return UserModel(
+      id: id,
+      name: name,
+      email: email,
+      schoolId: schoolId,
+      schoolName: schoolName,
+      className: className,
+      gender: gender,
+      age: age,
+      profileImageUrl: profileImageUrl,
+      schoolLevel: schoolLevel,
+      createdAt: createdAt,
+      sppgId: sppgId,
+      sppgName: sppgName,
+      provinsi: provinsi,
+      kabupatenKota: kabupatenKota,
+      allergies: List.unmodifiable(allergies),
+      allergyOther: allergies.contains(AllergyConstants.otherValue)
+          ? allergyOther
+          : null,
+      allergyFilled: true,
+    );
+  }
+
+  /// Daftar label alergi untuk ditampilkan (mis. ["Kacang", "Lainnya: bawang"]).
+  List<String> get allergyLabels {
+    return allergies.map((a) {
+      if (a == AllergyConstants.otherValue) {
+        final other = allergyOther?.trim() ?? '';
+        return other.isEmpty ? 'Lainnya' : 'Lainnya: $other';
+      }
+      return AllergyConstants.labelOf(a);
+    }).toList();
+  }
+
+  /// Ringkasan satu baris: "Belum diisi" / "Tidak ada alergi" / "Kacang, Susu".
+  String get allergySummary {
+    if (!allergyFilled) return 'Belum diisi';
+    if (allergies.isEmpty) return 'Tidak ada alergi';
+    return allergyLabels.join(', ');
   }
 
   String get genderLabel {

@@ -14,6 +14,7 @@ export class SppgController {
    *
    * Endpoint publik — hanya mengembalikan nama wilayah yang memiliki SPPG aktif.
    */
+
   getRegions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { level = 'provinsi', parent } = req.query as { level?: string; parent?: string };

@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service'; // ← BARU
 
 @Injectable()
 export class DistributionService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(DistributionService.name); // ← BARU
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService, // ← BARU
+  ) {}
 
   /**
    * Ringkasan distribusi: total sekolah, total jadwal menu, dan range tanggal
@@ -232,6 +238,16 @@ export class DistributionService {
         items: { include: { food: { select: { name: true } } } },
       },
     });
+
+    // ← BARU: kirim notifikasi "ompreng akan dibagikan" ke siswa.
+    // Dibungkus try/catch agar kegagalan notifikasi tidak membatalkan pembuatan jadwal.
+    try {
+      const { sent } = await this.notifications.notifyMenuScheduled(created.id);
+      this.logger.log(`Jadwal ${created.id}: notifikasi terkirim ke ${sent} siswa`);
+    } catch (e) {
+      this.logger.error(`Gagal mengirim notifikasi untuk jadwal ${created.id}`, e as any);
+    }
+
     return created;
   }
 
@@ -283,4 +299,3 @@ export class DistributionService {
     return { deleted: true, id };
   }
 }
-

@@ -3,8 +3,9 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
   LayoutDashboard, ClipboardList, Star,
-  MessageSquare, BarChart3, LogOut, Menu, X, Utensils, Truck, UtensilsCrossed, School, MapPin,
+  MessageSquare, BarChart3, LogOut, Menu, X, Truck, UtensilsCrossed, School, MapPin,
 } from 'lucide-react';
+import '@/styles/brand.css';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,12 +36,15 @@ export default function Sidebar() {
     >
       {/* Header */}
       <div className="sidebar__header">
-        {!collapsed && (
-          <div className="sidebar__logo">
-            <Utensils size={22} />
-            <span>Foodler Admin</span>
-          </div>
-        )}
+        <div className="sidebar__brand">
+          <img className="sidebar__brand-img" src="/logo-mbg.png" alt="Logo MBG" />
+          {!collapsed && (
+            <div className="sidebar__brand-text">
+              <span className="sidebar__brand-name">Foodler</span>
+              <span className="sidebar__brand-sub">Admin MBG</span>
+            </div>
+          )}
+        </div>
         <button
           className="sidebar__toggle"
           onClick={() => setCollapsed(!collapsed)}

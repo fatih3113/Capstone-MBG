@@ -2,17 +2,17 @@ class NutritionModel {
   final String id;
   final String foodId;
   final String foodName;
-  final double calories;    // kcal per 100g
-  final double protein;     // g per 100g
-  final double carbs;       // g per 100g
-  final double fat;         // g per 100g
-  final double fiber;       // g per 100g
-  final double sugar;       // g per 100g
-  final double sodium;      // mg per 100g
-  final double calcium;     // mg per 100g
-  final double iron;        // mg per 100g
-  final double vitaminC;    // mg per 100g
-  final double vitaminA;    // mcg per 100g
+  final double calories; // kcal per 100g
+  final double protein; // g per 100g
+  final double carbs; // g per 100g
+  final double fat; // g per 100g
+  final double fiber; // g per 100g
+  final double sugar; // g per 100g
+  final double sodium; // mg per 100g
+  final double calcium; // mg per 100g
+  final double iron; // mg per 100g
+  final double vitaminC; // mg per 100g
+  final double vitaminA; // mcg per 100g
   final double portionGram; // default serving size in gram
 
   const NutritionModel({
@@ -41,10 +41,11 @@ class NutritionModel {
 
     return NutritionModel(
       id: json['id']?.toString() ?? '',
-      foodId: (json['food_id'] ?? json['foodId'] ?? food?['id'])?.toString() ?? '',
-      foodName: (json['food_name'] ?? json['foodName'] ?? food?['name'])
-              as String? ??
-          '',
+      foodId:
+          (json['food_id'] ?? json['foodId'] ?? food?['id'])?.toString() ?? '',
+      foodName:
+          (json['food_name'] ?? json['foodName'] ?? food?['name']) as String? ??
+              '',
       calories: num0(json['calories']),
       protein: num0(json['protein']),
       carbs: num0(json['carbs']),
@@ -63,22 +64,22 @@ class NutritionModel {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'food_id': foodId,
-    'food_name': foodName,
-    'calories': calories,
-    'protein': protein,
-    'carbs': carbs,
-    'fat': fat,
-    'fiber': fiber,
-    'sugar': sugar,
-    'sodium': sodium,
-    'calcium': calcium,
-    'iron': iron,
-    'vitamin_c': vitaminC,
-    'vitamin_a': vitaminA,
-    'portion_gram': portionGram,
-  };
+        'id': id,
+        'food_id': foodId,
+        'food_name': foodName,
+        'calories': calories,
+        'protein': protein,
+        'carbs': carbs,
+        'fat': fat,
+        'fiber': fiber,
+        'sugar': sugar,
+        'sodium': sodium,
+        'calcium': calcium,
+        'iron': iron,
+        'vitamin_c': vitaminC,
+        'vitamin_a': vitaminA,
+        'portion_gram': portionGram,
+      };
 
   /// Scale nutrition values by portion
   NutritionModel scaleByPortion(double gram) {

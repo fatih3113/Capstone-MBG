@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
+import '../../shared/widgets/allergy_selector.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
 
@@ -24,6 +25,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? _selectedLevel;
   bool _isLoading = false;
 
+  // Alergi makanan
+  late AllergySelection _allergy;
+  // Pengguna lama yang belum pernah mengisi tidak dipaksa mengisi saat edit profil
+  late bool _allergyRequired;
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +39,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _ageController = TextEditingController(text: user?.age?.toString());
     _selectedGender = user?.gender;
     _selectedLevel = user?.schoolLevel;
+    _allergy = AllergySelection.fromUser(
+      filled: user?.allergyFilled ?? false,
+      allergies: user?.allergies ?? const [],
+      other: user?.allergyOther,
+    );
+    _allergyRequired = user?.allergyFilled ?? false;
   }
 
   @override
@@ -48,6 +60,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() => _isLoading = true);
 
     final auth = context.read<AuthProvider>();
+
+    // Simpan alergi ke server dulu (hanya jika sudah dipilih)
+    if (!_allergy.isEmpty) {
+      final error = await auth.updateAllergies(
+        allergies: _allergy.allergyList,
+        allergyOther: _allergy.otherOrNull,
+      );
+      if (error != null) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+    }
+
     final updatedUser = auth.user!.copyWith(
       name: _nameController.text.trim(),
       className: _classController.text.trim(),
@@ -170,6 +202,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ).toList(),
               ),
+              const SizedBox(height: 24),
+              AllergySelector(
+                initialValue: _allergy,
+                required: _allergyRequired,
+                onChanged: (value) => _allergy = value,
+              ),
+              const SizedBox(height: 16),
+              const AllergyConsentNote(),
               const SizedBox(height: 32),
               CustomButton(
                 label: 'Simpan Perubahan',

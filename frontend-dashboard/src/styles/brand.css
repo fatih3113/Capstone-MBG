@@ -1,0 +1,286 @@
+/* ═══════════════════════════════════════════════════════════════
+   brand.css — tampilan login (split-screen) + logo di sidebar
+   Berdiri sendiri: tidak bergantung pada class lama di index.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --brand-primary: #6366f1;
+  --brand-primary-dark: #4f46e5;
+  --brand-deep: #1e1b4b;
+  --brand-ink: #111827;
+  --brand-muted: #6b7280;
+  --brand-line: #e5e7eb;
+}
+
+/* ─── LOGIN ──────────────────────────────────────────────────── */
+.login-v2 {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  background: #f5f6fb;
+}
+
+/* Panel kiri: brand */
+.login-v2__brand {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 56px;
+  color: #fff;
+  background:
+    radial-gradient(900px 500px at 15% 0%, rgba(129, 140, 248, 0.55) 0%, transparent 60%),
+    radial-gradient(700px 500px at 100% 100%, rgba(52, 211, 153, 0.22) 0%, transparent 60%),
+    linear-gradient(160deg, #312e81 0%, #1e1b4b 60%, #15133a 100%);
+}
+
+.login-v2__brand::before,
+.login-v2__brand::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.login-v2__brand::before { width: 520px; height: 520px; top: -180px; right: -160px; }
+.login-v2__brand::after  { width: 360px; height: 360px; bottom: -140px; left: -120px; }
+
+.login-v2__logo {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 78%);
+  height: auto;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.4));
+}
+
+.login-v2__headline {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+  text-align: center;
+}
+.login-v2__headline h2 {
+  margin: 0 0 10px;
+  font-size: 1.65rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.login-v2__headline p {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.login-v2__features {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.login-v2__features li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+
+/* Panel kanan: form */
+.login-v2__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.login-v2__card {
+  width: 100%;
+  max-width: 400px;
+}
+.login-v2__mobile-logo {
+  display: none;
+  width: 140px;
+  height: auto;
+  margin: 0 auto 20px;
+}
+.login-v2__title {
+  margin: 0 0 6px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--brand-ink);
+}
+.login-v2__subtitle {
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+  color: var(--brand-muted);
+}
+
+.lv2-form { display: flex; flex-direction: column; gap: 18px; }
+.lv2-field { display: flex; flex-direction: column; gap: 6px; }
+.lv2-label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+
+.lv2-input-wrap { position: relative; }
+.lv2-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+.lv2-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
+  padding: 0 44px 0 42px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--brand-ink);
+  background: #fff;
+  border: 1.5px solid var(--brand-line);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.lv2-input::placeholder { color: #b6bcc8; }
+.lv2-input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+.lv2-eye {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: #9ca3af;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.lv2-eye:hover { color: var(--brand-primary-dark); background: #eef2ff; }
+
+.lv2-alert {
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+}
+
+.lv2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 50px;
+  margin-top: 4px;
+  font: inherit;
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+}
+.lv2-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.38);
+}
+.lv2-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.lv2-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: lv2-spin 0.7s linear infinite;
+}
+@keyframes lv2-spin { to { transform: rotate(360deg); } }
+
+.lv2-note {
+  margin: 26px 0 0;
+  padding-top: 18px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  text-align: center;
+  color: #9ca3af;
+  border-top: 1px solid var(--brand-line);
+}
+
+/* Responsif: di layar kecil panel brand disembunyikan, logo pindah ke atas form */
+@media (max-width: 900px) {
+  .login-v2 { grid-template-columns: 1fr; }
+  .login-v2__brand { display: none; }
+  .login-v2__mobile-logo { display: block; }
+  .login-v2__panel { padding: 32px 20px; }
+  .login-v2__title, .login-v2__subtitle { text-align: center; }
+}
+
+/* ─── SIDEBAR: logo ──────────────────────────────────────────── */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.sidebar__brand-img {
+  flex-shrink: 0;
+  width: auto;
+  height: 42px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+.sidebar__brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.sidebar__brand-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Saat sidebar diciutkan: logo di atas, tombol di bawahnya */
+.sidebar--collapsed .sidebar__header {
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.sidebar--collapsed .sidebar__brand-img { height: 34px; }

@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- seed_sppg_workflow.sql
 -- Deskripsi : Data demo untuk workflow SPPG (akun SPPG_ADMIN, procurement,
 --             production_batch, delivery, incident, 1 SPPG PENDING, 1 SUSPENDED).

@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- manual_migration_sppg_workflow.sql
 -- Deskripsi : Menambah kolom workflow ke sppgs & users, membuat tabel operasional
 --             baru (procurements, production_batches, deliveries, food_safety_incidents).

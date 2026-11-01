@@ -73,6 +73,13 @@ model User {
   age             Int?
   profileImageUrl String?  @map("profile_image_url")
   schoolLevel     String?  @map("school_level") // SD | SMP | SMA | SMK
+
+  // ── Alergi Makanan ────────────────────────────────────────────────
+  // Nilai yang diizinkan: kacang, telur, susu, ikan, udang, gandum, kedelai, lainnya
+  allergies       String[] @default([])
+  allergyOther    String?  @map("allergy_other")   // diisi hanya jika "lainnya" dipilih
+  allergyFilled   Boolean  @default(false) @map("allergy_filled") // false = belum pernah diisi
+
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -84,10 +91,28 @@ model User {
   foodRatings         FoodRating[]
   foodFeedbacks       FoodFeedback[]
   reportedIncidents   FoodSafetyIncident[] @relation("IncidentReporter")
+  notifications       Notification[]
 
   @@index([role])
   @@index([accountStatus])
   @@map("users")
+}
+
+// ─── NOTIFICATIONS (Notifikasi distribusi ompreng, dll.) ──────────────
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  body      String
+  type      String   @default("distribution")
+  data      Json?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
 }
 
 // ─── SCHOOLS ─────────────────────────────────────────────────────────
@@ -281,18 +306,18 @@ model FoodFeedback {
   userId          String   @map("user_id")
   foodId          String?  @map("food_id")
   foodName        String   @map("food_name")
-  
+
   // Penilaian sensorik (1-5)
   tastRating      Int?     @map("taste_rating")
   textureRating   Int?     @map("texture_rating")
   aromaRating     Int?     @map("aroma_rating")
   portionRating   Int?     @map("portion_rating")
   satisfactionRating Int?  @map("satisfaction_rating")
-  
+
   // Status konsumsi (bukan berat, melainkan pilihan user)
   consumptionStatus String? @map("consumption_status")
   // "habis" | "sebagian" | "hampir_tidak"
-  
+
   suggestion      String?
   submittedAt     DateTime @default(now()) @map("submitted_at")
 

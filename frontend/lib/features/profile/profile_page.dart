@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../data/models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../shared/widgets/custom_button.dart';
 
@@ -95,6 +96,10 @@ class ProfilePage extends StatelessWidget {
                       label: 'Jenjang',
                       value: user?.schoolLevel ?? '-'),
                   ]),
+                  const SizedBox(height: 16),
+
+                  // Alergi makanan
+                  _buildAllergyCard(context, user),
                   const SizedBox(height: 20),
 
                   // Actions
@@ -177,6 +182,87 @@ class ProfilePage extends StatelessWidget {
               const Divider(height: 1, indent: 46),
           ],
         )).toList(),
+      ),
+    );
+  }
+
+  Widget _buildAllergyCard(BuildContext context, UserModel? user) {
+    final filled = user?.allergyFilled ?? false;
+    final labels = user?.allergyLabels ?? const <String>[];
+
+    Widget content;
+    if (!filled) {
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Belum diisi',
+            style: AppTextStyles.bodyMedium
+                .copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => context.push('/profile/edit'),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: const Text('Isi Alergi Makanan'),
+            ),
+          ),
+        ],
+      );
+    } else if (labels.isEmpty) {
+      content = Text(
+        'Tidak ada alergi',
+        style:
+            AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+      );
+    } else {
+      content = Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: labels
+            .map(
+              (label) => Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLighter,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelMedium
+                      .copyWith(color: AppColors.primaryDark),
+                ),
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.no_food_outlined,
+                  color: AppColors.primary, size: 18),
+              const SizedBox(width: 12),
+              const Text('Alergi Makanan', style: AppTextStyles.titleSmall),
+            ],
+          ),
+          const SizedBox(height: 12),
+          content,
+        ],
       ),
     );
   }

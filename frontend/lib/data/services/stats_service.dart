@@ -6,6 +6,7 @@ import '../dummy/dummy_data.dart';
 
 /// Service untuk mengambil statistik gizi pengguna
 /// Mendukung mode mock (offline) dan live API
+
 class StatsService {
   /// Ubah ke [true] untuk mode offline/development
   static const bool _useMock = false;

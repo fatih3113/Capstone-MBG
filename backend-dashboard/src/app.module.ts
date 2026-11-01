@@ -13,6 +13,7 @@ import { NutritionReportsModule } from './nutrition-reports/nutrition-reports.mo
 import { DistributionModule } from './distribution/distribution.module';
 import { FoodsModule } from './foods/foods.module';
 import { SchoolsModule } from './schools/schools.module';
+import { SppgModule } from './sppg/sppg.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SchoolsModule } from './schools/schools.module';
     DistributionModule,
     FoodsModule,
     SchoolsModule,
+    SppgModule,
   ],
   providers: [
     // Global rate-limit guard

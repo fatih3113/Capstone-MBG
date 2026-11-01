@@ -1,10 +1,6 @@
-// Prisma schema untuk backend-dashboard (NestJS)
-// Database SAMA dengan backend Flutter (backend/)
-// Tabel tidak diubah — backend-dashboard hanya membaca (dan update status menu_requests)
-
 generator client {
   provider = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -12,57 +8,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Sppg {
+  id                 String               @id @default(uuid())
+  kode               String?              @unique
+  nama               String
+  provinsi           String
+  kabupatenKota      String               @map("kabupaten_kota")
+  kecamatan          String
+  kelurahanDesa      String               @map("kelurahan_desa")
+  alamat             String?
+  latitude           Float?
+  longitude          Float?
+  isActive           Boolean              @default(true) @map("is_active")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  verificationStatus String               @default("APPROVED") @map("verification_status")
+  rejectionReason    String?              @map("rejection_reason")
+  verifiedBy         String?              @map("verified_by")
+  verifiedAt         DateTime?            @map("verified_at")
+  operationalStatus  String               @default("ACTIVE") @map("operational_status")
+  suspensionReason   String?              @map("suspension_reason")
+  suspendedAt        DateTime?            @map("suspended_at")
+  is3t               Boolean              @default(false) @map("is_3t")
+  kapasitasPorsi     Int?                 @map("kapasitas_porsi")
+  penanggungjawab    String?              @map("penanggung_jawab")
+  kontak             String?
+  incidents          FoodSafetyIncident[]
+  procurements       Procurement[]
+  productionBatches  ProductionBatch[]
+  schools            School[]
+  users              User[]
+
+  @@index([provinsi, kabupatenKota])
+  @@index([verificationStatus, operationalStatus])
+  @@map("sppgs")
+}
+
 model User {
-  id              String   @id @default(uuid())
-  name            String
-  email           String   @unique
-  passwordHash    String   @map("password_hash")
-  role            String   @default("student")
-  schoolId        String?  @map("school_id")
-  class_          String?  @map("class")
-  gender          String?
-  age             Int?
-  profileImageUrl String?  @map("profile_image_url")
-  schoolLevel     String?  @map("school_level")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id                String               @id @default(uuid())
+  name              String
+  email             String               @unique
+  passwordHash      String               @map("password_hash")
+  role              String               @default("student")
+  schoolId          String?              @map("school_id")
+  class_            String?              @map("class")
+  gender            String?
+  age               Int?
+  profileImageUrl   String?              @map("profile_image_url")
+  schoolLevel       String?              @map("school_level")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  sppgId            String?              @map("sppg_id")
+  allergies         String[]             @default([])
+  allergy_other     String?
+  allergy_filled    Boolean              @default(false)
+  accountStatus     String               @default("ACTIVE") @map("account_status")
+  dailyNutritions   DailyNutrition[]
+  foodFeedbacks     FoodFeedback[]
+  foodRatings       FoodRating[]
+  reportedIncidents FoodSafetyIncident[] @relation("IncidentReporter")
+  menuRequests      MenuRequest[]
+  notifications     Notification[]
+  scanHistories     ScanHistory[]
+  school            School?              @relation(fields: [schoolId], references: [id])
+  sppg              Sppg?                @relation(fields: [sppgId], references: [id])
 
-  school         School?         @relation(fields: [schoolId], references: [id])
-  scanHistories  ScanHistory[]
-  dailyNutritions DailyNutrition[]
-  menuRequests   MenuRequest[]
-  foodRatings    FoodRating[]
-  foodFeedbacks  FoodFeedback[]
-
+  @@index([role])
+  @@index([accountStatus])
   @@map("users")
 }
 
-model School {
-  id       String @id @default(uuid())
-  name     String
-  level    String
-  address  String?
-  city     String?
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  body      String
+  type      String   @default("distribution")
+  data      Json?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  users    User[]
-  mbgMenus MbgMenu[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model School {
+  id         String               @id @default(uuid())
+  name       String
+  level      String
+  address    String?
+  city       String?
+  sppgId     String?              @map("sppg_id")
+  deliveries Delivery[]
+  incidents  FoodSafetyIncident[]
+  mbgMenus   MbgMenu[]
+  sppg       Sppg?                @relation(fields: [sppgId], references: [id])
+  users      User[]
 
   @@map("schools")
 }
 
 model Food {
-  id          String  @id @default(uuid())
+  id          String         @id @default(uuid())
   name        String
   category    String
-  imageUrl    String? @map("image_url")
+  imageUrl    String?        @map("image_url")
   description String?
-  isActive    Boolean @default(true) @map("is_active")
-
-  nutrition   Nutrition?
-  menuItems   MbgMenuItem[]
-  predictions Prediction[]
-  foodRatings FoodRating[]
+  isActive    Boolean        @default(true) @map("is_active")
   feedbacks   FoodFeedback[]
+  foodRatings FoodRating[]
+  menuItems   MbgMenuItem[]
+  nutrition   Nutrition?
+  predictions Prediction[]
 
   @@map("foods")
 }
@@ -84,88 +143,84 @@ model Nutrition {
   portionGram   Float   @default(100) @map("portion_gram")
   cookingMethod String? @map("cooking_method")
   dataSource    String  @default("TKPI 2017") @map("data_source")
-
   food          Food    @relation(fields: [foodId], references: [id])
 
   @@map("nutrition")
 }
 
 model MbgMenu {
-  id       String   @id @default(uuid())
-  schoolId String   @map("school_id")
-  date     DateTime @db.Date
-  dayName  String   @map("day_name")
-
-  school   School        @relation(fields: [schoolId], references: [id])
+  id       String        @id @default(uuid())
+  schoolId String        @map("school_id")
+  date     DateTime      @db.Date
+  dayName  String        @map("day_name")
   items    MbgMenuItem[]
+  school   School        @relation(fields: [schoolId], references: [id])
 
   @@unique([schoolId, date])
   @@map("mbg_menus")
 }
 
 model MbgMenuItem {
-  id          String @id @default(uuid())
-  menuId      String @map("menu_id")
-  foodId      String @map("food_id")
-  portionGram Float  @default(100) @map("portion_gram")
-
-  menu        MbgMenu @relation(fields: [menuId], references: [id])
+  id          String  @id @default(uuid())
+  menuId      String  @map("menu_id")
+  foodId      String  @map("food_id")
+  portionGram Float   @default(100) @map("portion_gram")
   food        Food    @relation(fields: [foodId], references: [id])
+  menu        MbgMenu @relation(fields: [menuId], references: [id])
 
   @@map("mbg_menu_items")
 }
 
 model ScanHistory {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  imageUrl      String?  @map("image_url")
-  scannedAt     DateTime @default(now()) @map("scanned_at")
-  totalCalories Float    @default(0) @map("total_calories")
-  totalProtein  Float    @default(0) @map("total_protein")
-  totalCarbs    Float    @default(0) @map("total_carbs")
-  totalFat      Float    @default(0) @map("total_fat")
-  totalFiber    Float    @default(0) @map("total_fiber")
-  status        String   @default("success")
-  akgTarget     String?  @map("akg_target")
-  sensoryData   Json?    @map("sensory_data")
-  consumptionData Json?  @map("consumption_data")
-
-  user          User         @relation(fields: [userId], references: [id])
-  predictions   Prediction[]
+  id              String       @id @default(uuid())
+  userId          String       @map("user_id")
+  imageUrl        String?      @map("image_url")
+  scannedAt       DateTime     @default(now()) @map("scanned_at")
+  totalCalories   Float        @default(0) @map("total_calories")
+  totalProtein    Float        @default(0) @map("total_protein")
+  totalCarbs      Float        @default(0) @map("total_carbs")
+  totalFat        Float        @default(0) @map("total_fat")
+  totalFiber      Float        @default(0) @map("total_fiber")
+  status          String       @default("success")
+  akgTarget       String?      @map("akg_target")
+  sensoryData     Json?        @map("sensory_data")
+  consumptionData Json?        @map("consumption_data")
+  predictions     Prediction[]
+  user            User         @relation(fields: [userId], references: [id])
 
   @@map("scan_history")
 }
 
 model Prediction {
-  id                  String  @id @default(uuid())
-  scanId              String  @map("scan_id")
-  foodId              String  @map("food_id")
+  id                  String      @id @default(uuid())
+  scanId              String      @map("scan_id")
+  foodId              String      @map("food_id")
   confidence          Float
-  portionEstimateGram Float   @default(100) @map("portion_estimate_gram")
-  weightInputGram     Float?  @map("weight_input_gram")
+  portionEstimateGram Float       @default(100) @map("portion_estimate_gram")
+  weightInputGram     Float?      @map("weight_input_gram")
   calories            Float?
   protein             Float?
   carbs               Float?
   fat                 Float?
-
-  scan                ScanHistory @relation(fields: [scanId], references: [id])
   food                Food        @relation(fields: [foodId], references: [id])
+  scan                ScanHistory @relation(fields: [scanId], references: [id])
 
   @@map("predictions")
 }
 
 model DailyNutrition {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  date          DateTime @db.Date
-  totalCalories Float    @default(0) @map("total_calories")
-  totalProtein  Float    @default(0) @map("total_protein")
-  totalCarbs    Float    @default(0) @map("total_carbs")
-  totalFat      Float    @default(0) @map("total_fat")
-  totalFiber    Float    @default(0) @map("total_fiber")
-  totalScans    Int      @default(0) @map("total_scans")
-
-  user          User     @relation(fields: [userId], references: [id])
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  totalCalories   Float    @default(0) @map("total_calories")
+  totalProtein    Float    @default(0) @map("total_protein")
+  totalCarbs      Float    @default(0) @map("total_carbs")
+  totalFat        Float    @default(0) @map("total_fat")
+  totalFiber      Float    @default(0) @map("total_fiber")
+  totalScans      Int      @default(0) @map("total_scans")
+  calories_target Float    @default(2000)
+  protein_target  Float    @default(60)
+  user            User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, date])
   @@map("daily_nutrition")
@@ -180,7 +235,6 @@ model MenuRequest {
   adminNote   String?  @map("admin_note")
   submittedAt DateTime @default(now()) @map("submitted_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
   user        User     @relation(fields: [userId], references: [id])
 
   @@map("menu_requests")
@@ -194,9 +248,8 @@ model FoodRating {
   rating   Int
   reason   String?
   ratedAt  DateTime @default(now()) @map("rated_at")
-
-  user     User  @relation(fields: [userId], references: [id])
-  food     Food? @relation(fields: [foodId], references: [id])
+  food     Food?    @relation(fields: [foodId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 
   @@map("food_ratings")
 }
@@ -214,9 +267,84 @@ model FoodFeedback {
   consumptionStatus  String?  @map("consumption_status")
   suggestion         String?
   submittedAt        DateTime @default(now()) @map("submitted_at")
-
-  user               User  @relation(fields: [userId], references: [id])
-  food               Food? @relation(fields: [foodId], references: [id])
+  food               Food?    @relation(fields: [foodId], references: [id])
+  user               User     @relation(fields: [userId], references: [id])
 
   @@map("food_feedbacks")
+}
+
+model Procurement {
+  id           String   @id @default(uuid())
+  sppgId       String   @map("sppg_id")
+  supplierName String   @map("supplier_name")
+  itemName     String   @map("item_name")
+  quantity     Decimal  @db.Decimal(12, 2)
+  unit         String
+  procuredAt   DateTime @default(now()) @map("procured_at")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  sppg         Sppg     @relation(fields: [sppgId], references: [id], onDelete: Cascade)
+
+  @@index([sppgId, procuredAt])
+  @@map("procurements")
+}
+
+model ProductionBatch {
+  id               String     @id @default(uuid())
+  sppgId           String     @map("sppg_id")
+  batchDate        DateTime   @map("batch_date") @db.Date
+  menuName         String     @map("menu_name")
+  portionsPlanned  Int        @default(0) @map("portions_planned")
+  portionsProduced Int        @default(0) @map("portions_produced")
+  qcStatus         String     @default("PENDING") @map("qc_status")
+  qcNotes          String?    @map("qc_notes")
+  finishedAt       DateTime?  @map("finished_at")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+  deliveries       Delivery[]
+  sppg             Sppg       @relation(fields: [sppgId], references: [id], onDelete: Cascade)
+
+  @@index([sppgId, batchDate])
+  @@map("production_batches")
+}
+
+model Delivery {
+  id         String          @id @default(uuid())
+  batchId    String          @map("batch_id")
+  schoolId   String          @map("school_id")
+  portions   Int             @default(0)
+  status     String          @default("PREPARED")
+  sentAt     DateTime?       @map("sent_at")
+  receivedAt DateTime?       @map("received_at")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  batch      ProductionBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  school     School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+  @@index([sentAt])
+  @@map("deliveries")
+}
+
+model FoodSafetyIncident {
+  id            String    @id @default(uuid())
+  sppgId        String    @map("sppg_id")
+  schoolId      String?   @map("school_id")
+  reportedBy    String    @map("reported_by")
+  incidentDate  DateTime  @map("incident_date") @db.Date
+  severity      String    @default("LOW")
+  affectedCount Int       @default(0) @map("affected_count")
+  description   String
+  status        String    @default("OPEN")
+  resolvedAt    DateTime? @map("resolved_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  reporter      User      @relation("IncidentReporter", fields: [reportedBy], references: [id], onDelete: Cascade)
+  school        School?   @relation(fields: [schoolId], references: [id])
+  sppg          Sppg      @relation(fields: [sppgId], references: [id], onDelete: Cascade)
+
+  @@index([sppgId, incidentDate])
+  @@index([status])
+  @@map("food_safety_incidents")
 }

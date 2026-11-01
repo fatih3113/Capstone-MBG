@@ -62,6 +62,9 @@ class AuthService {
     String? className,
     String? gender,
     int? age,
+    List<String>? allergies,
+    String? allergyOther,
+    bool? allergyFilled,
   }) async {
     if (_useMock) return _mockRegister(name, email);
 
@@ -77,15 +80,71 @@ class AuthService {
           'class': className,
           'gender': gender,
           'age': age,
+          'allergies': allergies,
+          'allergy_other': allergyOther,
+          'allergy_filled': allergyFilled,
         },
       );
       return ApiResponse.fromJson(
         response.data,
         (data) => UserModel.fromJson(data as Map<String, dynamic>),
       );
+    } on DioException catch (e) {
+      // Tampilkan pesan dari backend (mis. validasi alergi) jika ada
+      return ApiResponse.error(
+        message: _backendMessage(e) ?? e.message ?? 'Registrasi gagal.',
+      );
     } catch (e) {
       return ApiResponse.error(message: e.toString());
     }
+  }
+
+  // ─── UPDATE ALERGI ────────────────────────────────────────────────
+  /// Simpan data alergi pemilik akun ke server (PUT /users/profile/update).
+  /// Respons berisi `allergies`, `allergy_other`, `allergy_filled`.
+  Future<ApiResponse<Map<String, dynamic>>> updateAllergies({
+    required List<String> allergies,
+    String? allergyOther,
+  }) async {
+    final payload = {
+      'allergies': allergies,
+      'allergy_other': allergyOther,
+      'allergy_filled': true,
+    };
+    if (_useMock) {
+      return ApiResponse.success(
+        data: payload,
+        message: 'Profil berhasil diperbarui',
+      );
+    }
+
+    try {
+      final response = await DioClient.instance.put(
+        ApiConstants.updateProfile,
+        data: payload,
+      );
+      return ApiResponse.fromJson(
+        response.data,
+        (data) => data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      return ApiResponse.error(
+        message: _backendMessage(e) ??
+            e.message ??
+            'Gagal menyimpan data alergi. Coba lagi.',
+      );
+    } catch (e) {
+      return ApiResponse.error(message: 'Terjadi kesalahan. Silakan coba lagi.');
+    }
+  }
+
+  /// Ambil pesan error dari body respons backend (jika ada).
+  String? _backendMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map && data['message'] is String) {
+      return data['message'] as String;
+    }
+    return null;
   }
 
   // ─── LOGOUT ───────────────────────────────────────────────────────

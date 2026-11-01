@@ -5,10 +5,20 @@ import { validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { ApiResponse } from '../utils/api-response';
 import { logger } from '../utils/logger';
+import { parseAllergyInput, allergyDbFields } from '../utils/allergy';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'mbg_nutrition_secret_key_change_in_production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+/** Cetak detail error validasi ke terminal (password disamarkan). */
+const logValidationErrors = (label: string, errors: any[]) => {
+  const detail = errors.map((e: any) => {
+    const field = e.path ?? e.param;
+    return { field, message: e.msg, value: field === 'password' ? '***' : e.value };
+  });
+  logger.warn(`${label}: ${JSON.stringify(detail)}`);
+};
 
 export class AuthController {
 
@@ -17,13 +27,23 @@ export class AuthController {
    */
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      // 422 #1: aturan di validators.ts (validateRegister)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        logValidationErrors('[REGISTER] Validasi gagal', errors.array());
         res.status(422).json(ApiResponse.validationError(errors.array()));
         return;
       }
 
       const { name, email, password, school_id, sppg_id, class: className, gender, age } = req.body;
+
+      // 422 #2: data alergi
+      const allergy = parseAllergyInput(req.body);
+      if (!allergy.ok) {
+        logger.warn(`[REGISTER] Data alergi ditolak: ${allergy.message}`);
+        res.status(422).json(ApiResponse.error(allergy.message, 422));
+        return;
+      }
 
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -32,10 +52,11 @@ export class AuthController {
         return;
       }
 
-      // Validasi sppg_id jika disertakan
+      // 422 #3: sppg_id (jika disertakan) harus ada & aktif di database
       if (sppg_id) {
         const sppg = await prisma.sppg.findUnique({ where: { id: sppg_id } });
         if (!sppg) {
+          logger.warn(`[REGISTER] SPPG tidak ditemukan untuk sppg_id: ${sppg_id}`);
           res.status(422).json(ApiResponse.error('SPPG tidak ditemukan', 422));
           return;
         }
@@ -54,11 +75,12 @@ export class AuthController {
           name,
           email,
           passwordHash,
-          schoolId: school_id,
-          sppgId: sppg_id,
+          schoolId: school_id || undefined,
+          sppgId: sppg_id || undefined,
           class_: className,
-          gender,
+          gender: gender || undefined,
           age: age ? parseInt(age) : null,
+          ...allergyDbFields(allergy),
         },
         select: {
           id: true, name: true, email: true,
@@ -81,6 +103,7 @@ export class AuthController {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        logValidationErrors('[LOGIN] Validasi gagal', errors.array());
         res.status(422).json(ApiResponse.validationError(errors.array()));
         return;
       }
@@ -128,6 +151,10 @@ export class AuthController {
         sppg_name: user.sppg?.nama ?? null,
         provinsi: user.sppg?.provinsi ?? null,
         kabupaten_kota: user.sppg?.kabupatenKota ?? null,
+        // Data alergi hanya untuk pemilik akun (login)
+        allergies: user.allergies,
+        allergy_other: user.allergyOther,
+        allergy_filled: user.allergyFilled,
       };
 
       logger.info(`User logged in: ${email}`);

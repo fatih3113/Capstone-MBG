@@ -640,3 +640,310 @@ The column `calories_target` does not exist in the current database.
 2026-10-25 10:11:08 [info]: User logged in: fatihmubarok850@gmail.com
 2026-10-25 11:05:06 [info]: New user registered: fatihmubarok3113@gmail.com
 2026-10-25 11:05:24 [info]: User logged in: fatihmubarok3113@gmail.com
+2026-10-31 10:50:08 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 10:50:08 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 11:21:56 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 11:21:56 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:05:38 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:05:38 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:13:32 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:13:32 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:13:41 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:43 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:44 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:44 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:45 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:46 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:46 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:49 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:50 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:50 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:51 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:13:51 [error]: [POST] /api/v1/auth/login - 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation in
+D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:38
+
+   97 const { email, password } = req.body;
+   98 
+   99 // Find user
+→ 100 const user = await prisma.user.findUnique(
+The column `users.account_status` does not exist in the current database.
+    at $n.handleRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\Project-Capstone\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async AuthController.login (D:\Project-Capstone\backend\src\controllers\auth.controller.ts:100:20)
+2026-10-31 21:28:01 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:28:01 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:36:07 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:36:07 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:48:37 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:48:37 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:49:31 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 21:49:31 [info]: 📖 API docs: http://localhost:3000/health
+2026-10-31 21:49:35 [info]: New user registered: tih@gmail.com
+2026-10-31 21:49:46 [info]: User logged in: tih@gmail.com
+2026-10-31 22:09:58 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-10-31 22:09:58 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 17:14:45 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 17:14:45 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 17:31:03 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 17:31:03 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 17:31:15 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 17:31:15 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 17:31:33 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 17:31:33 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 18:27:25 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 18:27:25 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 18:36:43 [info]: User logged in: tih@gmail.com

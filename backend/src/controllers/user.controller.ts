@@ -4,6 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import { ApiResponse } from '../utils/api-response';
 import { JwtRequest } from '../middleware/auth.middleware';
+import { parseAllergyInput, allergyDbFields, toAllergyResponse } from '../utils/allergy';
 
 const prisma = new PrismaClient();
 
@@ -37,6 +38,7 @@ export class UserController {
           id: true, name: true, email: true, class_: true,
           gender: true, age: true, schoolLevel: true,
           profileImageUrl: true, schoolId: true, createdAt: true, updatedAt: true,
+          allergies: true, allergyOther: true, allergyFilled: true,
           school: { select: { id: true, name: true, level: true, city: true, address: true } },
         },
       });
@@ -46,7 +48,7 @@ export class UserController {
         return;
       }
 
-      res.json(ApiResponse.success(user));
+      res.json(ApiResponse.success(toAllergyResponse(user)));
     } catch (error) {
       next(error);
     }
@@ -59,6 +61,13 @@ export class UserController {
     try {
       const { name, class: className, gender, age, school_level, school_id } = req.body;
 
+      // Data alergi: hanya diubah jika dikirim di request
+      const allergy = parseAllergyInput(req.body);
+      if (!allergy.ok) {
+        res.status(422).json(ApiResponse.error(allergy.message, 422));
+        return;
+      }
+
       const user = await prisma.user.update({
         where: { id: req.userId },
         data: {
@@ -68,15 +77,17 @@ export class UserController {
           ...(age !== undefined && { age: parseInt(age) }),
           ...(school_level && { schoolLevel: school_level }),
           ...(school_id && { schoolId: school_id }),
+          ...allergyDbFields(allergy),
         },
         select: {
           id: true, name: true, email: true, class_: true,
           gender: true, age: true, schoolLevel: true,
           profileImageUrl: true, schoolId: true, createdAt: true, updatedAt: true,
+          allergies: true, allergyOther: true, allergyFilled: true,
         },
       });
 
-      res.json(ApiResponse.success(user, 'Profil berhasil diperbarui'));
+      res.json(ApiResponse.success(toAllergyResponse(user), 'Profil berhasil diperbarui'));
     } catch (error) {
       next(error);
     }

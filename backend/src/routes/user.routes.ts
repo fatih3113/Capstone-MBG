@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { UserController, uploadProfileImage } from '../controllers/user.controller';
+import { validateUpdateProfile } from '../middleware/validation.middleware';
 
 const router = Router();
 const ctrl = new UserController();
@@ -9,7 +10,7 @@ const ctrl = new UserController();
 router.get('/profile', authMiddleware, ctrl.getProfile);
 
 // PUT /api/v1/users/profile/update
-router.put('/profile/update', authMiddleware, ctrl.updateProfile);
+router.put('/profile/update', authMiddleware, validateUpdateProfile, ctrl.updateProfile);
 
 // POST /api/v1/users/profile/photo — Upload foto profil
 router.post('/profile/photo', authMiddleware, uploadProfileImage, ctrl.uploadPhoto);

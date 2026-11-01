@@ -7,6 +7,7 @@ import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/sppg_provider.dart';
 import '../../data/models/sppg_model.dart';
+import '../../shared/widgets/allergy_selector.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
 
@@ -25,6 +26,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   String? _selectedGender;
   final _ageController = TextEditingController();
+
+  // Alergi makanan (dikelola oleh AllergySelector)
+  AllergySelection _allergy = const AllergySelection.empty();
 
   // Validasi SPPG
   bool _sppgTouched = false;
@@ -75,6 +79,9 @@ class _RegisterPageState extends State<RegisterPage> {
       gender: _selectedGender,
       age: int.tryParse(_ageController.text),
       sppgId: sppgProvider.selectedSppg?.id,
+      allergies: _allergy.allergyList,
+      allergyOther: _allergy.otherOrNull,
+      allergyFilled: true, // sudah divalidasi: ada pilihan atau "Tidak ada alergi"
     );
 
     if (mounted && success) {
@@ -222,12 +229,20 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 24),
 
+              // ── SECTION ALERGI MAKANAN ──────────────────────────────────
+              AllergySelector(
+                onChanged: (value) => _allergy = value,
+              ),
+              const SizedBox(height: 24),
+
               // ── SECTION WILAYAH SPPG ────────────────────────────────────
               _SppgSection(
                 sppgValidationError:
                     _sppgTouched ? _sppgValidationError : null,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+              const AllergyConsentNote(),
+              const SizedBox(height: 20),
 
               // Register button
               Consumer<AuthProvider>(

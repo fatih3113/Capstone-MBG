@@ -67,6 +67,9 @@ class AuthProvider extends ChangeNotifier {
     String? gender,
     int? age,
     String? sppgId,
+    List<String>? allergies,
+    String? allergyOther,
+    bool? allergyFilled,
   }) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
@@ -79,6 +82,9 @@ class AuthProvider extends ChangeNotifier {
       gender: gender,
       age: age,
       sppgId: sppgId,
+      allergies: allergies,
+      allergyOther: allergyOther,
+      allergyFilled: allergyFilled,
     );
 
     if (response.success) {
@@ -99,6 +105,41 @@ class AuthProvider extends ChangeNotifier {
     _token = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
+  }
+
+  /// Simpan alergi ke server, lalu perbarui data & cache lokal.
+  /// Mengembalikan null jika berhasil, atau pesan error jika gagal.
+  /// (Sengaja tidak mengubah [status] agar layar lain tidak ikut berkedip.)
+  Future<String?> updateAllergies({
+    required List<String> allergies,
+    String? allergyOther,
+  }) async {
+    final current = _user;
+    if (current == null) {
+      return 'Sesi tidak ditemukan. Silakan login kembali.';
+    }
+
+    final response = await _authService.updateAllergies(
+      allergies: allergies,
+      allergyOther: allergyOther,
+    );
+    if (!response.success) return response.message;
+
+    // Pakai nilai yang dikonfirmasi server; jika tidak ada, pakai yang dikirim
+    final data = response.data ?? const <String, dynamic>{};
+    final savedAllergies = (data['allergies'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        allergies;
+    final savedOther = data.containsKey('allergy_other')
+        ? data['allergy_other'] as String?
+        : allergyOther;
+
+    updateUser(current.withAllergy(
+      allergies: savedAllergies,
+      allergyOther: savedOther,
+    ));
+    return null;
   }
 
   void updateUser(UserModel updatedUser) {
