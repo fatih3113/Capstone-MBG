@@ -28,7 +28,9 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Menu MBG Mingguan')),
+      appBar: AppBar(
+        title: const Text('Menu MBG Mingguan'),
+      ),
       body: Consumer<MenuProvider>(
         builder: (context, menu, _) {
           if (menu.isLoading) {

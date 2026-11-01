@@ -287,6 +287,18 @@ export class DistributionService {
         items: { include: { food: { select: { name: true } } } },
       },
     });
+
+    // ← BARU: kirim ulang notifikasi (data menu terbaru) ke siswa.
+    // Dibungkus try/catch agar kegagalan notifikasi tidak membatalkan penyimpanan.
+    try {
+      const { sent } = await this.notifications.notifyMenuScheduled(updated.id, {
+        updated: true,
+      });
+      this.logger.log(`Jadwal ${updated.id} diedit: notifikasi terkirim ke ${sent} siswa`);
+    } catch (e) {
+      this.logger.error(`Gagal mengirim notifikasi edit untuk jadwal ${updated.id}`, e as any);
+    }
+
     return updated;
   }
 

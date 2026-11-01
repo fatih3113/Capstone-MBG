@@ -947,3 +947,11 @@ The column `users.account_status` does not exist in the current database.
 2026-11-01 18:27:25 [info]: 🚀 MBG Nutrition API running on port 3000
 2026-11-01 18:27:25 [info]: 📖 API docs: http://localhost:3000/health
 2026-11-01 18:36:43 [info]: User logged in: tih@gmail.com
+2026-11-01 20:50:59 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 20:50:59 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 21:01:14 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 21:01:14 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 21:03:20 [info]: User logged in: tih@gmail.com
+2026-11-01 21:21:22 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-01 21:21:22 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-01 21:21:31 [info]: User logged in: tih@gmail.com

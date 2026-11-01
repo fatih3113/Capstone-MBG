@@ -23,6 +23,7 @@ import '../../features/profile/profile_page.dart';
 import '../../features/profile/edit_profile_page.dart';
 import '../../features/profile/settings_page.dart';
 import '../../features/report/report_page.dart';
+import '../../features/notifications/notification_page.dart';
 
 class AppRouter {
   static GoRouter createRouter(BuildContext context) {
@@ -70,6 +71,10 @@ class AppRouter {
             GoRoute(
               path: '/menu',
               builder: (_, __) => const MbgMenuPage(),
+            ),
+            GoRoute(
+              path: '/notifications',
+              builder: (_, __) => const NotificationPage(),
             ),
             GoRoute(
               path: '/report',

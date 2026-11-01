@@ -4,11 +4,9 @@ import { ApiResponse } from '../utils/api-response';
 
 const prisma = new PrismaClient();
 
-// Ambil id user dari hasil auth middleware.
-// Token dibuat dengan { userId, email }, jadi umumnya req.user.userId; id juga dicoba sebagai cadangan.
+// Ambil id user dari hasil auth middleware (authMiddleware menyimpan di req.userId).
 const getUserId = (req: Request): string | undefined => {
-  const u = (req as any).user;
-  return u?.userId ?? u?.id;
+  return (req as any).userId;
 };
 
 export class NotificationController {

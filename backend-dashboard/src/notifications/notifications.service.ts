@@ -7,7 +7,17 @@ export class NotificationsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async notifyMenuScheduled(menuId: string): Promise<{ sent: number }> {
+  /**
+   * @param opts.updated true = jadwal diedit admin. Notifikasi lama untuk jadwal ini
+   *                     dihapus lalu dibuat baru (id baru, belum dibaca) supaya
+   *                     pop-up muncul lagi di HP dengan data menu terbaru.
+   */
+  async notifyMenuScheduled(
+    menuId: string,
+    opts: { updated?: boolean } = {},
+  ): Promise<{ sent: number }> {
+    const updated = opts.updated === true;
+
     const menu = await this.prisma.mbgMenu.findUnique({
       where: { id: menuId },
       include: {
@@ -40,6 +50,14 @@ export class NotificationsService {
       return { sent: 0 };
     }
 
+    // Jadwal diedit: buang notifikasi lama (termasuk milik siswa sekolah sebelumnya
+    // kalau sekolah diganti) agar yang tampil hanya data terbaru.
+    if (updated) {
+      await this.prisma.notification.deleteMany({
+        where: { type: 'distribution', data: { path: ['menuId'], equals: menu.id } },
+      });
+    }
+
     // Hindari notifikasi ganda jika jadwal yang sama dikirim ulang
     const already = await this.prisma.notification.findMany({
       where: {
@@ -68,8 +86,10 @@ export class NotificationsService {
     await this.prisma.notification.createMany({
       data: targets.map((s) => ({
         userId: s.id,
-        title: '🍱 Ompreng MBG akan dibagikan',
-        body: `${tanggal}\nMenu: ${menuText}`,
+        title: updated
+          ? '✏️ Menu MBG diperbarui'
+          : '🍱 Ompreng MBG akan dibagikan',
+        body: `${tanggal}\nMenu: ${menuText}${updated ? '\n(Jadwal diperbarui oleh admin)' : ''}`,
         type: 'distribution',
         data: {
           menuId: menu.id,

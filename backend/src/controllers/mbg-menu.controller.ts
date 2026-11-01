@@ -5,14 +5,36 @@ import { JwtRequest } from '../middleware/auth.middleware';
 
 const prisma = new PrismaClient();
 
+/**
+ * Tentukan filter sekolah untuk menu:
+ *  1. Jika query ?school_id= diberikan → pakai itu.
+ *  2. Jika tidak, pakai sekolah milik user (schoolId).
+ *  3. Jika user hanya punya sppgId (hasil register) → semua sekolah di SPPG itu.
+ *  4. Jika tidak ada sama sekali → tanpa filter (perilaku lama).
+ */
+async function buildSchoolFilter(req: JwtRequest): Promise<Record<string, any>> {
+  const { school_id } = req.query;
+  if (school_id) return { schoolId: school_id as string };
+
+  if (req.userId) {
+    const me = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { schoolId: true, sppgId: true },
+    });
+    if (me?.schoolId) return { schoolId: me.schoolId };
+    if (me?.sppgId) return { school: { sppgId: me.sppgId } };
+  }
+  return {};
+}
+
 export class MbgMenuController {
 
   /**
-   * GET /mbg-menu — Menu mingguan (Senin-Jumat) dari sekolah user
+   * GET /mbg-menu — Menu mingguan (Senin-Jumat) dari sekolah/SPPG user
    */
   getWeeklyMenu = async (req: JwtRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { school_id } = req.query;
+      const schoolFilter = await buildSchoolFilter(req); // ← BARU
 
       // Hitung awal minggu (Senin)
       const monday = new Date();
@@ -25,7 +47,7 @@ export class MbgMenuController {
 
       const menus = await prisma.mbgMenu.findMany({
         where: {
-          ...(school_id && { schoolId: school_id as string }),
+          ...schoolFilter, // ← BARU (menggantikan ...(school_id && { schoolId }))
           date: { gte: monday, lte: friday },
         },
         include: {
@@ -50,14 +72,14 @@ export class MbgMenuController {
    */
   getTodayMenu = async (req: JwtRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { school_id } = req.query;
+      const schoolFilter = await buildSchoolFilter(req); // ← BARU
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const menu = await prisma.mbgMenu.findFirst({
         where: {
-          ...(school_id && { schoolId: school_id as string }),
+          ...schoolFilter, // ← BARU
           date: today,
         },
         include: {

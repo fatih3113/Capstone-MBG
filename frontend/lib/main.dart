@@ -15,6 +15,8 @@ import 'data/services/stats_service.dart';
 import 'providers/nutrition_provider.dart';
 import 'providers/sppg_provider.dart';
 import 'data/services/sppg_service.dart';
+import 'providers/notification_provider.dart'; 
+     
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,7 @@ class MbgNutritionApp extends StatelessWidget {
       providers: [
         // Theme
         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
 
         // Auth
         ChangeNotifierProvider(

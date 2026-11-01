@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Bungkus halaman Home dengan widget ini. Ia akan:
 ///  - mengambil notifikasi belum dibaca dari GET /notifications?unread=true
 ///  - menampilkan pop-up "Ompreng MBG akan dibagikan" (satu per satu)
-///  - menandai notifikasi sebagai dibaca setelah siswa menekan "Oke"
+///  - mengingat ID yang sudah di-popup (SharedPreferences) agar tidak muncul dua kali
+///  - status "dibaca" baru berubah saat dibuka dari halaman Notifikasi (menu)
 ///  - memeriksa ulang tiap [interval] dan saat aplikasi kembali dibuka
 ///
 /// Pemakaian:
@@ -41,11 +43,27 @@ class _DistributionNotificationWatcherState
   final List<Map<String, dynamic>> _queue = [];
   bool _dialogOpen = false;
 
+  static const _kShownKey = 'shown_distribution_notif_ids';
+
+  Future<void> _loadShown() async {
+    final prefs = await SharedPreferences.getInstance();
+    _handled.addAll(prefs.getStringList(_kShownKey) ?? const []);
+  }
+
+  Future<void> _saveShown() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = _handled.toList();
+    await prefs.setStringList(
+        _kShownKey, list.length > 200 ? list.sublist(list.length - 200) : list);
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _check();
+    _loadShown().then((_) {
+      if (mounted) _check();
+    });
     _timer = Timer.periodic(widget.interval, (_) => _check());
   }
 
@@ -90,12 +108,9 @@ class _DistributionNotificationWatcherState
     while (_queue.isNotEmpty && mounted) {
       final n = _queue.removeAt(0);
       await _showDialog(n);
-      try {
-        await widget.dio.patch('/notifications/${n['id']}/read');
-      } catch (_) {}
+      await _saveShown();
     }
     _dialogOpen = false;
-    if (mounted) _check(); // perbarui badge setelah ditandai dibaca
   }
 
   Future<void> _showDialog(Map<String, dynamic> n) {
