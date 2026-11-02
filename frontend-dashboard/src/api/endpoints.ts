@@ -8,6 +8,7 @@ import type {
   DistributionSummary, SchoolDistribution, DistributionRecord,
   School, FoodOption, FoodItem, SchoolItem,
   SppgItem, SppgRegionSummary, SppgOption,
+  UserItem, UserSummary,
   PaginatedResponse,
 } from '@/types/api.types';
 
@@ -157,6 +158,18 @@ export const schoolsApi = {
 
   delete: (id: string) =>
     apiClient.delete<{ success: boolean; message: string }>(`/schools/${id}`),
+};
+
+// ── Data Pengguna Mobile ─────────────────────────────────────
+export const usersApi = {
+  list: (params?: {
+    search?: string; level?: string; gender?: string; allergy?: string;
+    schoolId?: string; page?: number; limit?: number;
+  }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<UserItem> }>('/users', { params }),
+
+  summary: () =>
+    apiClient.get<{ success: boolean; data: UserSummary }>('/users/summary'),
 };
 
 // ── SPPG (Wilayah SPPG) ──────────────────────────────────────────────

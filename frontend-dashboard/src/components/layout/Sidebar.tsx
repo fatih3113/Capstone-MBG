@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
   LayoutDashboard, ClipboardList, Star,
-  MessageSquare, BarChart3, LogOut, Menu, X, Truck, UtensilsCrossed, School, MapPin,
+  MessageSquare, BarChart3, LogOut, Menu, X, Truck, UtensilsCrossed, School, MapPin, Users,
 } from 'lucide-react';
 import '@/styles/brand.css';
 
@@ -17,6 +17,7 @@ const navItems = [
   { to: '/foods', label: 'Data Makanan', icon: UtensilsCrossed },
   { to: '/schools', label: 'Data Sekolah', icon: School },
   { to: '/sppg', label: 'Wilayah SPPG', icon: MapPin },
+  { to: '/users', label: 'Data Pengguna', icon: Users },
 ];
 
 export default function Sidebar() {

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../data/models/school_model.dart';
 import '../data/models/sppg_model.dart';
 import '../data/services/sppg_service.dart';
 
@@ -35,6 +36,12 @@ class SppgProvider extends ChangeNotifier {
   SppgModel? _selectedSppg;
   String? _sppgError;
 
+  // ── State sekolah (bergantung pada SPPG terpilih) ───────────────────────
+  SppgLoadState _schoolState = SppgLoadState.initial;
+  List<SchoolModel> _schoolList = [];
+  SchoolModel? _selectedSchool;
+  String? _schoolError;
+
   // ── Getters ──────────────────────────────────────────────────────────────
   SppgLoadState get provinsiState => _provinsiState;
   List<String> get provinces => _provinces;
@@ -55,6 +62,11 @@ class SppgProvider extends ChangeNotifier {
   List<SppgModel> get sppgList => _sppgList;
   SppgModel? get selectedSppg => _selectedSppg;
   String? get sppgError => _sppgError;
+
+  SppgLoadState get schoolState => _schoolState;
+  List<SchoolModel> get schoolList => _schoolList;
+  SchoolModel? get selectedSchool => _selectedSchool;
+  String? get schoolError => _schoolError;
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -162,8 +174,34 @@ class SppgProvider extends ChangeNotifier {
   }
 
   /// Dipanggil saat pengguna memilih SPPG akhir.
-  void selectSppg(SppgModel? sppg) {
+  Future<void> selectSppg(SppgModel? sppg) async {
     _selectedSppg = sppg;
+    _resetSchool();
+
+    if (sppg == null) {
+      notifyListeners();
+      return;
+    }
+
+    _schoolState = SppgLoadState.loading;
+    notifyListeners();
+
+    final resp = await _service.getSchools(sppgId: sppg.id);
+    // Abaikan hasil lama bila pengguna sudah mengganti SPPG selagi memuat
+    if (_selectedSppg?.id != sppg.id) return;
+    if (resp.success && resp.data != null) {
+      _schoolList = resp.data!;
+      _schoolState = SppgLoadState.loaded;
+    } else {
+      _schoolError = resp.message;
+      _schoolState = SppgLoadState.error;
+    }
+    notifyListeners();
+  }
+
+  /// Dipanggil saat pengguna memilih sekolah.
+  void selectSchool(SchoolModel? school) {
+    _selectedSchool = school;
     notifyListeners();
   }
 
@@ -199,5 +237,13 @@ class SppgProvider extends ChangeNotifier {
     _selectedSppg = null;
     _sppgError = null;
     _sppgState = SppgLoadState.initial;
+    _resetSchool();
+  }
+
+  void _resetSchool() {
+    _schoolList = [];
+    _selectedSchool = null;
+    _schoolError = null;
+    _schoolState = SppgLoadState.initial;
   }
 }

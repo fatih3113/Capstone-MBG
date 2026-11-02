@@ -207,6 +207,22 @@ export interface FoodItem {
   nutrition: FoodNutrition | null;
 }
 
+// ── Data Pengguna Mobile ───────────────────────────────────────────
+export interface UserItem {
+  id: string; name: string; email: string;
+  gender: 'L' | 'P' | null; age: number | null;
+  className: string | null; schoolLevel: string | null;
+  createdAt: string;
+  allergies: string[]; allergyOther: string | null; allergyFilled: boolean;
+  school: { id: string; name: string } | null;
+  sppg: { id: string; nama: string } | null;
+}
+
+export interface UserSummary {
+  total: number; newThisMonth: number; withAllergy: number;
+  withoutSchool: number; male: number; female: number;
+}
+
 // ── CRUD Sekolah ───────────────────────────────────────────────────
 export interface SchoolItem {
   id: string; name: string; level: string;

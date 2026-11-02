@@ -44,15 +44,20 @@ export class SchoolController {
   };
 
   /**
-   * GET /schools?level=SD&city=Jakarta — Filter sekolah berdasarkan level/kota
+   * GET /schools?level=SD&city=Jakarta&sppg_id=... — Filter sekolah berdasarkan level/kota/SPPG
    */
   getSchoolsFiltered = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { level, city, search } = req.query;
+      const { level, city, search, sppg_id } = req.query;
 
       const schools = await prisma.school.findMany({
         where: {
           ...(level && { level: level as string }),
+          // Sekolah milik SPPG tsb + sekolah yang belum ditautkan ke SPPG mana pun,
+          // supaya register tidak buntu bila admin belum mengisi SPPG di Data Sekolah.
+          ...(sppg_id && {
+            OR: [{ sppgId: sppg_id as string }, { sppgId: null }],
+          }),
           ...(city && { city: city as string }),
           ...(search && {
             name: { contains: search as string, mode: 'insensitive' },

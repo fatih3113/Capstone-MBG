@@ -11,6 +11,7 @@ import DistributionPage from '@/pages/distribution';
 import FoodsPage from '@/pages/foods';
 import SchoolsPage from '@/pages/schools';
 import SppgRegionsPage from '@/pages/SppgRegionsPage';
+import UsersPage from '@/pages/users';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="foods" element={<FoodsPage />} />
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="sppg" element={<SppgRegionsPage />} />
+            <Route path="users" element={<UsersPage />} />
           </Route>
 
           {/* Fallback */}

@@ -66,6 +66,22 @@ export class AuthController {
         }
       }
 
+      // 422 #4: school_id (jika disertakan) harus ada; jenjang diambil dari sekolah
+      let schoolLevel: string | undefined;
+      if (school_id) {
+        const school = await prisma.school.findUnique({ where: { id: school_id } });
+        if (!school) {
+          logger.warn(`[REGISTER] Sekolah tidak ditemukan untuk school_id: ${school_id}`);
+          res.status(422).json(ApiResponse.error('Sekolah tidak ditemukan', 422));
+          return;
+        }
+        if (sppg_id && school.sppgId && school.sppgId !== sppg_id) {
+          res.status(422).json(ApiResponse.error('Sekolah tidak terdaftar pada SPPG yang dipilih', 422));
+          return;
+        }
+        schoolLevel = school.level; // SD | SMP | SMA | SMK → tampil di Profil (Jenjang)
+      }
+
       // Hash password
       const passwordHash = await bcrypt.hash(password, 12);
 
@@ -76,6 +92,7 @@ export class AuthController {
           email,
           passwordHash,
           schoolId: school_id || undefined,
+          schoolLevel,
           sppgId: sppg_id || undefined,
           class_: className,
           gender: gender || undefined,
@@ -85,7 +102,7 @@ export class AuthController {
         select: {
           id: true, name: true, email: true,
           class_: true, gender: true, age: true,
-          schoolLevel: true, createdAt: true,
+          schoolId: true, schoolLevel: true, createdAt: true,
         },
       });
 

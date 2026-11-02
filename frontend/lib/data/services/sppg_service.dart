@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
+import '../models/school_model.dart';
 import '../models/sppg_model.dart';
 
 class SppgService {
@@ -49,6 +50,36 @@ class SppgService {
           ? (e.response!.data as Map)['message'] as String?
           : null;
       return ApiResponse.error(message: msg ?? 'Gagal memuat wilayah');
+    } catch (e) {
+      return ApiResponse.error(message: 'Terjadi kesalahan. Coba lagi.');
+    }
+  }
+
+  // ── SEKOLAH ──────────────────────────────────────────────────────────────
+
+  /// Ambil daftar sekolah untuk SPPG terpilih (dipakai di halaman Register)
+  Future<ApiResponse<List<SchoolModel>>> getSchools({String? sppgId}) async {
+    try {
+      final response = await DioClient.instance.get(
+        ApiConstants.schools,
+        queryParameters: {if (sppgId != null) 'sppg_id': sppgId},
+      );
+      final apiResp = ApiResponse<List<dynamic>>.fromJson(
+        response.data,
+        (data) => data as List<dynamic>,
+      );
+      if (!apiResp.success) {
+        return ApiResponse.error(message: apiResp.message);
+      }
+      final schools = (apiResp.data ?? [])
+          .map((e) => SchoolModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return ApiResponse.success(data: schools, message: apiResp.message);
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? (e.response!.data as Map)['message'] as String?
+          : null;
+      return ApiResponse.error(message: msg ?? 'Gagal memuat daftar sekolah');
     } catch (e) {
       return ApiResponse.error(message: 'Terjadi kesalahan. Coba lagi.');
     }

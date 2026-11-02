@@ -6,6 +6,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/sppg_provider.dart';
+import '../../data/models/school_model.dart';
 import '../../data/models/sppg_model.dart';
 import '../../shared/widgets/allergy_selector.dart';
 import '../../shared/widgets/custom_button.dart';
@@ -26,6 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   String? _selectedGender;
   final _ageController = TextEditingController();
+  final _classController = TextEditingController();
 
   // Alergi makanan (dikelola oleh AllergySelector)
   AllergySelection _allergy = const AllergySelection.empty();
@@ -50,6 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _ageController.dispose();
+    _classController.dispose();
     super.dispose();
   }
 
@@ -57,6 +60,9 @@ class _RegisterPageState extends State<RegisterPage> {
     final sppgProv = context.read<SppgProvider>();
     if (sppgProv.selectedSppg == null) {
       return 'Harap pilih SPPG tempat Anda terdaftar';
+    }
+    if (sppgProv.selectedSchool == null) {
+      return 'Harap pilih sekolah Anda';
     }
     return null;
   }
@@ -79,6 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
       gender: _selectedGender,
       age: int.tryParse(_ageController.text),
       sppgId: sppgProvider.selectedSppg?.id,
+      schoolId: sppgProvider.selectedSchool?.id,
+      className: _classController.text.trim().isEmpty
+          ? null
+          : _classController.text.trim(),
       allergies: _allergy.allergyList,
       allergyOther: _allergy.otherOrNull,
       allergyFilled: true, // sudah divalidasi: ada pilihan atau "Tidak ada alergi"
@@ -227,6 +237,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     color: AppColors.textHint, size: 20),
                 validator: Validators.age,
               ),
+              const SizedBox(height: 16),
+
+              // Kelas (tampil di Profil)
+              CustomTextField(
+                label: 'Kelas',
+                hint: 'Contoh: 7A (boleh dikosongkan)',
+                controller: _classController,
+                prefixIcon: const Icon(Icons.class_outlined,
+                    color: AppColors.textHint, size: 20),
+              ),
               const SizedBox(height: 24),
 
               // ── SECTION ALERGI MAKANAN ──────────────────────────────────
@@ -314,7 +334,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Pilih SPPG (Satuan Pelayanan Pemenuhan Gizi) tempat Anda terdaftar',
+            'Pilih SPPG (Satuan Pelayanan Pemenuhan Gizi), lalu sekolah Anda',
             style: AppTextStyles.bodySmall
                 .copyWith(color: AppColors.textSecondary),
           ),
@@ -417,6 +437,34 @@ class _SppgSection extends StatelessWidget {
                   : null,
               itemLabel: (s) => s.displayLabel,
               onChanged: (val) => prov.selectSppg(val),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Dropdown Sekolah (muncul setelah SPPG dipilih)
+          Consumer<SppgProvider>(
+            builder: (_, prov, __) => _WilayahDropdown<SchoolModel>(
+              label: 'Sekolah',
+              hint: prov.selectedSppg == null
+                  ? 'Pilih SPPG terlebih dahulu'
+                  : 'Pilih sekolah',
+              value: prov.selectedSchool,
+              items: prov.schoolList,
+              isLoading: prov.schoolState == SppgLoadState.loading,
+              isEnabled: prov.selectedSppg != null &&
+                  prov.schoolState != SppgLoadState.loading,
+              isEmpty: prov.selectedSppg != null &&
+                  prov.schoolState == SppgLoadState.loaded &&
+                  prov.schoolList.isEmpty,
+              emptyMessage: 'Belum ada sekolah untuk SPPG ini',
+              errorMessage: prov.schoolState == SppgLoadState.error
+                  ? prov.schoolError
+                  : null,
+              onRetry: prov.selectedSppg != null
+                  ? () => prov.selectSppg(prov.selectedSppg)
+                  : null,
+              itemLabel: (s) => s.displayLabel,
+              onChanged: (val) => prov.selectSchool(val),
             ),
           ),
 

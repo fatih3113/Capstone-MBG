@@ -69,6 +69,13 @@ export const validateRegister = [
     .trim()
     .notEmpty()
     .withMessage('Format sppg_id tidak valid'),
+  // Keberadaan sekolah dicek ke database di controller ("Sekolah tidak ditemukan")
+  body('school_id')
+    .optional(EMPTY_OK)
+    .isString()
+    .trim()
+    .notEmpty()
+    .withMessage('Format school_id tidak valid'),
   ...allergyValidators,
 ];
 
