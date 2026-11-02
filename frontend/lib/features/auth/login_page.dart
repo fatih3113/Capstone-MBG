@@ -7,6 +7,7 @@ import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
+import '../../shared/widgets/app_logo.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -117,20 +118,7 @@ class _LoginPageState extends State<LoginPage>
                     Center(
                       child: Column(
                         children: [
-                          Container(
-                            width: 80, height: 80,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: AppColors.primaryGradient,
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Center(
-                              child: Text('🍱', style: TextStyle(fontSize: 36)),
-                            ),
-                          ),
+                          const AppLogo(size: 104, withShadow: true),
                           const SizedBox(height: 20),
                           const Text('Selamat Datang!',
                             style: AppTextStyles.headlineLarge),

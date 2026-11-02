@@ -57,10 +57,11 @@ export const validateRegister = [
     .optional(EMPTY_OK)
     .isIn(['L', 'P'])
     .withMessage('Jenis kelamin harus L atau P'),
+  // min 0: peserta posyandu bisa balita (siswa sekolah tetap divalidasi min 5 di aplikasi)
   body('age')
     .optional(EMPTY_OK)
-    .isInt({ min: 5, max: 100 })
-    .withMessage('Umur harus antara 5-100 tahun'),
+    .isInt({ min: 0, max: 100 })
+    .withMessage('Umur harus antara 0-100 tahun'),
   // Sebelumnya isUUID(). Dibuat longgar: keberadaan SPPG tetap dicek ke database
   // di controller ("SPPG tidak ditemukan"), jadi format ID tidak perlu dikunci di sini.
   body('sppg_id')

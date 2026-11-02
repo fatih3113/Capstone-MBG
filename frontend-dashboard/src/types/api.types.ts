@@ -48,8 +48,20 @@ export interface RecentScan {
   foods: string[];
 }
 
+export interface InstitutionStat {
+  institutions: number;
+  users: number;
+  scans: number;
+}
+
+export interface InstitutionSummary {
+  sekolah: InstitutionStat;
+  posyandu: InstitutionStat;
+}
+
 export interface DashboardOverview {
   summary: DashboardSummary;
+  institutionSummary?: InstitutionSummary;
   menuRequestsByStatus: StatusCount[];
   consumptionSummary: StatusCount[];
   topFavorites: FavoriteFood[];
@@ -208,6 +220,8 @@ export interface FoodItem {
 }
 
 // ── Data Pengguna Mobile ───────────────────────────────────────────
+export type InstitutionType = 'sekolah' | 'posyandu';
+
 export interface UserItem {
   id: string; name: string; email: string;
   gender: 'L' | 'P' | null; age: number | null;
@@ -223,7 +237,7 @@ export interface UserSummary {
   withoutSchool: number; male: number; female: number;
 }
 
-// ── CRUD Sekolah ───────────────────────────────────────────────────
+// ── CRUD Sekolah / Lembaga ─────────────────────────────────────────
 export interface SchoolItem {
   id: string; name: string; level: string;
   address: string | null; city: string | null;

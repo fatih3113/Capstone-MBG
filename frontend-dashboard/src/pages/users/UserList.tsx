@@ -1,8 +1,9 @@
-import type { UserItem } from '@/types/api.types';
+import type { UserItem, InstitutionType } from '@/types/api.types';
 import { Users } from 'lucide-react';
 import { ALLERGY_LABEL, LEVEL_COLOR, fmtDate, genderLabel } from './types';
 
 interface UserListProps {
+  type: InstitutionType;
   records: UserItem[];
   total: number;
   page: number;
@@ -10,7 +11,11 @@ interface UserListProps {
   onPageChange: (page: number) => void;
 }
 
-export default function UserList({ records, total, page, totalPages, onPageChange }: UserListProps) {
+export default function UserList({
+  type, records, total, page, totalPages, onPageChange,
+}: UserListProps) {
+  const isPosyandu = type === 'posyandu';
+
   return (
     <div>
       <div className="table-wrapper">
@@ -18,9 +23,9 @@ export default function UserList({ records, total, page, totalPages, onPageChang
           <thead>
             <tr>
               <th>Pengguna</th>
-              <th>Sekolah / SPPG</th>
-              <th>Kelas</th>
-              <th>Jenjang</th>
+              <th>{isPosyandu ? 'Posyandu / SPPG' : 'Sekolah / SPPG'}</th>
+              <th>{isPosyandu ? 'Kelompok' : 'Kelas'}</th>
+              <th>{isPosyandu ? 'Tipe' : 'Jenjang'}</th>
               <th>Jenis Kelamin</th>
               <th style={{ textAlign: 'center' }}>Umur</th>
               <th>Alergi</th>
@@ -43,7 +48,9 @@ export default function UserList({ records, total, page, totalPages, onPageChang
                 <td>
                   {u.school
                     ? <strong style={{ fontWeight: 500 }}>{u.school.name}</strong>
-                    : <span className="badge badge--orange">Belum pilih sekolah</span>}
+                    : <span className="badge badge--orange">
+                        {isPosyandu ? 'Belum pilih posyandu' : 'Belum pilih sekolah'}
+                      </span>}
                   <div className="row-sub">{u.sppg?.nama ?? '—'}</div>
                 </td>
                 <td>{u.className || '—'}</td>

@@ -10,8 +10,8 @@ export class UsersController {
   constructor(private readonly svc: UsersService) {}
 
   @Get('summary')
-  async summary() {
-    return { success: true, data: await this.svc.summary() };
+  async summary(@Query('type') type?: string) {
+    return { success: true, data: await this.svc.summary(type) };
   }
 
   @Get()
@@ -21,13 +21,14 @@ export class UsersController {
     @Query('gender') gender?: string,
     @Query('allergy') allergy?: string, // ada | tidak | belum
     @Query('schoolId') schoolId?: string,
+    @Query('type') type?: string,       // sekolah | posyandu
     @Query('page') page = 1,
     @Query('limit') limit = 15,
   ) {
     return {
       success: true,
       data: await this.svc.findAll({
-        search, level, gender, allergy, schoolId,
+        search, level, gender, allergy, schoolId, type,
         page: Math.max(1, +page || 1),
         limit: Math.min(100, Math.max(1, +limit || 15)),
       }),

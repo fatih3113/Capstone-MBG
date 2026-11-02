@@ -53,7 +53,8 @@ class Validators {
     return null;
   }
 
-  static String? age(String? value) {
+  /// [min] = 5 untuk siswa sekolah, 0 untuk peserta posyandu (balita).
+  static String? age(String? value, {int min = 5}) {
     if (value == null || value.trim().isEmpty) {
       return null; // optional
     }
@@ -61,8 +62,8 @@ class Validators {
     if (age == null) {
       return 'Umur harus berupa angka';
     }
-    if (age < 5 || age > 100) {
-      return 'Umur harus antara 5-100 tahun';
+    if (age < min || age > 100) {
+      return 'Umur harus antara $min-100 tahun';
     }
     return null;
   }

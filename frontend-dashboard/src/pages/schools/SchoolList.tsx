@@ -1,8 +1,9 @@
-import type { SchoolItem } from '@/types/api.types';
+import type { SchoolItem, InstitutionType } from '@/types/api.types';
 import { Pencil, Trash2, Building2 } from 'lucide-react';
 import { LEVEL_COLOR } from './types';
 
 interface SchoolListProps {
+  type: InstitutionType;
   records: SchoolItem[];
   total: number;
   page: number;
@@ -13,16 +14,19 @@ interface SchoolListProps {
 }
 
 export default function SchoolList({
-  records, total, page, totalPages, onEdit, onDelete, onPageChange,
+  type, records, total, page, totalPages, onEdit, onDelete, onPageChange,
 }: SchoolListProps) {
+  const isPosyandu = type === 'posyandu';
+  const label = isPosyandu ? 'Posyandu' : 'Sekolah';
+
   return (
     <div>
       <div className="table-wrapper">
         <table className="data-table" id="schools-table">
           <thead>
             <tr>
-              <th>Nama Sekolah / Lembaga</th>
-              <th>Jenjang</th>
+              <th>Nama {label}</th>
+              <th>{isPosyandu ? 'Tipe' : 'Jenjang'}</th>
               <th>Kota / Kab.</th>
               <th>Alamat</th>
               <th style={{ textAlign: 'center' }}>Jadwal Distribusi</th>
@@ -33,7 +37,7 @@ export default function SchoolList({
             {records.length === 0 ? (
               <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-3)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '.75rem' }}>
-                  <Building2 size={32} /><span>Belum ada sekolah. Klik "Tambah Sekolah".</span>
+                  <Building2 size={32} /><span>Belum ada {label.toLowerCase()}. Klik "Tambah {label}".</span>
                 </div>
               </td></tr>
             ) : records.map((s) => (
@@ -69,7 +73,7 @@ export default function SchoolList({
 
       {/* Footer pagination */}
       <div className="table-footer">
-        <p className="table-footer__count">Total <strong>{total}</strong> sekolah</p>
+        <p className="table-footer__count">Total <strong>{total}</strong> {label.toLowerCase()}</p>
         {totalPages > 1 && (
           <div className="pagination">
             <button id="school-prev-page" className="btn btn--ghost btn--sm"

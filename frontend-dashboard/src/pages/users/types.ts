@@ -3,10 +3,12 @@ export const ALLERGY_LABEL: Record<string, string> = {
   udang: 'Udang', gandum: 'Gandum', kedelai: 'Kedelai', lainnya: 'Lainnya',
 };
 
+/** Jenjang untuk filter pengguna di tab Sekolah */
 export const LEVELS = ['SD', 'SMP', 'SMA', 'SMK'];
 
 export const LEVEL_COLOR: Record<string, string> = {
   SD: 'badge--blue', SMP: 'badge--green', SMA: 'badge--yellow', SMK: 'badge--purple',
+  Posyandu: 'badge--orange',
 };
 
 export const genderLabel = (g: string | null) =>

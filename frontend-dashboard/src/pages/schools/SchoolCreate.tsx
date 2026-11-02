@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
 import { schoolsApi, sppgApi } from '@/api/endpoints';
 import { X, Check } from 'lucide-react';
-import { LEVELS, emptySchoolForm } from './types';
+import { SEKOLAH_LEVELS, POSYANDU_LEVELS, emptySchoolForm } from './types';
 import type { SchoolForm } from './types';
-import type { SppgItem } from '@/types/api.types';
+import type { SppgItem, InstitutionType } from '@/types/api.types';
 
 interface SchoolCreateProps {
+  type: InstitutionType;
   onSuccess: () => void;
   onClose: () => void;
 }
 
-export default function SchoolCreate({ onSuccess, onClose }: SchoolCreateProps) {
-  const [form, setForm] = useState<SchoolForm>(emptySchoolForm());
+export default function SchoolCreate({ type, onSuccess, onClose }: SchoolCreateProps) {
+  const isPosyandu = type === 'posyandu';
+  const label = isPosyandu ? 'Posyandu' : 'Sekolah';
+  const levelOptions = isPosyandu ? POSYANDU_LEVELS : SEKOLAH_LEVELS;
+
+  const [form, setForm] = useState<SchoolForm>({
+    ...emptySchoolForm(),
+    level: isPosyandu ? 'Posyandu' : '',
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [sppgOptions, setSppgOptions] = useState<SppgItem[]>([]);
@@ -44,7 +52,7 @@ export default function SchoolCreate({ onSuccess, onClose }: SchoolCreateProps) 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog">
         <div className="modal__header">
-          <h2 className="modal__title">Tambah Sekolah / Lembaga</h2>
+          <h2 className="modal__title">Tambah {label}</h2>
           <button className="modal__close" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="modal__body">
@@ -52,16 +60,18 @@ export default function SchoolCreate({ onSuccess, onClose }: SchoolCreateProps) 
 
           <div className="form-row-2">
             <div className="form-group">
-              <label className="form-label" htmlFor="sch-name">Nama Sekolah / Lembaga *</label>
-              <input id="sch-name" className="form-input" value={form.name} placeholder="cth. SDN 01 Jakarta"
+              <label className="form-label" htmlFor="sch-name">Nama {label} *</label>
+              <input id="sch-name" className="form-input" value={form.name}
+                placeholder={isPosyandu ? 'cth. Posyandu Melati 01' : 'cth. SDN 01 Jakarta'}
                 onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="sch-level">Jenjang / Tipe *</label>
+              <label className="form-label" htmlFor="sch-level">{isPosyandu ? 'Tipe *' : 'Jenjang *'}</label>
               <select id="sch-level" className="form-input" value={form.level}
+                disabled={isPosyandu}
                 onChange={(e) => setForm({ ...form, level: e.target.value })}>
                 <option value="">— Pilih —</option>
-                {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+                {levelOptions.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
             </div>
           </div>

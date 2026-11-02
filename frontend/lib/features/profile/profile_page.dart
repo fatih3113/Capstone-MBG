@@ -14,6 +14,8 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
+    // Akun posyandu/puskesmas: tidak punya Kelas & Jenjang sekolah
+    final isHealth = const {'Posyandu', 'Puskesmas'}.contains(user?.schoolLevel);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -81,11 +83,12 @@ class ProfilePage extends StatelessWidget {
                   // Profile info card
                   _buildInfoCard([
                     _InfoRow(icon: Icons.school_outlined,
-                      label: 'Sekolah',
+                      label: isHealth ? 'Posyandu' : 'Sekolah',
                       value: user?.schoolName ?? '-'),
-                    _InfoRow(icon: Icons.class_outlined,
-                      label: 'Kelas',
-                      value: user?.className ?? '-'),
+                    if (!isHealth)
+                      _InfoRow(icon: Icons.class_outlined,
+                        label: 'Kelas',
+                        value: user?.className ?? '-'),
                     _InfoRow(icon: Icons.person_outline,
                       label: 'Jenis Kelamin',
                       value: user?.genderLabel ?? '-'),
@@ -93,7 +96,7 @@ class ProfilePage extends StatelessWidget {
                       label: 'Umur',
                       value: user?.age != null ? '${user!.age} tahun' : '-'),
                     _InfoRow(icon: Icons.account_balance_outlined,
-                      label: 'Jenjang',
+                      label: isHealth ? 'Jenis' : 'Jenjang',
                       value: user?.schoolLevel ?? '-'),
                   ]),
                   const SizedBox(height: 16),

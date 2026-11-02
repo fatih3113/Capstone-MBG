@@ -145,12 +145,14 @@ export const foodsApi = {
     apiClient.delete<{ success: boolean; message: string }>(`/foods/${id}`),
 };
 
-// ── Sekolah (Schools CRUD) ───────────────────────────────────
+// ── Lembaga: Sekolah & Posyandu (Schools CRUD) ───────────────
 export const schoolsApi = {
-  list: (params?: { search?: string; level?: string; page?: number; limit?: number }) =>
+  list: (params?: {
+    search?: string; level?: string; type?: string; page?: number; limit?: number;
+  }) =>
     apiClient.get<{ success: boolean; data: PaginatedResponse<SchoolItem> }>('/schools', { params }),
 
-  create: (body: { name: string; level: string; address?: string; city?: string }) =>
+  create: (body: { name: string; level: string; address?: string; city?: string; sppgId?: string }) =>
     apiClient.post<{ success: boolean; message: string; data: SchoolItem }>('/schools', body),
 
   update: (id: string, body: { name?: string; level?: string; address?: string; city?: string; sppgId?: string | null }) =>
@@ -164,12 +166,12 @@ export const schoolsApi = {
 export const usersApi = {
   list: (params?: {
     search?: string; level?: string; gender?: string; allergy?: string;
-    schoolId?: string; page?: number; limit?: number;
+    schoolId?: string; type?: string; page?: number; limit?: number;
   }) =>
     apiClient.get<{ success: boolean; data: PaginatedResponse<UserItem> }>('/users', { params }),
 
-  summary: () =>
-    apiClient.get<{ success: boolean; data: UserSummary }>('/users/summary'),
+  summary: (type?: string) =>
+    apiClient.get<{ success: boolean; data: UserSummary }>('/users/summary', { params: { type } }),
 };
 
 // ── SPPG (Wilayah SPPG) ──────────────────────────────────────────────

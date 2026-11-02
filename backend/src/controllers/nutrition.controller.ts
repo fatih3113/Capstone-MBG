@@ -124,7 +124,27 @@ export class NutritionController {
       let fiberTarget: number;
 
       // Aturan berdasarkan AKG (Angka Kecukupan Gizi) Indonesia
-      if (schoolLevel === 'SD') {
+      // Peserta Posyandu usia balita → AKG 2019 (Permenkes 28/2019), L & P sama.
+      // Catatan: umur < 1 tahun ikut target 1-3 tahun.
+      const isBalita = schoolLevel === 'Posyandu' && age <= 6;
+
+      if (isBalita) {
+        if (age <= 3) {
+          // 1-3 tahun
+          caloriesTarget = 1350;
+          proteinTarget = 20;
+          carbsTarget = 215;
+          fatTarget = 45;
+          fiberTarget = 19;
+        } else {
+          // 4-6 tahun
+          caloriesTarget = 1400;
+          proteinTarget = 25;
+          carbsTarget = 220;
+          fatTarget = 50;
+          fiberTarget = 20;
+        }
+      } else if (schoolLevel === 'SD') {
         caloriesTarget = gender === 'L' ? 1850 : 1750;
         proteinTarget = gender === 'L' ? 49 : 45;
         carbsTarget = gender === 'L' ? 265 : 250;

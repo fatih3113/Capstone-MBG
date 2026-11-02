@@ -18,6 +18,11 @@ export class DashboardService {
       consumptionDistribution,
       topFavorites,
       recentScans,
+      posyanduCount,
+      schoolCount,
+      posyanduUsers,
+      totalUsers,
+      posyanduScans,
     ] = await Promise.all([
       // Total usulan menu
       this.prisma.menuRequest.count({
@@ -83,6 +88,27 @@ export class DashboardService {
           },
         },
       }),
+
+      // ── Ringkasan per lembaga ──────────────────────────────
+      // Jumlah lembaga Posyandu
+      this.prisma.school.count({ where: { level: 'Posyandu' } }),
+
+      // Jumlah lembaga Sekolah (selain Posyandu)
+      this.prisma.school.count({ where: { level: { not: 'Posyandu' } } }),
+
+      // Pengguna Posyandu
+      this.prisma.user.count({ where: { role: 'student', schoolLevel: 'Posyandu' } }),
+
+      // Total pengguna mobile
+      this.prisma.user.count({ where: { role: 'student' } }),
+
+      // Scan oleh pengguna Posyandu
+      this.prisma.scanHistory.count({
+        where: {
+          ...(dateFilter ? { scannedAt: dateFilter } : {}),
+          user: { schoolLevel: 'Posyandu' },
+        },
+      }),
     ]);
 
     return {
@@ -94,6 +120,18 @@ export class DashboardService {
         avgFoodRating: avgRatingAgg._avg.rating
           ? +avgRatingAgg._avg.rating.toFixed(2)
           : null,
+      },
+      institutionSummary: {
+        sekolah: {
+          institutions: schoolCount,
+          users: totalUsers - posyanduUsers,
+          scans: totalScans - posyanduScans,
+        },
+        posyandu: {
+          institutions: posyanduCount,
+          users: posyanduUsers,
+          scans: posyanduScans,
+        },
       },
       menuRequestsByStatus: menuRequestsByStatus.map((s) => ({
         status: s.status,

@@ -96,7 +96,7 @@ export class AuthController {
           sppgId: sppg_id || undefined,
           class_: className,
           gender: gender || undefined,
-          age: age ? parseInt(age) : null,
+          age: age !== undefined && age !== null && age !== '' ? parseInt(age) : null,
           ...allergyDbFields(allergy),
         },
         select: {

@@ -8,18 +8,35 @@ export class UsersService {
   /** Hanya pengguna mobile; akun admin tidak ditampilkan. */
   private readonly base = { role: 'student' };
 
+  /**
+   * Pemisah pengguna Sekolah vs Posyandu.
+   * Posyandu = schoolLevel 'Posyandu'; Sekolah = selain itu (termasuk yang null).
+   */
+  private scope(type?: string) {
+    if (type === 'posyandu') return { schoolLevel: 'Posyandu' };
+    if (type === 'sekolah') {
+      return { OR: [{ schoolLevel: null }, { schoolLevel: { not: 'Posyandu' } }] };
+    }
+    return {};
+  }
+
   async findAll(p: {
-    search?: string; level?: string; gender?: string;
+    search?: string; level?: string; gender?: string; type?: string;
     allergy?: string; schoolId?: string; page: number; limit: number;
   }) {
     const where: any = { ...this.base };
+    const and: any[] = [this.scope(p.type)];
 
     if (p.search) {
-      where.OR = [
-        { name: { contains: p.search, mode: 'insensitive' } },
-        { email: { contains: p.search, mode: 'insensitive' } },
-      ];
+      and.push({
+        OR: [
+          { name: { contains: p.search, mode: 'insensitive' } },
+          { email: { contains: p.search, mode: 'insensitive' } },
+        ],
+      });
     }
+    where.AND = and;
+
     if (p.level) where.schoolLevel = p.level;
     if (p.gender === 'L' || p.gender === 'P') where.gender = p.gender;
     if (p.schoolId) where.schoolId = p.schoolId;
@@ -56,18 +73,20 @@ export class UsersService {
     return { records, total, page: p.page, limit: p.limit, totalPages: Math.ceil(total / p.limit) };
   }
 
-  async summary() {
+  async summary(type?: string) {
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
+    const w = (extra: any = {}) => ({ ...this.base, ...extra, AND: [this.scope(type)] });
+
     const [total, newThisMonth, withAllergy, withoutSchool, male, female] = await Promise.all([
-      this.prisma.user.count({ where: this.base }),
-      this.prisma.user.count({ where: { ...this.base, createdAt: { gte: startOfMonth } } }),
-      this.prisma.user.count({ where: { ...this.base, allergies: { isEmpty: false } } }),
-      this.prisma.user.count({ where: { ...this.base, schoolId: null } }),
-      this.prisma.user.count({ where: { ...this.base, gender: 'L' } }),
-      this.prisma.user.count({ where: { ...this.base, gender: 'P' } }),
+      this.prisma.user.count({ where: w() }),
+      this.prisma.user.count({ where: w({ createdAt: { gte: startOfMonth } }) }),
+      this.prisma.user.count({ where: w({ allergies: { isEmpty: false } }) }),
+      this.prisma.user.count({ where: w({ schoolId: null }) }),
+      this.prisma.user.count({ where: w({ gender: 'L' }) }),
+      this.prisma.user.count({ where: w({ gender: 'P' }) }),
     ]);
 
     return { total, newThisMonth, withAllergy, withoutSchool, male, female };

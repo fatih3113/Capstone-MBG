@@ -105,6 +105,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Akun posyandu/puskesmas: tidak ada Kelas & Jenjang sekolah, umur boleh balita
+    final isHealth = const {'Posyandu', 'Puskesmas'}.contains(_selectedLevel);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profil'),
@@ -128,22 +130,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 validator: Validators.name,
               ),
               const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Kelas',
-                hint: 'Contoh: 6A',
-                controller: _classController,
-                prefixIcon: const Icon(Icons.class_outlined,
-                  color: AppColors.textHint, size: 20),
-                validator: (v) => Validators.required(v, fieldName: 'Kelas'),
-              ),
-              const SizedBox(height: 16),
+              if (!isHealth) ...[
+                CustomTextField(
+                  label: 'Kelas',
+                  hint: 'Contoh: 6A',
+                  controller: _classController,
+                  prefixIcon: const Icon(Icons.class_outlined,
+                    color: AppColors.textHint, size: 20),
+                  validator: (v) => Validators.required(v, fieldName: 'Kelas'),
+                ),
+                const SizedBox(height: 16),
+              ],
               CustomTextField(
                 label: 'Umur',
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 prefixIcon: const Icon(Icons.cake_outlined,
                   color: AppColors.textHint, size: 20),
-                validator: Validators.age,
+                validator: (v) => Validators.age(v, min: isHealth ? 0 : 5),
               ),
               const SizedBox(height: 16),
               const Text('Jenis Kelamin', style: AppTextStyles.labelMedium),
@@ -176,32 +180,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 )).toList(),
               ),
               const SizedBox(height: 16),
-              const Text('Jenjang Sekolah', style: AppTextStyles.labelMedium),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: ['SD', 'SMP', 'SMA', 'SMK'].map((lvl) =>
-                  GestureDetector(
-                    onTap: () => setState(() => _selectedLevel = lvl),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: _selectedLevel == lvl
-                            ? AppColors.primary : AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
+              if (!isHealth) ...[
+                const Text('Jenjang Sekolah', style: AppTextStyles.labelMedium),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: ['SD', 'SMP', 'SMA', 'SMK'].map((lvl) =>
+                    GestureDetector(
+                      onTap: () => setState(() => _selectedLevel = lvl),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
                           color: _selectedLevel == lvl
-                              ? AppColors.primary : AppColors.cardBorder),
+                              ? AppColors.primary : AppColors.surfaceVariant,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _selectedLevel == lvl
+                                ? AppColors.primary : AppColors.cardBorder),
+                        ),
+                        child: Text(lvl, style: AppTextStyles.labelMedium.copyWith(
+                          color: _selectedLevel == lvl
+                              ? Colors.white : AppColors.textSecondary)),
                       ),
-                      child: Text(lvl, style: AppTextStyles.labelMedium.copyWith(
-                        color: _selectedLevel == lvl
-                            ? Colors.white : AppColors.textSecondary)),
                     ),
-                  ),
-                ).toList(),
-              ),
+                  ).toList(),
+                ),
+              ],
               const SizedBox(height: 24),
               AllergySelector(
                 initialValue: _allergy,

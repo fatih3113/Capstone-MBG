@@ -9,8 +9,14 @@ import '../../providers/sppg_provider.dart';
 import '../../data/models/school_model.dart';
 import '../../data/models/sppg_model.dart';
 import '../../shared/widgets/allergy_selector.dart';
+import '../../shared/widgets/app_logo.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
+
+/// Level institusi yang dianggap fasilitas kesehatan (dikelompokkan ke "Posyandu").
+const _kHealthLevels = {'posyandu', 'puskesmas'};
+bool _isHealthFacility(SchoolModel s) =>
+    _kHealthLevels.contains(s.level.trim().toLowerCase());
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -31,6 +37,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Alergi makanan (dikelola oleh AllergySelector)
   AllergySelection _allergy = const AllergySelection.empty();
+
+  // Jenis pengguna: false = siswa sekolah, true = peserta posyandu
+  bool _isPosyandu = false;
 
   // Validasi SPPG
   bool _sppgTouched = false;
@@ -62,9 +71,22 @@ class _RegisterPageState extends State<RegisterPage> {
       return 'Harap pilih SPPG tempat Anda terdaftar';
     }
     if (sppgProv.selectedSchool == null) {
-      return 'Harap pilih sekolah Anda';
+      return _isPosyandu
+          ? 'Harap pilih posyandu Anda'
+          : 'Harap pilih sekolah Anda';
     }
     return null;
+  }
+
+  void _onUserTypeChanged(bool posyandu) {
+    if (posyandu == _isPosyandu) return;
+    setState(() {
+      _isPosyandu = posyandu;
+      _classController.clear();
+      _sppgValidationError = null;
+    });
+    // daftar institusi berbeda → pilihan lama harus direset
+    context.read<SppgProvider>().selectSchool(null);
   }
 
   Future<void> _handleRegister() async {
@@ -86,7 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
       age: int.tryParse(_ageController.text),
       sppgId: sppgProvider.selectedSppg?.id,
       schoolId: sppgProvider.selectedSchool?.id,
-      className: _classController.text.trim().isEmpty
+      className: (_isPosyandu || _classController.text.trim().isEmpty)
           ? null
           : _classController.text.trim(),
       allergies: _allergy.allergyList,
@@ -139,7 +161,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 child: Row(
                   children: [
-                    const Text('🍱', style: TextStyle(fontSize: 36)),
+                    const AppLogo(size: 56),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +177,35 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
+
+              // Jenis pengguna
+              const Text('Daftar sebagai', style: AppTextStyles.labelMedium),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _UserTypeCard(
+                      emoji: '🏫',
+                      title: 'Siswa Sekolah',
+                      subtitle: 'Penerima MBG di sekolah',
+                      selected: !_isPosyandu,
+                      onTap: () => _onUserTypeChanged(false),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _UserTypeCard(
+                      emoji: '👶',
+                      title: 'Peserta Posyandu',
+                      subtitle: 'Balita / ibu di posyandu',
+                      selected: _isPosyandu,
+                      onTap: () => _onUserTypeChanged(true),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
 
               // Nama
               CustomTextField(
@@ -230,24 +280,29 @@ class _RegisterPageState extends State<RegisterPage> {
               // Umur
               CustomTextField(
                 label: 'Umur',
-                hint: 'Contoh: 12',
+                hint: _isPosyandu ? 'Contoh: 3 (tahun)' : 'Contoh: 12',
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 prefixIcon: const Icon(Icons.cake_outlined,
                     color: AppColors.textHint, size: 20),
-                validator: Validators.age,
+                validator: _isPosyandu
+                    ? (v) => Validators.age(v, min: 0)
+                    : Validators.age,
               ),
               const SizedBox(height: 16),
 
-              // Kelas (tampil di Profil)
-              CustomTextField(
-                label: 'Kelas',
-                hint: 'Contoh: 7A (boleh dikosongkan)',
-                controller: _classController,
-                prefixIcon: const Icon(Icons.class_outlined,
-                    color: AppColors.textHint, size: 20),
-              ),
-              const SizedBox(height: 24),
+              // Kelas (tampil di Profil) — hanya untuk siswa sekolah
+              if (!_isPosyandu) ...[
+                CustomTextField(
+                  label: 'Kelas',
+                  hint: 'Contoh: 7A (boleh dikosongkan)',
+                  controller: _classController,
+                  prefixIcon: const Icon(Icons.class_outlined,
+                      color: AppColors.textHint, size: 20),
+                ),
+                const SizedBox(height: 8),
+              ],
+              const SizedBox(height: 16),
 
               // ── SECTION ALERGI MAKANAN ──────────────────────────────────
               AllergySelector(
@@ -257,6 +312,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               // ── SECTION WILAYAH SPPG ────────────────────────────────────
               _SppgSection(
+                isPosyandu: _isPosyandu,
                 sppgValidationError:
                     _sppgTouched ? _sppgValidationError : null,
               ),
@@ -297,9 +353,10 @@ class _RegisterPageState extends State<RegisterPage> {
 // ── SPPG Section Widget ────────────────────────────────────────────────────
 
 class _SppgSection extends StatelessWidget {
+  final bool isPosyandu;
   final String? sppgValidationError;
 
-  const _SppgSection({this.sppgValidationError});
+  const _SppgSection({required this.isPosyandu, this.sppgValidationError});
 
   @override
   Widget build(BuildContext context) {
@@ -334,7 +391,9 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Pilih SPPG (Satuan Pelayanan Pemenuhan Gizi), lalu sekolah Anda',
+            isPosyandu
+                ? 'Pilih SPPG (Satuan Pelayanan Pemenuhan Gizi), lalu posyandu Anda'
+                : 'Pilih SPPG (Satuan Pelayanan Pemenuhan Gizi), lalu sekolah Anda',
             style: AppTextStyles.bodySmall
                 .copyWith(color: AppColors.textSecondary),
           ),
@@ -441,31 +500,38 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Dropdown Sekolah (muncul setelah SPPG dipilih)
+          // Dropdown Sekolah / Posyandu (muncul setelah SPPG dipilih)
           Consumer<SppgProvider>(
-            builder: (_, prov, __) => _WilayahDropdown<SchoolModel>(
-              label: 'Sekolah',
-              hint: prov.selectedSppg == null
-                  ? 'Pilih SPPG terlebih dahulu'
-                  : 'Pilih sekolah',
-              value: prov.selectedSchool,
-              items: prov.schoolList,
-              isLoading: prov.schoolState == SppgLoadState.loading,
-              isEnabled: prov.selectedSppg != null &&
-                  prov.schoolState != SppgLoadState.loading,
-              isEmpty: prov.selectedSppg != null &&
-                  prov.schoolState == SppgLoadState.loaded &&
-                  prov.schoolList.isEmpty,
-              emptyMessage: 'Belum ada sekolah untuk SPPG ini',
-              errorMessage: prov.schoolState == SppgLoadState.error
-                  ? prov.schoolError
-                  : null,
-              onRetry: prov.selectedSppg != null
-                  ? () => prov.selectSppg(prov.selectedSppg)
-                  : null,
-              itemLabel: (s) => s.displayLabel,
-              onChanged: (val) => prov.selectSchool(val),
-            ),
+            builder: (_, prov, __) {
+              // hanya tampilkan institusi sesuai jenis pengguna
+              final institutions = prov.schoolList
+                  .where((s) => _isHealthFacility(s) == isPosyandu)
+                  .toList();
+              final noun = isPosyandu ? 'posyandu' : 'sekolah';
+              return _WilayahDropdown<SchoolModel>(
+                label: isPosyandu ? 'Posyandu' : 'Sekolah',
+                hint: prov.selectedSppg == null
+                    ? 'Pilih SPPG terlebih dahulu'
+                    : 'Pilih $noun',
+                value: prov.selectedSchool,
+                items: institutions,
+                isLoading: prov.schoolState == SppgLoadState.loading,
+                isEnabled: prov.selectedSppg != null &&
+                    prov.schoolState != SppgLoadState.loading,
+                isEmpty: prov.selectedSppg != null &&
+                    prov.schoolState == SppgLoadState.loaded &&
+                    institutions.isEmpty,
+                emptyMessage: 'Belum ada $noun untuk SPPG ini',
+                errorMessage: prov.schoolState == SppgLoadState.error
+                    ? prov.schoolError
+                    : null,
+                onRetry: prov.selectedSppg != null
+                    ? () => prov.selectSppg(prov.selectedSppg)
+                    : null,
+                itemLabel: (s) => s.displayLabel,
+                onChanged: (val) => prov.selectSchool(val),
+              );
+            },
           ),
 
           // Error pesan validasi
@@ -632,6 +698,67 @@ class _WilayahDropdown<T> extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+// ── Kartu pilihan jenis pengguna ───────────────────────────────────────────
+
+class _UserTypeCard extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _UserTypeCard({
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withOpacity(0.08)
+              : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.cardBorder,
+            width: selected ? 1.8 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 24)),
+                const Spacer(),
+                if (selected)
+                  const Icon(Icons.check_circle,
+                      color: AppColors.primary, size: 18),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(title,
+                style: AppTextStyles.labelMedium.copyWith(
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textPrimary)),
+            const SizedBox(height: 2),
+            Text(subtitle, style: AppTextStyles.caption),
+          ],
+        ),
+      ),
     );
   }
 }

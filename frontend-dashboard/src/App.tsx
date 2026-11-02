@@ -9,9 +9,8 @@ import FeedbackPage from '@/pages/FeedbackPage';
 import NutritionPage from '@/pages/NutritionPage';
 import DistributionPage from '@/pages/distribution';
 import FoodsPage from '@/pages/foods';
-import SchoolsPage from '@/pages/schools';
+import InstitutionsPage from '@/pages/institutions';
 import SppgRegionsPage from '@/pages/SppgRegionsPage';
-import UsersPage from '@/pages/users';
 
 export default function App() {
   return (
@@ -30,9 +29,12 @@ export default function App() {
             <Route path="nutrition" element={<NutritionPage />} />
             <Route path="distribution" element={<DistributionPage />} />
             <Route path="foods" element={<FoodsPage />} />
-            <Route path="schools" element={<SchoolsPage />} />
+            <Route path="institutions" element={<InstitutionsPage />} />
             <Route path="sppg" element={<SppgRegionsPage />} />
-            <Route path="users" element={<UsersPage />} />
+
+            {/* Link lama diarahkan ke Data Lembaga */}
+            <Route path="schools" element={<Navigate to="/institutions" replace />} />
+            <Route path="users" element={<Navigate to="/institutions" replace />} />
           </Route>
 
           {/* Fallback */}

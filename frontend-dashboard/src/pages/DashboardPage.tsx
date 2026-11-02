@@ -6,7 +6,9 @@ import {
 import { dashboardApi } from '@/api/endpoints';
 import type { DashboardOverview } from '@/types/api.types';
 import StatCard from '@/components/ui/StatCard';
-import { ClipboardList, Star, MessageSquare, ScanLine, TrendingUp } from 'lucide-react';
+import {
+  ClipboardList, Star, MessageSquare, ScanLine, TrendingUp, School, HeartPulse, Users, Building2,
+} from 'lucide-react';
 
 const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
 const STATUS_LABELS: Record<string, string> = {
@@ -90,6 +92,35 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Ringkasan per Lembaga: Sekolah & Posyandu */}
+          {data.institutionSummary && (
+            <>
+              <h2 className="chart-card__title" style={{ margin: '1.5rem 0 .75rem' }}>
+                Sekolah
+              </h2>
+              <div className="stat-grid">
+                <StatCard label="Jumlah Sekolah" value={data.institutionSummary.sekolah.institutions}
+                  color="blue" icon={<Building2 size={20} />} />
+                <StatCard label="Pengguna Sekolah" value={data.institutionSummary.sekolah.users}
+                  color="green" icon={<Users size={20} />} />
+                <StatCard label="Scan Gizi Sekolah" value={data.institutionSummary.sekolah.scans}
+                  color="purple" icon={<School size={20} />} />
+              </div>
+
+              <h2 className="chart-card__title" style={{ margin: '1.5rem 0 .75rem' }}>
+                Posyandu
+              </h2>
+              <div className="stat-grid">
+                <StatCard label="Jumlah Posyandu" value={data.institutionSummary.posyandu.institutions}
+                  color="orange" icon={<Building2 size={20} />} />
+                <StatCard label="Peserta Posyandu" value={data.institutionSummary.posyandu.users}
+                  color="red" icon={<Users size={20} />} />
+                <StatCard label="Scan Gizi Posyandu" value={data.institutionSummary.posyandu.scans}
+                  color="purple" icon={<HeartPulse size={20} />} />
+              </div>
+            </>
+          )}
+
           {/* Charts row */}
           <div className="chart-grid">
             {/* Status Usulan Menu */}
@@ -157,7 +188,7 @@ export default function DashboardPage() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Waktu</th><th>Siswa</th><th>Jenjang</th>
+                    <th>Waktu</th><th>Pengguna</th><th>Jenjang / Tipe</th>
                     <th>Kalori*</th><th>Protein*</th><th>Makanan</th>
                   </tr>
                 </thead>

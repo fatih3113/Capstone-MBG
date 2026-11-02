@@ -1,0 +1,51 @@
+/* ── Tab Data Lembaga ─────────────────────────────── */
+.inst-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  margin-top: 1rem;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.inst-tabs--sub {
+  margin-top: 0.5rem;
+  border-bottom: none;
+}
+
+.inst-tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-3, #6b7280);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.inst-tabs__item:hover {
+  color: var(--color-text-1, #111827);
+}
+
+.inst-tabs__item--active {
+  color: var(--color-primary, #16a34a);
+  border-bottom-color: var(--color-primary, #16a34a);
+}
+
+/* Sub tab tampil sebagai pill */
+.inst-tabs--sub .inst-tabs__item {
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.inst-tabs--sub .inst-tabs__item--active {
+  background: var(--color-primary, #16a34a);
+  border-color: var(--color-primary, #16a34a);
+  color: #fff;
+}
