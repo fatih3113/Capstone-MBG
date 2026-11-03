@@ -1,12 +1,15 @@
+// Layanan jadwal menu MBG: mengambil kalender menu mingguan makanan bergizi gratis dari server serta jadwal menu harian spesifik per tanggal.
 import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
 import '../models/mbg_menu_model.dart';
 import '../dummy/dummy_data.dart';
 
+// Kelas penyedia fungsi HTTP request untuk mengambil jadwal menu makanan MBG.
 class MenuService {
   static const bool _useMock = false;
 
+  // Mengambil menu makanan 5 hari sekolah untuk sekolah yang terdaftar.
   Future<ApiResponse<List<MbgMenuModel>>> getWeeklyMenu({
     String? schoolId,
   }) async {
@@ -32,6 +35,7 @@ class MenuService {
     }
   }
 
+  // Mengambil menu makanan khusus untuk tanggal tertentu.
   Future<ApiResponse<MbgMenuModel>> getMenuByDate({
     required DateTime date,
     String? schoolId,

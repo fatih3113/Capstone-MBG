@@ -1,3 +1,4 @@
+// Layanan statistik nutrisi: mengambil data asupan harian, grafik gizi 7 hari terakhir (Data Warehouse), makanan terpopuler, dan rekomendasi sistem cerdas.
 import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
@@ -6,7 +7,7 @@ import '../dummy/dummy_data.dart';
 
 /// Service untuk mengambil statistik gizi pengguna
 /// Mendukung mode mock (offline) dan live API
-
+// Kelas penyedia fungsi HTTP request untuk data analitik dan statistik nutrisi siswa.
 class StatsService {
   /// Ubah ke [true] untuk mode offline/development
   static const bool _useMock = false;

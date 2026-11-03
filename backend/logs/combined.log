@@ -972,3 +972,22 @@ The column `users.account_status` does not exist in the current database.
 2026-11-02 18:58:54 [info]: 📖 API docs: http://localhost:3000/health
 2026-11-02 21:44:20 [info]: New user registered: jibril@gmail.com
 2026-11-02 21:44:35 [info]: User logged in: jibril@gmail.com
+2026-11-03 19:33:22 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 19:33:22 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 19:38:45 [info]: User logged in: tih@gmail.com
+2026-11-03 19:39:28 [info]: User logged in: jibril@gmail.com
+2026-11-03 20:02:34 [info]: User logged in: tih@gmail.com
+2026-11-03 20:03:00 [info]: User logged in: jibril@gmail.com
+2026-11-03 20:04:09 [info]: User logged in: tih@gmail.com
+2026-11-03 22:50:13 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 22:50:13 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 22:53:38 [info]: User logged in: tih@gmail.com
+2026-11-03 23:03:52 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 23:03:52 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 23:05:49 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 23:05:49 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 23:12:37 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 23:12:37 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 23:14:48 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-03 23:14:48 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-03 23:15:31 [info]: User logged in: tih@gmail.com

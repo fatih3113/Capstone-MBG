@@ -1,3 +1,5 @@
+// File ini menyediakan data tiruan (dummy data) untuk pengujian aplikasi saat offline atau tanpa koneksi backend.
+
 import '../models/food_model.dart';
 import '../models/nutrition_model.dart';
 import '../models/mbg_menu_model.dart';
@@ -8,10 +10,12 @@ import '../models/daily_nutrition_model.dart';
 
 /// Centralized dummy data for offline/mock usage
 /// Replace with actual API calls when backend is ready
+// DummyData: kumpulan data tiruan makanan, gizi, menu mingguan, dan riwayat scan untuk pengujian antarmuka.
 class DummyData {
   DummyData._();
 
   // ─── FOODS ──────────────────────────────────────────────────────
+  // Daftar data contoh makanan Indonesia.
   static final List<FoodModel> foods = [
     const FoodModel(id: 'f1', name: 'Nasi Putih', category: 'Karbohidrat',
       description: 'Nasi putih yang merupakan makanan pokok masyarakat Indonesia.'),
@@ -47,6 +51,7 @@ class DummyData {
 
   // ─── NUTRITION ───────────────────────────────────────────────────
   /// Per 100 gram
+  // Data gizi standar per 100 gram untuk masing-masing makanan dummy.
   static final List<NutritionModel> nutritionList = [
     const NutritionModel(id: 'n1', foodId: 'f1', foodName: 'Nasi Putih',
       calories: 130, protein: 2.7, carbs: 28.2, fat: 0.3, fiber: 0.4, sugar: 0, portionGram: 200),
@@ -81,6 +86,7 @@ class DummyData {
   ];
 
   // ─── MBG MENUS ───────────────────────────────────────────────────
+  // Membangun daftar menu MBG tiruan selama sepekan (Senin s/d Jumat).
   static List<MbgMenuModel> getMbgMenusForWeek() {
     final now = DateTime.now();
     // Find last Monday
@@ -117,6 +123,7 @@ class DummyData {
   }
 
   // ─── SCAN HISTORY ─────────────────────────────────────────────────
+  // Menyediakan daftar riwayat pemindaian contoh untuk simulasi UI.
   static List<ScanHistoryModel> getScanHistory(String userId) {
     final now = DateTime.now();
     return [
@@ -190,6 +197,7 @@ class DummyData {
   }
 
   // ─── DAILY NUTRITION ──────────────────────────────────────────────
+  // Membangun data konsumsi gizi harian 7 hari terakhir untuk grafik statistik.
   static List<DailyNutritionModel> getDailyNutrition(String userId) {
     final now = DateTime.now();
     return List.generate(7, (i) {
@@ -215,6 +223,7 @@ class DummyData {
   }
 
   // ─── DEMO USER ────────────────────────────────────────────────────
+  // Akun contoh untuk pengujian login offline.
   static final UserModel demoUser = UserModel(
     id: 'user1',
     name: 'Fatih Ramadan',
@@ -229,6 +238,7 @@ class DummyData {
   );
 
   // ─── HELPER METHODS ───────────────────────────────────────────────
+  // Mengambil informasi gizi berdasarkan ID makanan.
   static NutritionModel? getNutritionByFoodId(String foodId) {
     try {
       return nutritionList.firstWhere((n) => n.foodId == foodId);
@@ -237,6 +247,7 @@ class DummyData {
     }
   }
 
+  // Mengambil detail makanan berdasarkan ID.
   static FoodModel? getFoodById(String foodId) {
     try {
       return foods.firstWhere((f) => f.id == foodId);
@@ -245,6 +256,7 @@ class DummyData {
     }
   }
 
+  // Memfilter daftar makanan berdasarkan kelompok kategori.
   static List<FoodModel> getFoodsByCategory(String category) {
     return foods.where((f) => f.category == category).toList();
   }

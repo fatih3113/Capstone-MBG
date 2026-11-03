@@ -1,12 +1,15 @@
+// File ini menentukan gaya tipografi teks (font Poppins, ukuran, ketebalan) yang digunakan secara konsisten di seluruh antarmuka.
+
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
+// AppTextStyles: kumpulan gaya teks standar agar hierarki tipografi aplikasi rapi dan mudah dibaca.
 class AppTextStyles {
   AppTextStyles._();
 
   static const String fontFamily = 'Poppins';
 
-  // Display
+  // Gaya teks ukuran besar untuk judul halaman utama atau banner (Display).
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 32,
@@ -23,7 +26,7 @@ class AppTextStyles {
     height: 1.2,
   );
 
-  // Headline
+  // Gaya teks headline untuk judul bagian dan header kartu besar.
   static const TextStyle headlineLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 24,
@@ -48,7 +51,7 @@ class AppTextStyles {
     height: 1.3,
   );
 
-  // Title
+  // Gaya teks judul kecil (Title) untuk item daftar dan subjudul.
   static const TextStyle titleLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
@@ -73,7 +76,7 @@ class AppTextStyles {
     height: 1.4,
   );
 
-  // Body
+  // Gaya teks isi paragraf (Body) untuk konten deskripsi dan penjelasan umum.
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
@@ -98,7 +101,7 @@ class AppTextStyles {
     height: 1.5,
   );
 
-  // Label
+  // Gaya teks label untuk tombol, chip, dan badge.
   static const TextStyle labelLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
@@ -123,7 +126,7 @@ class AppTextStyles {
     height: 1.4,
   );
 
-  // Caption
+  // Gaya teks keterangan kecil (Caption) untuk catatan kaki atau petunjuk form.
   static const TextStyle caption = TextStyle(
     fontFamily: fontFamily,
     fontSize: 11,

@@ -1,3 +1,5 @@
+// Halaman Detail Riwayat Scan: menyajikan rincian lengkap hasil deteksi makanan, total nutrisi makro, evaluasi sensorik, dan data konsumsi sisa makanan.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -7,13 +9,13 @@ import '../../data/models/scan_history_model.dart';
 import '../../data/models/evaluation_model.dart';
 import '../../shared/widgets/nutrition_card.dart';
 
-
 class HistoryDetailPage extends StatelessWidget {
   final ScanHistoryModel history;
   const HistoryDetailPage({super.key, required this.history});
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: struktur dasar halaman dengan AppBar bertombol kembali dan area isi konten yang dapat digeser.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -23,12 +25,13 @@ class HistoryDetailPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
+      // SingleChildScrollView: memastikan seluruh rincian informasi makanan dan evaluasi tidak terpotong pada layar kecil.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
+            // Container pratinjau foto/ilustrasi baki makanan MBG yang dipindai
             Container(
               height: 200,
               width: double.infinity,
@@ -41,7 +44,7 @@ class HistoryDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Info row
+            // Baris waktu pemindaian dan badge status sukses
             Row(
               children: [
                 const Icon(Icons.access_time_rounded,
@@ -67,7 +70,7 @@ class HistoryDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Detected foods
+            // Bagian daftar hidangan yang berhasil terdeteksi AI beserta nilai keyakinan (confidence)
             const Text('Makanan Teridentifikasi',
               style: AppTextStyles.titleLarge),
             const SizedBox(height: 12),
@@ -114,9 +117,10 @@ class HistoryDetailPage extends StatelessWidget {
             )),
             const SizedBox(height: 20),
 
-            // Total nutrition
+            // Bagian total 4 nutrisi makro yang disajikan dalam Grid 2x2 NutritionCard
             const Text('Total Gizi', style: AppTextStyles.titleLarge),
             const SizedBox(height: 12),
+            // GridView.count: menampilkan 4 kartu nutrisi (Kalori, Protein, Karbohidrat, Lemak) secara rapi.
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -144,7 +148,7 @@ class HistoryDetailPage extends StatelessWidget {
               ],
             ),
 
-            // Sensorik & Konsumsi jika ada
+            // Menampilkan bagian evaluasi rasa (sensorik) dan daya terima (konsumsi) jika tersedia
             if (history.sensoryData != null) ..._buildSensorySection(history.sensoryData!),
             if (history.consumptionData != null) ..._buildConsumptionSection(history.consumptionData!),
 
@@ -155,6 +159,7 @@ class HistoryDetailPage extends StatelessWidget {
     );
   }
 
+  // Merender kartu rincian evaluasi rasa, asin, manis, tekstur, dan aroma makanan.
   List<Widget> _buildSensorySection(SensoryData s) => [
     const SizedBox(height: 20),
     const Text('Data Sensorik', style: AppTextStyles.titleLarge),
@@ -182,6 +187,7 @@ class HistoryDetailPage extends StatelessWidget {
     ),
   ];
 
+  // Merender kartu rincian porsi yang dimakan, jumlah sisa makanan, dan progress bar persentase habis.
   List<Widget> _buildConsumptionSection(ConsumptionData c) => [
     const SizedBox(height: 20),
     const Text('Data Konsumsi', style: AppTextStyles.titleLarge),
@@ -232,6 +238,7 @@ class HistoryDetailPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
+          // ClipRRect + LinearProgressIndicator: menampilkan indikator batang warna hijau/kuning sesuai porsi makanan yang habis.
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
@@ -248,6 +255,7 @@ class HistoryDetailPage extends StatelessWidget {
   ];
 }
 
+// Baris informasi satu parameter uji sensorik makanan (seperti rasa, tekstur, aroma) dilengkapi rating bintang.
 class _SensoryRow extends StatelessWidget {
   final String emoji;
   final String label;
@@ -279,6 +287,7 @@ class _SensoryRow extends StatelessWidget {
             ],
           ),
         ),
+        // Menampilkan 5 ikon bintang kuning/abu-abu sesuai skor sensorik
         if (showStars && score != null)
           Row(
             children: List.generate(5, (i) => Icon(

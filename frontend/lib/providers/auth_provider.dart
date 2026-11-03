@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import '../data/models/school_model.dart';
+import '../data/models/sppg_model.dart';
 import '../data/models/user_model.dart';
 import '../data/services/auth_service.dart';
 
@@ -143,6 +145,75 @@ class AuthProvider extends ChangeNotifier {
       allergies: savedAllergies,
       allergyOther: savedOther,
     ));
+    return null;
+  }
+
+  /// Simpan seluruh profil ke server, lalu perbarui data & cache lokal
+  /// supaya dashboard admin ikut menerima perubahan.
+  /// Mengembalikan null jika berhasil, atau pesan error jika gagal.
+  Future<String?> updateProfile({
+    required String name,
+    int? age,
+    String? gender,
+    String? className,
+    SchoolModel? school,
+    SppgModel? sppg,
+    String? sppgId,
+    List<String>? allergies,
+    String? allergyOther,
+  }) async {
+    final current = _user;
+    if (current == null) {
+      return 'Sesi tidak ditemukan. Silakan login kembali.';
+    }
+
+    final response = await _authService.updateProfile(
+      name: name,
+      age: age,
+      gender: gender,
+      className: className,
+      schoolId: school?.id,
+      sppgId: sppg?.id ?? sppgId,
+      allergies: allergies,
+      allergyOther: allergyOther,
+    );
+    if (!response.success) return response.message;
+
+    // Server bisa membungkus user di key 'user' atau langsung di data
+    final raw = response.data ?? const <String, dynamic>{};
+    final data = raw['user'] is Map
+        ? Map<String, dynamic>.from(raw['user'] as Map)
+        : raw;
+
+    var updated = current.copyWith(
+      name: data['name'] as String? ?? name,
+      age: data['age'] is int ? data['age'] as int : age,
+      gender: data['gender'] as String? ?? gender,
+      className: data['class'] as String? ?? className,
+      schoolId: data['school_id']?.toString() ?? school?.id,
+      schoolName: data['school_name'] as String? ?? school?.name,
+      schoolLevel: data['school_level'] as String? ?? school?.level,
+      sppgId: data['sppg_id']?.toString() ?? sppg?.id ?? sppgId,
+      sppgName: data['sppg_name'] as String? ?? sppg?.nama,
+      provinsi: data['provinsi'] as String? ?? sppg?.provinsi,
+      kabupatenKota: data['kabupaten_kota'] as String? ?? sppg?.kabupatenKota,
+    );
+
+    if (allergies != null) {
+      final savedAllergies = (data['allergies'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          allergies;
+      final savedOther = data.containsKey('allergy_other')
+          ? data['allergy_other'] as String?
+          : allergyOther;
+      updated = updated.withAllergy(
+        allergies: savedAllergies,
+        allergyOther: savedOther,
+      );
+    }
+
+    updateUser(updated);
     return null;
   }
 

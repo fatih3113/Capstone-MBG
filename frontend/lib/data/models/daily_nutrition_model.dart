@@ -1,3 +1,6 @@
+// File ini mendefinisikan model akumulasi asupan nutrisi harian pengguna serta persentase ketercapaian target gizi.
+
+// DailyNutritionModel: menyimpan total kalori, protein, karbohidrat, lemak, dan serat yang dikonsumsi pengguna dalam satu hari.
 class DailyNutritionModel {
   final String id;
   final String userId;
@@ -31,6 +34,7 @@ class DailyNutritionModel {
     this.fiberTarget = 25,
   });
 
+  // Factory untuk memetakan respons JSON backend (mendukung camelCase maupun snake_case).
   factory DailyNutritionModel.fromJson(Map<String, dynamic> json) {
     // Support both camelCase (Prisma backend) and snake_case (legacy) field names
     return DailyNutritionModel(
@@ -77,6 +81,7 @@ class DailyNutritionModel {
     );
   }
 
+  // Mengubah objek model kembali menjadi Map JSON untuk penyimpanan atau pengiriman data.
   Map<String, dynamic> toJson() => {
     'id': id,
     'user_id': userId,
@@ -94,6 +99,7 @@ class DailyNutritionModel {
     'fiber_target': fiberTarget,
   };
 
+  // Menghitung persentase capaian masing-masing nutrisi terhadap target harian.
   double get caloriesPercent =>
       caloriesTarget > 0 ? (totalCalories / caloriesTarget).clamp(0, 2) : 0;
   double get proteinPercent =>

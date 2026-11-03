@@ -1,0 +1,153 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserController = exports.uploadProfileImage = void 0;
+const client_1 = require("@prisma/client");
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const api_response_1 = require("../utils/api-response");
+const allergy_1 = require("../utils/allergy");
+const prisma = new client_1.PrismaClient();
+// Multer config untuk upload profile picture
+const storage = multer_1.default.diskStorage({
+    destination: (_, __, cb) => cb(null, 'uploads/profiles/'),
+    filename: (req, file, cb) => {
+        const ext = path_1.default.extname(file.originalname);
+        cb(null, `profile_${req.userId}_${Date.now()}${ext}`);
+    },
+});
+exports.uploadProfileImage = (0, multer_1.default)({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: (_, file, cb) => {
+        const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        cb(null, allowed.includes(file.mimetype));
+    },
+}).single('profile_image');
+class UserController {
+    constructor() {
+        /**
+         * GET /users/profile — Profil user yang sedang login
+         */
+        this.getProfile = async (req, res, next) => {
+            try {
+                const user = await prisma.user.findUnique({
+                    where: { id: req.userId },
+                    select: {
+                        id: true, name: true, email: true, class_: true,
+                        gender: true, age: true, schoolLevel: true,
+                        profileImageUrl: true, schoolId: true, createdAt: true, updatedAt: true,
+                        allergies: true, allergyOther: true, allergyFilled: true,
+                        school: { select: { id: true, name: true, level: true, city: true, address: true } },
+                    },
+                });
+                if (!user) {
+                    res.status(404).json(api_response_1.ApiResponse.error('User tidak ditemukan', 404));
+                    return;
+                }
+                res.json(api_response_1.ApiResponse.success((0, allergy_1.toAllergyResponse)(user)));
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+        /**
+         * PUT /users/profile/update — Update profil user
+         */
+        this.updateProfile = async (req, res, next) => {
+            try {
+                const { name, class: className, gender, age, school_level, school_id } = req.body;
+                // Data alergi: hanya diubah jika dikirim di request
+                const allergy = (0, allergy_1.parseAllergyInput)(req.body);
+                if (!allergy.ok) {
+                    res.status(422).json(api_response_1.ApiResponse.error(allergy.message, 422));
+                    return;
+                }
+                // Sinkronkan jenjang (schoolLevel) otomatis dari sekolah jika school_id dikirim atau ada perubahan
+                let resolvedSchoolLevel = school_level;
+                if (!resolvedSchoolLevel) {
+                    const targetSchoolId = school_id;
+                    if (targetSchoolId) {
+                        const school = await prisma.school.findUnique({ where: { id: targetSchoolId } });
+                        if (school?.level) {
+                            resolvedSchoolLevel = school.level;
+                        }
+                    }
+                    else {
+                        // Jika tidak mengirim school_id baru, cek apakah user sudah terhubung ke sekolah tapi schoolLevel belum terisi
+                        const current = await prisma.user.findUnique({
+                            where: { id: req.userId },
+                            select: { schoolLevel: true, school: { select: { level: true } } },
+                        });
+                        if (!current?.schoolLevel && current?.school?.level) {
+                            resolvedSchoolLevel = current.school.level;
+                        }
+                    }
+                }
+                const user = await prisma.user.update({
+                    where: { id: req.userId },
+                    data: {
+                        ...(name && { name }),
+                        ...(className !== undefined && { class_: className }),
+                        ...(gender && { gender }),
+                        ...(age !== undefined && { age: parseInt(age) }),
+                        ...(resolvedSchoolLevel && { schoolLevel: resolvedSchoolLevel }),
+                        ...(school_id && { schoolId: school_id }),
+                        ...(0, allergy_1.allergyDbFields)(allergy),
+                    },
+                    select: {
+                        id: true, name: true, email: true, class_: true,
+                        gender: true, age: true, schoolLevel: true,
+                        profileImageUrl: true, schoolId: true, createdAt: true, updatedAt: true,
+                        allergies: true, allergyOther: true, allergyFilled: true,
+                    },
+                });
+                res.json(api_response_1.ApiResponse.success((0, allergy_1.toAllergyResponse)(user), 'Profil berhasil diperbarui'));
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+        /**
+         * POST /users/profile/photo — Upload foto profil
+         */
+        this.uploadPhoto = async (req, res, next) => {
+            try {
+                if (!req.file) {
+                    res.status(400).json(api_response_1.ApiResponse.error('Tidak ada file yang diunggah', 400));
+                    return;
+                }
+                const imageUrl = `/uploads/profiles/${req.file.filename}`;
+                const user = await prisma.user.update({
+                    where: { id: req.userId },
+                    data: { profileImageUrl: imageUrl },
+                    select: {
+                        id: true, name: true, email: true, class_: true,
+                        gender: true, age: true, schoolLevel: true,
+                        profileImageUrl: true, schoolId: true, createdAt: true, updatedAt: true,
+                    },
+                });
+                res.json(api_response_1.ApiResponse.success({ profile_image_url: imageUrl, user }, 'Foto profil berhasil diperbarui'));
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+        /**
+         * DELETE /users/profile — Hapus akun user
+         */
+        this.deleteAccount = async (req, res, next) => {
+            try {
+                await prisma.user.delete({ where: { id: req.userId } });
+                res.json(api_response_1.ApiResponse.success(null, 'Akun berhasil dihapus'));
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+    }
+}
+exports.UserController = UserController;
+//# sourceMappingURL=user.controller.js.map

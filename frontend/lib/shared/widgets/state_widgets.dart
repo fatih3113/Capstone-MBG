@@ -1,7 +1,9 @@
+// Komponen status antarmuka aplikasi: menyediakan widget terstandarisasi untuk status memuat (loading), pesan kegagalan (error) dengan tombol coba lagi, dan tampilan data kosong (empty state).
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
+// StatelessWidget: widget penampil animasi loading putar dengan pesan opsional di bawahnya.
 class AppLoadingWidget extends StatelessWidget {
   final String? message;
   final bool fullScreen;
@@ -10,10 +12,12 @@ class AppLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Column: menata lingkaran CircularProgressIndicator dan teks keterangan proses di tengah layar.
     final content = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // CircularProgressIndicator: indikator pemuatan data berputar dengan warna hijau tema utama.
         const SizedBox(
           width: 44,
           height: 44,
@@ -35,6 +39,7 @@ class AppLoadingWidget extends StatelessWidget {
       ],
     );
 
+    // Scaffold: digunakan jika mode fullScreen bernilai true agar menutupi seluruh halaman dengan latar belakang bersih.
     if (fullScreen) {
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -48,6 +53,7 @@ class AppLoadingWidget extends StatelessWidget {
   }
 }
 
+// StatelessWidget: widget penampil pesan galat (error) beserta tombol coba lagi jika permintaan data ke server gagal.
 class AppErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -62,6 +68,7 @@ class AppErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Column: menempatkan ikon peringatan merah, judul 'Oops!', isi pesan error, dan tombol muat ulang.
     final content = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -93,6 +100,7 @@ class AppErrorWidget extends StatelessWidget {
         ),
         if (onRetry != null) ...[
           const SizedBox(height: 24),
+          // ElevatedButton.icon: tombol aksi untuk memicu pemanggilan ulang fungsi pemuatan data.
           ElevatedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -118,6 +126,7 @@ class AppErrorWidget extends StatelessWidget {
   }
 }
 
+// StatelessWidget: widget penampil informasi saat daftar data atau halaman dalam keadaan kosong tanpa data.
 class EmptyStateWidget extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -136,9 +145,11 @@ class EmptyStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Center: memposisikan ilustrasi ikon dan pesan informasi di titik tengah area tampilan.
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
+        // Column: menyusun ikon besar dalam lingkaran, teks judul, deskripsi, dan tombol aksi opsional.
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -160,6 +171,7 @@ class EmptyStateWidget extends StatelessWidget {
             ),
             if (onAction != null && actionLabel != null) ...[
               const SizedBox(height: 24),
+              // ElevatedButton: tombol opsional untuk mengarahkan pengguna melakukan aksi (misal: tambah atau scan).
               ElevatedButton(
                 onPressed: onAction,
                 child: Text(actionLabel!),

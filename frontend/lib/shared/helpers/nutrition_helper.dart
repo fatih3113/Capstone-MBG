@@ -1,8 +1,9 @@
-/// Helper functions untuk format angka gizi, teks, dan warna
+// Kumpulan fungsi utilitas gizi: konversi satuan kalori/gram, pemetaan warna dan ikon kategori makanan, perhitungan target kebutuhan harian berdasarkan profil siswa.
 library;
 
 import 'package:flutter/material.dart';
 
+// Kelas statis pembantu perhitungan dan visualisasi status nutrisi makanan.
 class NutritionHelper {
   NutritionHelper._();
 

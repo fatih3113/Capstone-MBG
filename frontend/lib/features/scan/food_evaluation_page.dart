@@ -1,3 +1,4 @@
+// Halaman evaluasi makanan: tempat siswa mengisi survei rasa, aroma, porsi yang dimakan, dan sisa makanan sebelum melihat laporan gizi akhir.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/scan_provider.dart';
 import '../../shared/widgets/custom_button.dart';
 
+// StatefulWidget: dipakai karena halaman ini menyimpan nilai input formulir evaluasi (rasa, porsi, sisa makanan) dan animasi transisi.
 class FoodEvaluationPage extends StatefulWidget {
   const FoodEvaluationPage({super.key});
 
@@ -29,6 +31,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
   String _leftoverAmount = 'Tidak ada';
   bool _isFinished = true;
 
+  // AnimationController: mengatur jalannya animasi pergeseran form dari bawah ke atas saat halaman dibuka.
   late AnimationController _slideController;
   late Animation<Offset> _slideAnim;
 
@@ -37,6 +40,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     super.initState();
     _slideController = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 500));
+    // Tween: menentukan titik awal pergeseran sedikit ke bawah agar formulir muncul perlahan dan halus.
     _slideAnim = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
         .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
     _slideController.forward();
@@ -63,6 +67,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
   ];
   static const _leftoverOptions = ['Tidak ada', 'Sedikit', 'Setengah', 'Banyak', 'Semua'];
 
+  // Fungsi pengiriman evaluasi dan pemicu kalkulasi nutrisi lengkap berdasarkan porsi yang dimakan.
   void _submit() async {
     final scan = context.read<ScanProvider>();
     final auth = context.read<AuthProvider>();
@@ -94,6 +99,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: kerangka halaman standar dengan AppBar judul dan tombol kembali ke hasil prediksi.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -103,18 +109,23 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
+      // Consumer<ScanProvider>: memantau status pemrosesan analisis gizi agar tombol submit bisa menampilkan loading indicator.
       body: Consumer<ScanProvider>(
         builder: (context, scan, _) {
+          // Stack: menumpuk isi formulir yang bisa digulir dengan tombol aksi yang menempel di bagian bawah layar.
           return Stack(
             children: [
+              // SlideTransition: menggerakkan tampilan form ke atas secara mulus saat halaman pertama kali dirender.
               SlideTransition(
                 position: _slideAnim,
+                // SingleChildScrollView: memungkinkan seluruh form di-scroll agar tidak terpotong pada layar berukuran kecil.
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+                  // Column: menyusun komponen evaluasi dari atas ke bawah secara vertikal dan teratur.
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Progress indicator
+                      // Progress indicator tahapan alur scan makanan
                       _buildProgressIndicator(),
                       const SizedBox(height: 20),
 
@@ -204,7 +215,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
                       _buildFinishedToggle(),
                       const SizedBox(height: 12),
 
-                      // Info note
+                      // Container info note: kotak pesan edukasi kecil tentang kegunaan data sensorik dan cara perhitungan gizi.
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -213,12 +224,14 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
                           border: Border.all(
                             color: AppColors.info.withValues(alpha: 0.2)),
                         ),
+                        // Row: meletakkan ikon info di samping paragraf penjelasan secara horizontal.
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(Icons.info_outline_rounded,
                               color: AppColors.info, size: 16),
                             const SizedBox(width: 8),
+                            // Expanded: membuat teks info fleksibel mengisi sisa lebar kontainer tanpa membuat layout overflow.
                             Expanded(
                               child: Text(
                                 'Data sensorik digunakan sebagai indikator penerimaan makanan, '
@@ -236,9 +249,10 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
                 ),
               ),
 
-              // Bottom action button
+              // Align: menempatkan tombol kirim di sisi paling bawah layar agar posisinya permanen dan mudah dijangkau jari.
               Align(
                 alignment: Alignment.bottomCenter,
+                // Container dekorasi tombol bawah dengan shadow agar tampak mengambang di atas konten yang di-scroll.
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -249,7 +263,9 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
                         blurRadius: 16, offset: const Offset(0, -4)),
                     ],
                   ),
+                  // SafeArea: melindungi tombol dari potongan navigasi gestur bawaan sistem operasi.
                   child: SafeArea(
+                    // CustomButton: tombol utama untuk mengirim form dan lanjut ke hasil analisis gizi.
                     child: CustomButton(
                       label: 'Lihat Analisis Gizi',
                       isLoading: scan.isProcessing,
@@ -267,6 +283,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget bantuan untuk menampilkan diagram alur tahapan analisis makanan (Foto -> Identifikasi -> Gizi -> Evaluasi -> Analisis).
   Widget _buildProgressIndicator() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -281,6 +298,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
           Text('Alur Analisis', style: AppTextStyles.labelMedium.copyWith(
             color: AppColors.textSecondary)),
           const SizedBox(height: 10),
+          // Row: menampilkan langkah-langkah dalam garis horizontal.
           Row(
             children: [
               _buildStep('📸', 'Foto', true),
@@ -299,8 +317,10 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget bantuan untuk menggambar lingkaran ikon dan nama tahapan scan.
   Widget _buildStep(String emoji, String label, bool isDone,
       {bool isActive = false}) {
+    // Expanded: membagi ruang step secara merata di dalam baris progress.
     return Expanded(
       child: Column(
         children: [
@@ -336,6 +356,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget garis penghubung antar bulatan tahapan pada indikator progress.
   Widget _buildStepConnector(bool isActive) {
     return Container(
       width: 16, height: 2,
@@ -343,6 +364,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget kartu ringkasan makanan yang terdeteksi beserta estimasi kalori dan protein awalnya.
   Widget _buildFoodSummary(ScanProvider scan) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -355,6 +377,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
+      // Row: menyusun ikon makanan, nama makanan, dan info gizi secara sejajar mendatar.
       child: Row(
         children: [
           Container(
@@ -367,6 +390,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
               style: TextStyle(fontSize: 24))),
           ),
           const SizedBox(width: 12),
+          // Expanded: memberikan area fleksibel bagi daftar nama makanan agar teks panjang tidak menabrak angka kalori.
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,6 +429,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Header judul bagian evaluasi (contoh: Sensorik atau Konsumsi) dengan ikon berwarna.
   Widget _buildSectionHeader({
     required IconData icon,
     required Color iconColor,
@@ -436,6 +461,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget pemilih opsi dropdown khusus untuk setiap parameter sensorik dan konsumsi.
   Widget _buildDropdown({
     required String icon,
     required String label,
@@ -455,8 +481,11 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
         children: [
           Text(icon, style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 10),
+          // Expanded: membentangkan DropdownButton agar mengisi seluruh sisa kolom input secara rapi.
           Expanded(
+            // DropdownButtonHideUnderline: menghapus garis bawah default dropdown agar sesuai desain kartu kustom.
             child: DropdownButtonHideUnderline(
+              // DropdownButton: daftar pilihan yang muncul saat pengguna mengetuk untuk memilih jawaban.
               child: DropdownButton<String>(
                 value: value,
                 isExpanded: true,
@@ -479,6 +508,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
     );
   }
 
+  // Widget tombol geser (Switch) untuk menyatakan apakah makanan dihabiskan sepenuhnya atau tidak.
   Widget _buildFinishedToggle() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -506,6 +536,7 @@ class _FoodEvaluationPageState extends State<FoodEvaluationPage>
               ],
             ),
           ),
+          // Switch: sakelar on/off cepat untuk mengubah status porsi makanan langsung menjadi 100% dan sisa 0%.
           Switch(
             value: _isFinished,
             activeThumbColor: AppColors.success,

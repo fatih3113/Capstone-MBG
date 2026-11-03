@@ -10,10 +10,6 @@ const getUserId = (req: Request): string | undefined => {
 };
 
 export class NotificationController {
-  /**
-   * GET /notifications            → semua notifikasi (maks 50, terbaru dulu)
-   * GET /notifications?unread=true → hanya yang belum dibaca
-   */
   list = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = getUserId(req);

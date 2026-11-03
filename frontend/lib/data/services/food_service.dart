@@ -1,3 +1,4 @@
+// Layanan data makanan dan gizi: menangani permintaan API untuk mengambil katalog makanan, mencari menu berdasarkan kata kunci, serta mengambil rincian kandungan nutrisi.
 import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
@@ -5,9 +6,11 @@ import '../models/food_model.dart';
 import '../models/nutrition_model.dart';
 import '../dummy/dummy_data.dart';
 
+// Kelas penyedia fungsi HTTP request ke endpoint makanan dan nutrisi.
 class FoodService {
   static const bool _useMock = false;
 
+  // Mengambil seluruh daftar makanan yang tercatat di database sistem MBG.
   Future<ApiResponse<List<FoodModel>>> getAllFoods() async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 400));
@@ -22,6 +25,7 @@ class FoodService {
     }
   }
 
+  // Mengambil informasi nutrisi lengkap untuk satu item makanan tertentu berdasarkan ID.
   Future<ApiResponse<NutritionModel>> getNutritionByFoodId(String foodId) async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 200));
@@ -41,6 +45,7 @@ class FoodService {
     }
   }
 
+  // Mengambil data nutrisi sekaligus untuk sekumpulan makanan hasil deteksi model AI.
   Future<ApiResponse<List<NutritionModel>>> getNutritionByFoodIds(
     List<String> foodIds) async {
     if (_useMock) {
@@ -64,6 +69,7 @@ class FoodService {
     }
   }
 
+  // Melakukan pencarian makanan berdasarkan kecocokan nama teks query.
   Future<ApiResponse<List<FoodModel>>> searchFoods(String query) async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 300));

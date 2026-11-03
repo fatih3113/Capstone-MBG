@@ -1,3 +1,5 @@
+// Halaman Pengaturan (Settings): konfigurasi tema gelap/terang, preferensi notifikasi pengingat makan, hapus riwayat scan, dan informasi versi aplikasi.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -10,8 +12,10 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // context.watch: memantau status tema aplikasi (gelap atau terang) dari ThemeProvider.
     final themeProvider = context.watch<ThemeProvider>();
 
+    // Scaffold: kerangka halaman pengaturan dengan tombol kembali pada AppBar.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pengaturan'),
@@ -20,11 +24,13 @@ class SettingsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
+      // SingleChildScrollView: memastikan seluruh bagian menu pengaturan dapat digulir jika layar sempit.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Bagian Tampilan (Saklar mode gelap)
             Text('Tampilan', style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.textSecondary)),
             const SizedBox(height: 10),
@@ -32,6 +38,7 @@ class SettingsPage extends StatelessWidget {
               _SettingsTile(
                 icon: Icons.dark_mode_outlined,
                 label: 'Mode Gelap',
+                // Switch: saklar geser untuk mengaktifkan atau mematikan tema gelap aplikasi.
                 trailing: Switch(
                   value: themeProvider.isDarkMode,
                   onChanged: (_) => themeProvider.toggleTheme(),
@@ -41,6 +48,7 @@ class SettingsPage extends StatelessWidget {
             ]),
             const SizedBox(height: 20),
 
+            // Bagian Notifikasi (Pengingat waktu makan & menu baru)
             Text('Notifikasi', style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.textSecondary)),
             const SizedBox(height: 10),
@@ -66,6 +74,7 @@ class SettingsPage extends StatelessWidget {
             ]),
             const SizedBox(height: 20),
 
+            // Bagian Privasi & Data (Hapus riwayat pemindaian)
             Text('Privasi & Data', style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.textSecondary)),
             const SizedBox(height: 10),
@@ -84,6 +93,7 @@ class SettingsPage extends StatelessWidget {
             ]),
             const SizedBox(height: 20),
 
+            // Bagian Informasi Aplikasi (Versi & Institusi Capstone)
             Text('Tentang', style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.textSecondary)),
             const SizedBox(height: 10),
@@ -107,6 +117,7 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  // Dialog konfirmasi sebelum menghapus seluruh rekaman riwayat pemindaian makanan.
   void _showDeleteConfirm(BuildContext context) {
     showDialog(
       context: context,
@@ -132,6 +143,7 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
+// Kartu berlatar putih dengan garis pembatas (Divider) tipis antar-pengaturan.
 class _SettingsCard extends StatelessWidget {
   final List<Widget> children;
   const _SettingsCard({required this.children});
@@ -157,6 +169,7 @@ class _SettingsCard extends StatelessWidget {
   }
 }
 
+// Komponen baris pengaturan ListTile dengan ikon berlatar warna dan tombol aksi di sisi kanan.
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -174,6 +187,7 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ListTile: komponen standar untuk baris daftar interaktif lengkap dengan ikon awal, judul, dan widget trailing.
     return ListTile(
       onTap: onTap,
       leading: Container(

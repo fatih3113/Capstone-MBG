@@ -1,3 +1,4 @@
+// Pipa pemrosesan citra digital: melakukan pra-pemrosesan foto makanan (resize 224x224, normalisasi tensor [0,1], pemerataan histogram kontras) sebelum diumpankan ke model AI.
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -10,6 +11,7 @@ import '../core/constants/app_constants.dart';
 /// Input → Resize → Normalize → Tensor Conversion → ML Input
 ///
 /// [MATA KULIAH: Pengolahan Citra Digital]
+// Layanan manipulasi citra digital tingkat lanjut untuk keperluan komputasi kecerdasan buatan.
 class ImageProcessingService {
   static const int _inputSize = AppConstants.mlInputSize; // 224
 
@@ -151,6 +153,7 @@ class ImageProcessingService {
   }
 }
 
+// Data class penampung metadata gambar seperti resolusi lebar, tinggi, dan rasio aspek.
 class ImageMetadata {
   final int width;
   final int height;

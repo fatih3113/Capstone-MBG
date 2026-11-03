@@ -1,3 +1,5 @@
+// Halaman Registrasi: formulir pembuatan akun baru bagi siswa sekolah atau peserta posyandu lengkap dengan wilayah SPPG dan data alergi.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +28,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // GlobalKey<FormState>: kunci untuk memvalidasi seluruh field formulir sekaligus sebelum dikirim.
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -48,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    // Muat daftar provinsi saat halaman dibuka
+    // Muat daftar provinsi saat halaman dibuka agar pilihan dropdown pertama langsung siap.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SppgProvider>().loadProvinces();
     });
@@ -56,6 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
+    // Membebaskan seluruh controller agar tidak membebani memori saat pengguna keluar halaman.
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -65,6 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  // Memastikan pengguna sudah memilih SPPG dan institusi sebelum form disubmit.
   String? _validateSppg() {
     final sppgProv = context.read<SppgProvider>();
     if (sppgProv.selectedSppg == null) {
@@ -78,6 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
+  // Mengubah tipe pengguna antara Siswa Sekolah dan Peserta Posyandu serta mereset input sekolah/posyandu.
   void _onUserTypeChanged(bool posyandu) {
     if (posyandu == _isPosyandu) return;
     setState(() {
@@ -89,6 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
     context.read<SppgProvider>().selectSchool(null);
   }
 
+  // Memvalidasi seluruh isian lalu memanggil API registrasi akun baru.
   Future<void> _handleRegister() async {
     setState(() => _sppgTouched = true);
     final sppgError = _validateSppg();
@@ -136,6 +143,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: kerangka halaman standar dengan tombol panah kembali pada AppBar.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Buat Akun Baru'),
@@ -144,14 +152,16 @@ class _RegisterPageState extends State<RegisterPage> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
+      // SingleChildScrollView: memungkinkan formulir yang panjang digeser ke atas terutama saat keyboard aktif.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
+        // Form: mengikat seluruh field teks agar validasi dapat dilakukan terpusat.
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Header banner: kartu gradasi hijau sebagai identitas aplikasi MBG Nutrition.
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -179,7 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 24),
 
-              // Jenis pengguna
+              // Pilihan tipe akun: menentukan apakah pengguna adalah siswa sekolah atau peserta posyandu.
               const Text('Daftar sebagai', style: AppTextStyles.labelMedium),
               const SizedBox(height: 8),
               Row(
@@ -207,7 +217,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 24),
 
-              // Nama
+              // CustomTextField Nama: field input nama lengkap pengguna.
               CustomTextField(
                 label: 'Nama Lengkap',
                 hint: 'Masukkan nama lengkap',
@@ -218,7 +228,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Email
+              // CustomTextField Email: field input alamat email dengan validasi email.
               CustomTextField(
                 label: 'Email',
                 hint: 'email@contoh.com',
@@ -230,7 +240,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Password
+              // CustomTextField Password: field input kata sandi dengan proteksi sembunyi teks.
               CustomTextField(
                 label: 'Password',
                 hint: 'Minimal 8 karakter',
@@ -242,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Confirm Password
+              // CustomTextField Konfirmasi Password: mencocokkan kembali password yang diinput.
               CustomTextField(
                 label: 'Konfirmasi Password',
                 hint: 'Ulangi password',
@@ -255,7 +265,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Jenis Kelamin
+              // Pilihan Jenis Kelamin: tombol chip untuk memilih Laki-laki atau Perempuan.
               const Text('Jenis Kelamin', style: AppTextStyles.labelMedium),
               const SizedBox(height: 6),
               Row(
@@ -277,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Umur
+              // CustomTextField Umur: input angka usia pengguna.
               CustomTextField(
                 label: 'Umur',
                 hint: _isPosyandu ? 'Contoh: 3 (tahun)' : 'Contoh: 12',
@@ -291,7 +301,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Kelas (tampil di Profil) — hanya untuk siswa sekolah
+              // CustomTextField Kelas: opsional hanya untuk siswa sekolah penerima MBG.
               if (!_isPosyandu) ...[
                 CustomTextField(
                   label: 'Kelas',
@@ -304,23 +314,24 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
               const SizedBox(height: 16),
 
-              // ── SECTION ALERGI MAKANAN ──────────────────────────────────
+              // AllergySelector: komponen pilihan ganda alergi makanan yang terintegrasi form.
               AllergySelector(
                 onChanged: (value) => _allergy = value,
               ),
               const SizedBox(height: 24),
 
-              // ── SECTION WILAYAH SPPG ────────────────────────────────────
+              // _SppgSection: bagian pilihan bertingkat wilayah dan nama SPPG serta sekolah/posyandu.
               _SppgSection(
                 isPosyandu: _isPosyandu,
                 sppgValidationError:
                     _sppgTouched ? _sppgValidationError : null,
               ),
               const SizedBox(height: 20),
+              // AllergyConsentNote: teks catatan persetujuan privasi data alergi pengguna.
               const AllergyConsentNote(),
               const SizedBox(height: 20),
 
-              // Register button
+              // Consumer<AuthProvider>: tombol kirim form yang otomatis menampilkan loading saat proses register.
               Consumer<AuthProvider>(
                 builder: (_, auth, __) => CustomButton(
                   label: 'Buat Akun',
@@ -330,7 +341,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16),
 
-              // Login link
+              // TextButton masuk: pintasan kembali ke login bagi yang sudah punya akun.
               Center(
                 child: TextButton(
                   onPressed: () => context.pop(),
@@ -352,6 +363,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
 // ── SPPG Section Widget ────────────────────────────────────────────────────
 
+// Bagian formulir pemilihan berjenjang: Provinsi -> Kab/Kota -> Kecamatan -> SPPG -> Sekolah/Posyandu.
 class _SppgSection extends StatelessWidget {
   final bool isPosyandu;
   final String? sppgValidationError;
@@ -360,6 +372,7 @@ class _SppgSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Container: wadah kartu berbatas abu-abu/merah untuk membedakan bagian wilayah dari data diri.
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -374,7 +387,7 @@ class _SppgSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header
+          // Header bagian wilayah SPPG
           Row(
             children: [
               const Icon(Icons.location_on_outlined,
@@ -399,7 +412,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Dropdown Provinsi
+          // Consumer<SppgProvider>: dropdown provinsi yang merespons perubahan data provinsi di provider.
           Consumer<SppgProvider>(
             builder: (_, prov, __) => _WilayahDropdown<String>(
               label: 'Provinsi',
@@ -418,7 +431,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Dropdown Kabupaten/Kota
+          // Consumer<SppgProvider>: dropdown kabupaten/kota yang aktif setelah provinsi terpilih.
           Consumer<SppgProvider>(
             builder: (_, prov, __) => _WilayahDropdown<String>(
               label: 'Kabupaten / Kota',
@@ -445,7 +458,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Dropdown Kecamatan
+          // Consumer<SppgProvider>: dropdown kecamatan yang aktif setelah kabupaten/kota terpilih.
           Consumer<SppgProvider>(
             builder: (_, prov, __) => _WilayahDropdown<String>(
               label: 'Kecamatan',
@@ -472,7 +485,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Dropdown SPPG
+          // Consumer<SppgProvider>: dropdown daftar unit SPPG pada kecamatan terpilih.
           Consumer<SppgProvider>(
             builder: (_, prov, __) => _WilayahDropdown<SppgModel>(
               label: 'SPPG',
@@ -500,7 +513,7 @@ class _SppgSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Dropdown Sekolah / Posyandu (muncul setelah SPPG dipilih)
+          // Consumer<SppgProvider>: dropdown memilih institusi sekolah atau posyandu di bawah naungan SPPG tersebut.
           Consumer<SppgProvider>(
             builder: (_, prov, __) {
               // hanya tampilkan institusi sesuai jenis pengguna
@@ -534,7 +547,7 @@ class _SppgSection extends StatelessWidget {
             },
           ),
 
-          // Error pesan validasi
+          // Pesan error validasi jika bagian wilayah belum lengkap diisi
           if (sppgValidationError != null) ...[
             const SizedBox(height: 8),
             Text(
@@ -551,6 +564,7 @@ class _SppgSection extends StatelessWidget {
 
 // ── Generic Dropdown Wilayah ───────────────────────────────────────────────
 
+// Komponen generik untuk menampilkan dropdown pilihan berstatus loading, error, atau kosong.
 class _WilayahDropdown<T> extends StatelessWidget {
   final String label;
   final String hint;
@@ -582,11 +596,13 @@ class _WilayahDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Column: menata label dropdown dan kotak pilihan secara vertikal.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTextStyles.labelMedium),
         const SizedBox(height: 6),
+        // Menampilkan animasi loading putar saat data wilayah sedang diunduh dari API.
         if (isLoading)
           Container(
             height: 48,
@@ -603,6 +619,7 @@ class _WilayahDropdown<T> extends StatelessWidget {
               ),
             ),
           )
+        // Menampilkan kotak error dan tombol coba lagi jika gagal mengambil data.
         else if (errorMessage != null)
           Container(
             padding:
@@ -636,6 +653,7 @@ class _WilayahDropdown<T> extends StatelessWidget {
               ],
             ),
           )
+        // Menampilkan pesan jika tidak ada opsi pilihan yang tersedia.
         else if (isEmpty)
           Container(
             padding:
@@ -656,6 +674,7 @@ class _WilayahDropdown<T> extends StatelessWidget {
               ],
             ),
           )
+        // DropdownButton: tombol dropdown pilihan item ketika data berhasil dimuat.
         else
           IgnorePointer(
             ignoring: !isEnabled,
@@ -704,6 +723,7 @@ class _WilayahDropdown<T> extends StatelessWidget {
 
 // ── Kartu pilihan jenis pengguna ───────────────────────────────────────────
 
+// Kartu interaktif untuk memilih peran akun (Siswa atau Posyandu) dengan efek animasi border aktif.
 class _UserTypeCard extends StatelessWidget {
   final String emoji;
   final String title;
@@ -721,8 +741,10 @@ class _UserTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // GestureDetector: menangkap sentuhan pengguna saat mengetuk kartu tipe akun.
     return GestureDetector(
       onTap: onTap,
+      // AnimatedContainer: memberikan transisi warna dan ketebalan garis tepi saat dipilih.
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12),
@@ -765,6 +787,7 @@ class _UserTypeCard extends StatelessWidget {
 
 // ── Gender Chip (tidak berubah) ──────────────────────────────────────────
 
+// Tombol chip sederhana untuk memilih jenis kelamin Laki-laki / Perempuan.
 class _GenderChip extends StatelessWidget {
   final String label;
   final String value;
@@ -780,8 +803,10 @@ class _GenderChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // GestureDetector: mendeteksi klik pada chip pilihan jenis kelamin.
     return GestureDetector(
       onTap: onTap,
+      // AnimatedContainer: mengubah warna latar jadi hijau pekat saat opsi aktif dipilih.
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

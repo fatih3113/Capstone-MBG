@@ -1,3 +1,5 @@
+// Halaman Beranda (Home): ringkasan gizi harian pengguna, pintasan fitur utama, menu MBG hari ini, panduan nutrisi, dan riwayat scan terakhir.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +22,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // Memuat data riwayat scan dan menu mingguan begitu frame pertama selesai dirender.
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
   }
 
+  // Mengambil riwayat scan gizi dan menu MBG mingguan dari backend.
   Future<void> _loadData() async {
     final auth = context.read<AuthProvider>();
     if (auth.user != null) {
@@ -31,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // Menentukan sapaan dinamis (Pagi, Siang, Sore, Malam) berdasarkan jam perangkat.
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 11) return 'Selamat Pagi';
@@ -41,6 +46,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // context.watch: berlangganan data auth, history, dan menu sehingga tampilan otomatis diperbarui saat data berubah.
     final auth = context.watch<AuthProvider>();
     final history = context.watch<HistoryProvider>();
     final menu = context.watch<MenuProvider>();
@@ -48,39 +54,44 @@ class _HomePageState extends State<HomePage> {
         ? history.dailyNutrition.first
         : null;
 
+    // Scaffold: kerangka layar beranda dengan warna latar belakang abu-abu terang standar aplikasi.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // RefreshIndicator: fitur tarik ke bawah (pull-to-refresh) untuk menyegarkan data gizi dan menu.
       body: RefreshIndicator(
         onRefresh: _loadData,
         color: AppColors.primary,
+        // CustomScrollView: menyatukan header melengkung dan daftar konten agar bisa digulir bersama dengan mulus.
         child: CustomScrollView(
           slivers: [
-            // Header
+            // SliverToBoxAdapter: membungkus widget Container header gradasi agar pas berada di dalam CustomScrollView.
             SliverToBoxAdapter(
               child: _buildHeader(auth.userName),
             ),
 
+            // SliverPadding: memberi margin horizontal 20dp pada seluruh bagian isi beranda.
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
+              // SliverList: menampilkan komponen-komponen beranda secara berurutan vertikal.
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Nutrition summary card
+                  // Kartu progres pencapaian kalori, protein, karbohidrat, dan lemak hari ini.
                   _buildNutritionSummary(today),
                   const SizedBox(height: 20),
 
-                  // Quick actions
+                  // Bagian kisi tombol pintasan ke fitur-fitur penting (Scan, Riwayat, Menu, Statistik).
                   _buildSectionTitle('Fitur Utama'),
                   const SizedBox(height: 12),
                   _buildQuickActions(context),
                   const SizedBox(height: 20),
 
-                  // Today's menu
+                  // Kartu pratinjau hidangan MBG yang dijadwalkan untuk hari ini.
                   _buildSectionTitle('Menu Hari Ini'),
                   const SizedBox(height: 12),
                   _buildTodayMenu(menu),
                   const SizedBox(height: 20),
 
-                  // Nutrition food guide
+                  // Bagian edukasi porsi gizi seimbang (Isi Piringku).
                   _buildSectionTitle('Panduan Makanan Bergizi'),
                   const SizedBox(height: 4),
                   const Text(
@@ -91,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                   _buildNutritionGuide(),
                   const SizedBox(height: 20),
 
-                  // Recent scan
+                  // Daftar 2 rekaman makanan terakhir yang dipindai pengguna.
                   _buildSectionTitle('Scan Terakhir'),
                   const SizedBox(height: 12),
                   _buildRecentScans(history),
@@ -105,6 +116,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Header atas berwarna gradasi hijau berisi ucapan salam, nama pengguna, dan tombol profil.
   Widget _buildHeader(String userName) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
@@ -146,6 +158,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 12),
+              // Tombol pintas avatar untuk langsung menuju tab Profil.
               GestureDetector(
                 onTap: () => context.go('/profile'),
                 child: Container(
@@ -162,6 +175,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 16),
+          // Banner pengingat makan menu MBG bergaya semi transparan.
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
@@ -185,6 +199,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Kartu indikator ringkasan asupan 4 nutrisi makro hari ini (Kalori, Protein, Karbohidrat, Lemak).
   Widget _buildNutritionSummary(DailyNutritionModel? today) {
     return Container(
       margin: const EdgeInsets.only(top: 20),
@@ -217,6 +232,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 14),
+          // Row indikator lingkaran 4 nutrisi makro utama.
           Row(
             children: [
               _MiniNutritionBar(
@@ -257,10 +273,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Label judul sub-bagian dengan tipografi tebal.
   Widget _buildSectionTitle(String title) {
     return Text(title, style: AppTextStyles.titleLarge);
   }
 
+  // Kisi tombol menu cepat (Grid 2 kolom) untuk mengakses fitur utama aplikasi.
   Widget _buildQuickActions(BuildContext context) {
     final actions = [
       _QuickAction('Scan\nMenu MBG', Icons.qr_code_scanner_rounded,
@@ -273,8 +291,7 @@ class _HomePageState extends State<HomePage> {
         AppColors.success, () => context.push('/stats')),
     ];
 
-    // FIX: pakai tinggi tetap (mainAxisExtent) supaya tidak overflow,
-    // dan padding zero supaya tidak ada jarak kosong di atas grid.
+    // GridView: menyusun 4 kartu aksi cepat dalam tata letak 2 kolom dengan tinggi tetap agar tidak overflow.
     return GridView(
       padding: EdgeInsets.zero,
       shrinkWrap: true,
@@ -289,6 +306,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Menampilkan hidangan MBG hari ini dalam bentuk chip daftar makanan.
   Widget _buildTodayMenu(MenuProvider menu) {
     if (menu.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -306,6 +324,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    // GestureDetector: membuka halaman Menu lengkap saat kartu menu hari ini ditekan.
     return GestureDetector(
       onTap: () => context.go('/menu'),
       child: Container(
@@ -336,6 +355,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 10),
+            // Wrap: membungkus chip nama-nama makanan agar otomatis turun baris jika melebihi lebar layar.
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -350,6 +370,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Slider horizontal berisi kartu edukasi kelompok makanan sehat dan tips porsinya.
   Widget _buildNutritionGuide() {
     final guides = [
       const _NutritionGuide(
@@ -399,6 +420,7 @@ class _HomePageState extends State<HomePage> {
       ),
     ];
 
+    // ListView.separated: daftar geser horizontal yang efisien dengan pemisah jarak antar kartu 12dp.
     return SizedBox(
       height: 210,
       child: ListView.separated(
@@ -413,6 +435,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Menampilkan cuplikan hasil pemindaian makanan terakhir pengguna.
   Widget _buildRecentScans(HistoryProvider history) {
     if (history.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -490,6 +513,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// Komponen indikator melingkar kecil untuk menampilkan persentase asupan nutrisi terhadap target harian.
 class _MiniNutritionBar extends StatelessWidget {
   final String label;
   final double value;
@@ -508,6 +532,7 @@ class _MiniNutritionBar extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
+          // Stack: menumpuk teks persentase tepat di tengah-tengah lingkaran CircularProgressIndicator.
           Stack(
             alignment: Alignment.center,
             children: [
@@ -539,6 +564,7 @@ class _MiniNutritionBar extends StatelessWidget {
   }
 }
 
+// Data penampung konfigurasi tombol aksi cepat.
 class _QuickAction {
   final String label;
   final IconData icon;
@@ -547,14 +573,17 @@ class _QuickAction {
   const _QuickAction(this.label, this.icon, this.color, this.onTap);
 }
 
+// Kartu interaktif untuk satu tombol aksi cepat pada grid beranda.
 class _QuickActionCard extends StatelessWidget {
   final _QuickAction action;
   const _QuickActionCard({required this.action});
 
   @override
   Widget build(BuildContext context) {
+    // GestureDetector: mendeteksi ketukan pada kartu fitur cepat.
     return GestureDetector(
       onTap: action.onTap,
+      // AnimatedContainer: wadah tombol dengan warna aksen lembut dan sudut melengkung.
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.all(14),
@@ -587,6 +616,7 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
+// Chip kapsul kecil untuk menampilkan nama makanan pada kartu menu hari ini.
 class _FoodChip extends StatelessWidget {
   final String name;
   final String category;
@@ -609,6 +639,7 @@ class _FoodChip extends StatelessWidget {
 
 // ── Nutrition Guide Data & Card ──────────────────────────────────────────────
 
+// Model data edukasi gizi per kategori makanan.
 class _NutritionGuide {
   final String emoji;
   final String title;
@@ -629,12 +660,14 @@ class _NutritionGuide {
   });
 }
 
+// Kartu panduan nutrisi dengan warna pastel, contoh makanan, dan tips porsi konsumsi.
 class _NutritionGuideCard extends StatelessWidget {
   final _NutritionGuide guide;
   const _NutritionGuideCard({required this.guide});
 
   @override
   Widget build(BuildContext context) {
+    // Container: kartu berlatar warna pastel lembut sesuai jenis makronutrisi.
     return Container(
       width: 160,
       padding: const EdgeInsets.all(14),
@@ -653,7 +686,7 @@ class _NutritionGuideCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Emoji + title
+          // Emoji + nama kelompok gizi
           Row(
             children: [
               Text(guide.emoji, style: const TextStyle(fontSize: 26)),
@@ -679,7 +712,7 @@ class _NutritionGuideCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          // Example foods
+          // Wrap: menyusun label contoh makanan (misal Nasi, Jagung) secara ringkas.
           Expanded(
             child: Wrap(
               spacing: 4,
@@ -701,7 +734,7 @@ class _NutritionGuideCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          // Portion tip
+          // Kotak tip porsi makan harian yang disarankan.
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),

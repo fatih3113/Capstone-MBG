@@ -1,4 +1,7 @@
+// File ini mendefinisikan model evaluasi makanan mencakup uji sensorik (rasa, aroma, tekstur), konsumsi porsi, dan kalkulasi gizi akhir.
+
 /// Model untuk data sensorik makanan (indikator penerimaan makanan)
+// SensoryData: menyimpan penilaian indra siswa terhadap makanan (tingkat rasa, asin, manis, tekstur, aroma).
 class SensoryData {
   final String taste;      // Enak, Biasa, Tidak Enak
   final String saltLevel;  // Terlalu Asin, Pas, Kurang Asin
@@ -73,6 +76,7 @@ class SensoryData {
 }
 
 /// Model untuk data konsumsi (indikator seberapa banyak dimakan)
+// ConsumptionData: mencatat porsi yang dihabiskan dan perkiraan sisa makanan untuk mengukur penerimaan menu.
 class ConsumptionData {
   final String portionSize;    // Penuh, 3/4, 1/2, 1/4, Sedikit
   final String leftoverAmount; // Tidak ada, Sedikit, Setengah, Banyak, Semua
@@ -125,6 +129,7 @@ class ConsumptionData {
 }
 
 /// Hasil analisis gizi lengkap setelah menggabungkan semua data
+// NutritionAnalysisResult: hasil hitung gizi akhir disesuaikan dengan persentase porsi aktual yang dimakan.
 class NutritionAnalysisResult {
   // Estimasi gizi (disesuaikan porsi)
   final double estimatedCalories;

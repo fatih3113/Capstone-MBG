@@ -1,11 +1,15 @@
+// File ini mengonfigurasi tema global Material 3 aplikasi (warna, tombol, input, navigasi, dan card) untuk mode terang dan gelap.
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
+// AppTheme: konfigurasi ThemeData utama untuk menghasilkan tampilan UI yang konsisten dan modern.
 class AppTheme {
   AppTheme._();
 
+  // lightTheme: konfigurasi tema terang yang menjadi tema default aplikasi.
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -24,10 +28,10 @@ class AppTheme {
         error: AppColors.error,
       ),
 
-      // Scaffold
+      // Scaffold: warna latar belakang default seluruh layar.
       scaffoldBackgroundColor: AppColors.background,
 
-      // AppBar
+      // AppBar: gaya bilah atas halaman dengan warna putih bersih tanpa bayangan berlebih.
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.white,
         foregroundColor: AppColors.textPrimary,
@@ -42,7 +46,7 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation
+      // Bottom Navigation: bilah navigasi bawah dengan warna aktif hijau primer.
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.white,
         selectedItemColor: AppColors.primary,
@@ -62,8 +66,7 @@ class AppTheme {
         ),
       ),
 
-
-      // Card
+      // Card: kartu dengan sudut melengkung dan garis tepi tipis rapi.
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
         elevation: 0,
@@ -74,7 +77,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
       ),
 
-      // ElevatedButton
+      // ElevatedButton: tema tombol utama dengan latar hijau dan teks putih.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -88,7 +91,7 @@ class AppTheme {
         ),
       ),
 
-      // OutlinedButton
+      // OutlinedButton: tema tombol alternatif dengan garis tepi hijau.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -101,7 +104,7 @@ class AppTheme {
         ),
       ),
 
-      // TextButton
+      // TextButton: tema tombol teks minimalis tanpa border.
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -109,7 +112,7 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration
+      // Input Decoration: gaya kolom input teks dengan border rounded dan warna fokus jelas.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariant,
@@ -135,7 +138,7 @@ class AppTheme {
         errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
       ),
 
-      // Chip
+      // Chip: tema elemen filter dan pilihan opsi (seperti alergi).
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.primaryLighter,
         selectedColor: AppColors.primary,
@@ -146,14 +149,14 @@ class AppTheme {
         ),
       ),
 
-      // Divider
+      // Divider: garis pemisah tipis antar bagian konten.
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
         thickness: 1,
         space: 0,
       ),
 
-      // FloatingActionButton
+      // FloatingActionButton: tombol aksi mengambang bulat.
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
@@ -161,7 +164,7 @@ class AppTheme {
         shape: CircleBorder(),
       ),
 
-      // SnackBar
+      // SnackBar: notifikasi popup bawah melayang dengan sudut membulat.
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.textPrimary,
@@ -173,7 +176,7 @@ class AppTheme {
         ),
       ),
 
-      // Progress Indicator
+      // Progress Indicator: indikator loading memutar atau garis horizontal.
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
         linearTrackColor: AppColors.primaryLighter,
@@ -181,6 +184,7 @@ class AppTheme {
     );
   }
 
+  // darkTheme: konfigurasi tema gelap untuk kenyamanan mata di kondisi minim cahaya.
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

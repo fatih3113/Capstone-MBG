@@ -1,3 +1,6 @@
+// File ini menyimpan seluruh endpoint URL API backend dan konfigurasi dasar koneksi jaringan.
+
+// ApiConstants: tempat terpusat untuk mendefinisikan rute endpoint agar pemanggilan API konsisten di seluruh aplikasi.
 class ApiConstants {
   ApiConstants._();
 
@@ -11,6 +14,7 @@ class ApiConstants {
   //   return 'http://192.168.0.113:$_port';
   static const String _port = '3000';
 
+  // baseUrl: getter alamat server utama backend, disesuaikan untuk pengujian lokal.
   static String get baseUrl {
     // Dengan ADB reverse, semua platform pakai localhost
     return 'http://localhost:$_port';
@@ -19,11 +23,11 @@ class ApiConstants {
   static const String apiVersion = '/api/v1';
   static String get apiBase => baseUrl + apiVersion;
 
-  // Timeout
+  // Batas waktu timeout permintaan jaringan (dalam milidetik).
   static const int connectTimeout = 30000; // ms
   static const int receiveTimeout = 30000; // ms
 
-  // Auth endpoints
+  // Endpoint untuk autentikasi pengguna (login, daftar, reset password).
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String logout = '/auth/logout';
@@ -31,19 +35,19 @@ class ApiConstants {
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
 
-  // User endpoints
+  // Endpoint manajemen profil pengguna.
   static const String users = '/users';
   static const String userProfile = '/users/profile';
   static const String updateProfile = '/users/profile/update';
   static const String uploadProfilePhoto = '/users/profile/photo';
 
-  // Food endpoints
+  // Endpoint data makanan dan pencarian.
   static const String foods = '/foods';
   static const String foodDetail = '/foods/{id}';
   static const String foodSearch = '/foods/search';
   static const String foodCategories = '/foods/categories';
 
-  // Nutrition endpoints
+  // Endpoint rekap dan rekomendasi gizi harian/mingguan.
   static const String nutrition = '/nutrition';
   static const String nutritionByFood = '/nutrition/food/{foodId}';
   static const String nutritionDaily = '/nutrition/daily';
@@ -53,35 +57,35 @@ class ApiConstants {
   static const String dailyNutrition = '/nutrition/daily';
   static const String weeklyNutrition = '/nutrition/weekly';
 
-  // MBG Menu endpoints
+  // Endpoint jadwal dan menu program MBG per sekolah.
   static const String mbgMenu = '/mbg-menu';
   static const String mbgMenuToday = '/mbg-menu/today';
   static const String mbgMenuByDate = '/mbg-menu/date/{date}';
   static const String mbgMenuBySchool = '/mbg-menu/school/{schoolId}';
 
-  // Prediction endpoints
+  // Endpoint klasifikasi gambar makanan via machine learning di backend.
   static const String predictions = '/predictions';
   static const String predictImage = '/predictions/classify';
 
-  // Scan History endpoints
+  // Endpoint riwayat pemindaian makanan pengguna.
   static const String scanHistory = '/scan-history';
   static const String scanHistoryDetail = '/scan-history/{id}';
   static const String saveScan = '/scan-history/save';
 
-  // School endpoints
+  // Endpoint daftar sekolah terdaftar.
   static const String schools = '/schools';
 
-  // Statistics endpoints
+  // Endpoint statistik dan ringkasan data gizi.
   static const String stats = '/stats';
   static const String statsDaily = '/stats/daily';
   static const String statsWeekly = '/stats/weekly';
   static const String statsTopFoods = '/stats/top-foods';
   static const String statsSummary = '/stats/summary';
 
-  // Cloud Storage
+  // Endpoint unggah media/gambar ke penyimpanan cloud.
   static const String uploadImage = '/storage/upload';
 
-  // Report endpoints (siswa)
+  // Endpoint laporan dari siswa (request menu, rating rasa, saran makanan).
   static const String menuRequests = '/reports/menu-requests';
   static const String menuRequestsMy = '/reports/menu-requests/my';
   static const String menuRequestsGrouped = '/reports/menu-requests/grouped';
@@ -91,7 +95,7 @@ class ApiConstants {
   static const String foodFeedbacks = '/reports/food-feedbacks';
   static const String foodFeedbacksMy = '/reports/food-feedbacks/my';
 
-  // Admin endpoints
+  // Endpoint khusus dashboard admin untuk memantau laporan dan data MBG.
   static const String adminDashboard = '/admin/dashboard';
   static const String adminNutritionReports = '/admin/nutrition-reports';
   static const String adminMenuRequestsAll = '/reports/menu-requests';
@@ -100,7 +104,7 @@ class ApiConstants {
   static const String adminFeedbacksAll = '/reports/food-feedbacks';
   static const String adminFeedbackSummary = '/reports/food-feedbacks/summary';
 
-  // SPPG endpoints (publik — digunakan saat register)
+  // Endpoint informasi unit SPPG untuk registrasi pengguna.
   static const String sppg = '/sppg';
   static const String sppgRegions = '/sppg/regions';
 }

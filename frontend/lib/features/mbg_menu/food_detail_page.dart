@@ -1,3 +1,5 @@
+// Halaman Detail Makanan: informasi lengkap kandungan gizi per 100 gram (kalori, makronutrisi, serat, gula) dan takaran porsi MBG standar.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -16,10 +18,13 @@ class FoodDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final nutrition = DummyData.getNutritionByFoodId(food.id);
 
+    // Scaffold: kerangka halaman detail hidangan dengan latar belakang konsisten.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // CustomScrollView: menyatukan efek parallax header gambar besar dan konten rincian gizi dalam satu scroll.
       body: CustomScrollView(
         slivers: [
+          // SliverAppBar: bilah atas yang dapat mengerut (collapsing) saat digulir ke bawah dengan ikon emoji makanan besar.
           SliverAppBar(
             expandedHeight: 240,
             pinned: true,
@@ -35,6 +40,7 @@ class FoodDetailPage extends StatelessWidget {
                   color: AppColors.primary, size: 18),
               ),
             ),
+            // FlexibleSpaceBar: menampilkan latar gradasi hijau dan emoji besar kategori makanan di area header yang dapat menciut.
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -56,6 +62,7 @@ class FoodDetailPage extends StatelessWidget {
             ),
           ),
 
+          // SliverToBoxAdapter: menempatkan kartu informasi nama, kategori, deskripsi, dan rincian nutrisi ke dalam scroll.
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -75,6 +82,7 @@ class FoodDetailPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      // Kotak penunjuk total kalori per 100 gram makanan
                       if (nutrition != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -98,6 +106,7 @@ class FoodDetailPage extends StatelessWidget {
                     ],
                   ),
 
+                  // Paragraf deskripsi hidangan jika tersedia
                   if (food.description != null) ...[
                     const SizedBox(height: 16),
                     const Text('Deskripsi', style: AppTextStyles.titleMedium),
@@ -107,6 +116,7 @@ class FoodDetailPage extends StatelessWidget {
                         color: AppColors.textSecondary)),
                   ],
 
+                  // Bagian kisi 6 kartu indikator nilai kandungan nutrisi (Kalori, Protein, Karbo, Lemak, Serat, Gula)
                   if (nutrition != null) ...[
                     const SizedBox(height: 24),
                     const Row(
@@ -119,6 +129,7 @@ class FoodDetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 14),
+                    // GridView.count: tata letak 2 kolom NutritionCard untuk menyajikan setiap parameter nutrisi.
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
@@ -173,7 +184,7 @@ class FoodDetailPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 20),
-                    // Portion estimate
+                    // Kotak estimasi porsi standar program MBG dalam hitungan gram dan kalori per porsi
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
@@ -204,6 +215,7 @@ class FoodDetailPage extends StatelessWidget {
                   ],
 
                   const SizedBox(height: 24),
+                  // CustomButton: tombol cepat untuk langsung mengarahkan pengguna ke fitur pemindaian kamera.
                   CustomButton(
                     label: 'Scan Makanan Ini',
                     onPressed: () => context.go('/scan'),
@@ -220,6 +232,7 @@ class FoodDetailPage extends StatelessWidget {
     );
   }
 
+  // Simbol emoji berdasarkan kategori makanan
   String _getFoodEmoji(String category) {
     switch (category) {
       case 'Karbohidrat': return '🍚';
@@ -233,6 +246,7 @@ class FoodDetailPage extends StatelessWidget {
   }
 }
 
+// Badge kategori kelompok makanan
 class _CategoryBadge extends StatelessWidget {
   final String label;
   const _CategoryBadge({required this.label});

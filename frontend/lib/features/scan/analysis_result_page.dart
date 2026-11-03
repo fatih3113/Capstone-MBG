@@ -1,3 +1,4 @@
+// Halaman hasil analisis gizi: menampilkan laporan menyeluruh tentang estimasi nutrisi makanan, perbandingan dengan standar AKG MBG, ulasan sensorik, dan rekomendasi cerdas.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import '../../data/models/evaluation_model.dart';
 import '../../providers/scan_provider.dart';
 import '../../shared/widgets/custom_button.dart';
 
+// StatefulWidget: digunakan karena halaman ini mengelola animasi kemunculan (fade in) dan state pilihan jenjang sekolah (AKG MBG).
 class AnalysisResultPage extends StatefulWidget {
   const AnalysisResultPage({super.key});
 
@@ -17,6 +19,7 @@ class AnalysisResultPage extends StatefulWidget {
 
 class _AnalysisResultPageState extends State<AnalysisResultPage>
     with TickerProviderStateMixin {
+  // AnimationController: mengatur durasi dan jalannya efek transisi memudar (fade-in) saat halaman dibuka.
   late AnimationController _fadeController;
   late Animation<double> _fadeAnim;
 
@@ -31,7 +34,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     _fadeAnim = CurvedAnimation(
         parent: _fadeController, curve: Curves.easeIn);
     _fadeController.forward();
-    // Default: SMP/MTs
+    // Default sasaran perbandingan: SMP/MTs
     _selectedSasaran = MbgAkgConstants.findById('smp_mts');
   }
 
@@ -43,17 +46,20 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
 
   @override
   Widget build(BuildContext context) {
+    // context.watch<ScanProvider>: memantau data hasil analisis gizi, sensorik, dan konsumsi dari state global.
     final scan = context.watch<ScanProvider>();
     final result = scan.analysisResult;
     final sensory = scan.sensoryData;
     final consumption = scan.consumptionData;
 
+    // Menampilkan loading sederhana jika kalkulasi analisis masih belum selesai dimuat.
     if (result == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
+    // Scaffold: struktur dasar halaman dengan AppBar navigasi dan latar belakang bersih.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -73,50 +79,55 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           ),
         ],
       ),
+      // FadeTransition: memberikan efek animasi muncul perlahan pada konten halaman.
       body: FadeTransition(
         opacity: _fadeAnim,
+        // SingleChildScrollView: memastikan seluruh bagian kartu hasil analisis bisa digulir ke bawah tanpa kepotong.
         child: SingleChildScrollView(
+          // Column: menyusun spanduk foto makanan di atas lalu diikuti kumpulan kartu informasi gizi di bawahnya.
           child: Column(
             children: [
-              // Header sukses
+              // Header sukses dengan foto piring makanan
               _buildSuccessBanner(scan),
 
+              // Padding: memberikan jarak tepi yang seragam untuk daftar kartu analisis di bawah foto.
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Makanan teridentifikasi
+                    // Kartu makanan teridentifikasi
                     _buildIdentifiedFoods(scan),
                     const SizedBox(height: 20),
 
-                    // Estimasi kandungan gizi
+                    // Bagian rincian estimasi kandungan gizi (kalori, protein, karbohidrat, dll)
                     _buildNutritionSection(result),
                     const SizedBox(height: 20),
 
-                    // ─── AKG MBG Dropdown ─────────────────────────────────
+                    // Bagian perbandingan gizi dengan target AKG MBG berdasarkan jenjang sekolah
                     _buildAkgMbgSection(result),
                     const SizedBox(height: 20),
 
-                    // Skor sensorik
+                    // Bagian skor ulasan sensorik jika diisi oleh pengguna
                     if (sensory != null) ...[
                       _buildSensorySection(sensory, result),
                       const SizedBox(height: 20),
                     ],
 
-                    // Data konsumsi
+                    // Bagian statistik konsumsi dan persentase makanan yang dihabiskan
                     if (consumption != null) ...[
                       _buildConsumptionSection(consumption, result),
                       const SizedBox(height: 20),
                     ],
 
-                    // Rekomendasi cerdas
+                    // Kotak rekomendasi pintar dan catatan penting
                     _buildSmartRecommendation(scan, result),
                     const SizedBox(height: 24),
 
-                    // Tombol aksi
+                    // Row: menempatkan tombol 'Scan Lagi' dan 'Lihat Statistik' berdampingan secara horizontal.
                     Row(
                       children: [
+                        // Expanded: membagi lebar tombol secara seimbang 50:50.
                         Expanded(
                           child: CustomButton(
                             label: 'Scan Lagi',
@@ -128,6 +139,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                           ),
                         ),
                         const SizedBox(width: 12),
+                        // Expanded: tombol kedua untuk berpindah ke halaman grafik statistik nutrisi harian.
                         Expanded(
                           child: CustomButton(
                             label: 'Lihat Statistik',
@@ -151,9 +163,10 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
 
   // ─── AKG MBG Section ──────────────────────────────────────────────────────
 
+  // Widget kartu pembanding dengan standar Angka Kecukupan Gizi (AKG) program Makan Bergizi Gratis (MBG).
   Widget _buildAkgMbgSection(NutritionAnalysisResult result) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
@@ -162,7 +175,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header ikon dan judul bagian AKG
           Row(
             children: [
               Container(
@@ -184,14 +197,14 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           ),
           const SizedBox(height: 12),
 
-          // Dropdown utama
+          // Dropdown jenjang sekolah utama (misal: SD, SMP, SMA)
           _buildSasaranDropdown(
             label: 'Sasaran Jenjang Sekolah',
             options: MbgAkgConstants.sasaranUtama,
           ),
           const SizedBox(height: 10),
 
-          // Dropdown tambahan
+          // Dropdown sasaran tambahan (opsional, misal: Ibu Hamil, Balita)
           _buildSasaranDropdown(
             label: 'Sasaran Tambahan (opsional)',
             options: MbgAkgConstants.sasaranTambahan,
@@ -199,13 +212,13 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           ),
           const SizedBox(height: 16),
 
-          // Tabel perbandingan
+          // Tabel perbandingan angka gizi aktual vs target AKG
           if (_selectedSasaran != null) ...[
             _buildComparisonTable(result, _selectedSasaran!),
             const SizedBox(height: 12),
           ],
 
-          // Disclaimer
+          // Kotak disclaimer pedoman gizi
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -230,6 +243,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget formulir pemilih sasaran jenjang sekolah berbentuk DropdownButtonFormField.
   Widget _buildSasaranDropdown({
     required String label,
     required List<MbgSasaran> options,
@@ -246,6 +260,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
+        // DropdownButtonFormField: input dropdown terintegrasi form field yang menampilkan nama jenjang sasaran MBG.
         DropdownButtonFormField<String>(
           initialValue: isSelectedInThisGroup ? _selectedSasaran!.id : null,
           isExpanded: true,
@@ -289,6 +304,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget tabel perbandingan nilai nutrisi nyata vs target minimal dan maksimal standar MBG.
   Widget _buildComparisonTable(
       NutritionAnalysisResult result, MbgSasaran sasaran) {
     final rows = [
@@ -342,31 +358,31 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           style: AppTextStyles.titleSmall.copyWith(color: AppColors.primary),
         ),
         const SizedBox(height: 10),
-        // Header tabel
+        // Header tabel kolom perbandingan gizi
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.primaryLighter,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              const Expanded(
-                flex: 3,
+              Expanded(
+                flex: 7,
                 child: Text('Gizi', style: AppTextStyles.caption),
               ),
-              const Expanded(
-                flex: 2,
+              Expanded(
+                flex: 5,
                 child: Text('Hasil Scan', style: AppTextStyles.caption,
                     textAlign: TextAlign.center),
               ),
-              const Expanded(
-                flex: 3,
+              Expanded(
+                flex: 6,
                 child: Text('Target AKG', style: AppTextStyles.caption,
                     textAlign: TextAlign.center),
               ),
-              const Expanded(
-                flex: 3,
+              Expanded(
+                flex: 6,
                 child: Text('Status', style: AppTextStyles.caption,
                     textAlign: TextAlign.center),
               ),
@@ -379,6 +395,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget baris individual untuk menampilkan satu parameter gizi dan status kesesuaiannya (sesuai/kurang/lebih).
   Widget _buildComparisonRow(_ComparisonRow row) {
     Color statusColor;
     IconData statusIcon;
@@ -402,7 +419,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(8),
@@ -411,36 +428,58 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
       child: Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 7,
             child: Row(
               children: [
                 Text(row.emoji, style: const TextStyle(fontSize: 14)),
-                const SizedBox(width: 6),
-                Text(row.label,
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    row.label,
                     style: AppTextStyles.bodySmall.copyWith(
-                        fontWeight: FontWeight.w600)),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),
           Expanded(
-            flex: 2,
-            child: Text(
-              '${row.actual.toStringAsFixed(1)} ${row.unit}',
-              style: AppTextStyles.bodySmall.copyWith(color: row.color),
-              textAlign: TextAlign.center,
+            flex: 5,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Text(
+                '${row.actual.toStringAsFixed(1)} ${row.unit}',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: row.color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
           Expanded(
-            flex: 3,
-            child: Text(
-              '${row.min.toStringAsFixed(0)}–${row.max.toStringAsFixed(0)} ${row.unit}',
-              style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
+            flex: 6,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Text(
+                '${row.min.toStringAsFixed(0)}–${row.max.toStringAsFixed(0)} ${row.unit}',
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 6,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -450,8 +489,12 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                   child: Text(
                     row.status.akgStatusLabel,
                     style: AppTextStyles.caption.copyWith(
-                        color: statusColor, fontWeight: FontWeight.w600),
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
                     textAlign: TextAlign.center,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -465,7 +508,9 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
 
   // ─── Existing sections (unchanged) ────────────────────────────────────────
 
+  // Banner atas yang memajang foto makanan hasil tangkapan kamera beserta lencana status analisis.
   Widget _buildSuccessBanner(ScanProvider scan) {
+    // Stack: menumpuk foto makanan asli dengan lapisan gradasi gelap agar lencana teks di atasnya terbaca jelas.
     return Stack(
       children: [
         if (scan.selectedImage != null)
@@ -486,6 +531,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
             ),
           ),
         ),
+        // Positioned: meletakkan badge status di pojok kiri bawah banner foto.
         Positioned(
           bottom: 16, left: 16, right: 16,
           child: Row(
@@ -535,6 +581,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget daftar item makanan yang berhasil diidentifikasi oleh model AI.
   Widget _buildIdentifiedFoods(ScanProvider scan) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,6 +641,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget bagian ringkasan makronutrisi yang ditata menggunakan GridView 2 kolom.
   Widget _buildNutritionSection(NutritionAnalysisResult result) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,6 +661,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
           'Nilai ini adalah estimasi, bukan hasil analisis laboratorium.',
           style: AppTextStyles.bodySmall),
         const SizedBox(height: 14),
+        // GridView.count: membagi kartu-kartu nutrisi (kalori, protein, karbohidrat, dll) menjadi grid 2 kolom yang rapi.
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -663,6 +712,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget bagian skor sensorik (rasa, tekstur, aroma, asin/manis) berdasarkan input evaluasi indera.
   Widget _buildSensorySection(
       SensoryData sensory, NutritionAnalysisResult result) {
     return Column(
@@ -748,6 +798,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Widget bagian data konsumsi yang menampilkan porsi, sisa makanan, dan progress bar ketercapaian porsi.
   Widget _buildConsumptionSection(
       ConsumptionData consumption, NutritionAnalysisResult result) {
     return Column(
@@ -808,8 +859,10 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
                     ],
                   ),
                   const SizedBox(height: 6),
+                  // ClipRRect: melengkungkan ujung garis indikator progress agar terlihat modern.
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
+                    // LinearProgressIndicator: menampilkan grafik batang persentase makanan yang dihabiskan.
                     child: LinearProgressIndicator(
                       value: result.consumptionPercentage / 100,
                       minHeight: 10,
@@ -851,12 +904,14 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     );
   }
 
+  // Fungsi penentu warna batang indikator konsumsi berdasarkan persentase porsi.
   Color _getConsumptionColor(double pct) {
     if (pct >= 75) return AppColors.success;
     if (pct >= 50) return AppColors.warning;
     return AppColors.error;
   }
 
+  // Widget bagian rekomendasi cerdas yang mengevaluasi apakah ada kekurangan rasa, tekstur, atau nutrisi.
   Widget _buildSmartRecommendation(
       ScanProvider scan, NutritionAnalysisResult result) {
     final recs = <String>[];
@@ -895,7 +950,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primaryLighter, AppColors.secondaryLighter],
@@ -948,6 +1003,7 @@ class _AnalysisResultPageState extends State<AnalysisResultPage>
 
 // ─── Data helper ──────────────────────────────────────────────────────────────
 
+// Kelas model lokal untuk menyatukan data satu baris perbandingan gizi pada tabel AKG.
 class _ComparisonRow {
   final String label;
   final String unit;
@@ -972,6 +1028,7 @@ class _ComparisonRow {
 
 // ─── Sub-widgets ──────────────────────────────────────────────────────────────
 
+// StatelessWidget: kartu kotak kecil penampil angka estimasi nutrisi tertentu (misal Kalori, Lemak, dll).
 class _NutritionEstimateCard extends StatelessWidget {
   final String emoji;
   final String label;
@@ -1019,6 +1076,7 @@ class _NutritionEstimateCard extends StatelessWidget {
   }
 }
 
+// StatelessWidget: baris penampil skor bintang untuk parameter sensorik seperti rasa, tekstur, dan aroma.
 class _SensoryScoreRow extends StatelessWidget {
   final String emoji;
   final String label;
@@ -1049,6 +1107,7 @@ class _SensoryScoreRow extends StatelessWidget {
                   style: AppTextStyles.caption.copyWith(
                       color: AppColors.textSecondary)),
               const SizedBox(height: 4),
+              // Row: merender 5 buah ikon bintang sesuai dengan perolehan skor ulasan.
               Row(
                 children: List.generate(
                     5,
@@ -1073,6 +1132,7 @@ class _SensoryScoreRow extends StatelessWidget {
   }
 }
 
+// StatelessWidget: kartu ringkas untuk menampilkan data statistik konsumsi seperti jumlah porsi dan sisa piring.
 class _ConsumptionStatCard extends StatelessWidget {
   final String emoji;
   final String label;

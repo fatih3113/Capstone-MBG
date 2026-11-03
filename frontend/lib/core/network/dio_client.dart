@@ -1,16 +1,21 @@
+// File ini mengatur konfigurasi klien HTTP Dio, interceptor token autentikasi, logging, dan penerjemahan pesan error.
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 import '../constants/app_constants.dart';
 
+// DioClient: kelas singleton penyedia instance Dio terkonfigurasi untuk seluruh panggilan HTTP ke backend.
 class DioClient {
   static Dio? _dio;
 
+  // Mengambil instance Dio atau membuat instance baru jika belum ada.
   static Dio get instance {
     _dio ??= _createDio();
     return _dio!;
   }
 
+  // Konfigurasi dasar Dio: baseUrl, batas timeout, dan interceptor.
   static Dio _createDio() {
     final dio = Dio(
       BaseOptions(
@@ -33,12 +38,14 @@ class DioClient {
     return dio;
   }
 
+  // Mereset instance Dio (misalnya saat logout atau ganti konfigurasi server).
   static void reset() {
     _dio = null;
   }
 }
 
 /// Automatically attaches Bearer token to requests
+// _AuthInterceptor: menyisipkan Bearer token otomatis di header Authorization dari SharedPreferences.
 class _AuthInterceptor extends Interceptor {
   @override
   void onRequest(
@@ -70,6 +77,7 @@ class _AuthInterceptor extends Interceptor {
 }
 
 /// Logging for debug mode
+// _LoggingInterceptor: mencetak jejak request, respons, dan error HTTP ke konsol untuk keperluan debugging.
 class _LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -94,6 +102,7 @@ class _LoggingInterceptor extends Interceptor {
 }
 
 /// Translates DioException into readable error messages
+// _ErrorInterceptor: menerjemahkan status kode dan kendala jaringan menjadi pesan error berbahasa Indonesia yang ramah pengguna.
 class _ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {

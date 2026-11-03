@@ -1,13 +1,6 @@
-/// AKG MBG (Angka Kecukupan Gizi) - Referensi untuk satu kali makan MBG
-///
-/// Sumber: Tabel AKG MBG yang diberikan oleh tim Foodler (internal reference).
-/// ⚠️  PERHATIAN: Nilai ini harus diverifikasi terhadap sumber resmi
-///     (Permenkes AKG atau regulasi MBG terbaru) sebelum digunakan
-///     sebagai rekomendasi gizi resmi.
-///
-/// Struktur tiap sasaran: { energiMin, energiMax, proteinMin, proteinMax,
-///                          lemakMin, lemakMax, karbohidratMin, karbohidratMax }
-/// Satuan: energi = kkal, protein/lemak/karbohidrat = gram
+// File ini mendefinisikan standar Angka Kecukupan Gizi (AKG) program MBG berdasarkan jenjang sekolah dan kelompok sasaran.
+
+// MbgAkgConstants: referensi standar kecukupan energi dan makronutrisi per kelompok sasaran MBG.
 class MbgAkgConstants {
   MbgAkgConstants._();
 
@@ -93,6 +86,7 @@ class MbgAkgConstants {
     }
   }
 
+  // Teks peringatan dan sumber data referensi AKG.
   static const String disclaimer =
       '⚠️ Data AKG MBG ini merupakan referensi estimasi. '
       'Verifikasi terhadap sumber resmi (Permenkes/regulasi MBG) diperlukan '
@@ -153,9 +147,23 @@ class MbgSasaran {
   }
 }
 
-/// Label untuk status perbandingan AKG
+/// Label ringkas untuk status perbandingan AKG (agar tidak terpotong pada tabel)
 extension AkgStatusLabel on String {
   String get akgStatusLabel {
+    switch (this) {
+      case 'below':
+        return 'Di Bawah';
+      case 'within':
+        return 'Sesuai';
+      case 'above':
+        return 'Di Atas';
+      default:
+        return '-';
+    }
+  }
+
+  /// Label versi panjang jika diperlukan
+  String get akgStatusFullLabel {
     switch (this) {
       case 'below':
         return 'Di Bawah Rentang';

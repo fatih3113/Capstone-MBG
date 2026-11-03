@@ -1,3 +1,4 @@
+// Implementasi tiruan (mock) layanan Machine Learning: menyimulasikan proses deteksi makanan multi-label dengan confidence score realistis untuk tahap pengujian dan demonstrasi.
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';

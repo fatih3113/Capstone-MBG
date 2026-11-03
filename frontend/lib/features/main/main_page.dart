@@ -1,3 +1,5 @@
+// Halaman Utama (MainPage): kerangka shell navigasi bawah (bottom navigation) yang menaungi tab Home, Scan, Notifikasi, Report, dan Profil.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +13,7 @@ class MainPage extends StatelessWidget {
   final Widget child;
   const MainPage({super.key, required this.child});
 
+  // Daftar item navigasi bilah bawah: label, ikon aktif/non-aktif, dan path rute halaman terkait.
   static const List<_NavItem> _navItems = [
     _NavItem(
         label: 'Home',
@@ -42,18 +45,20 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tab aktif dihitung dari lokasi router, jadi selalu sinkron
-    // (termasuk saat pindah halaman lewat context.go dari Home).
+    // Menghitung indeks tab aktif secara langsung dari URL GoRouter agar sinkron dengan rute yang sedang dibuka.
     final location = GoRouterState.of(context).uri.path;
     final currentIndex =
         _navItems.indexWhere((e) => location.startsWith(e.path));
 
+    // DistributionNotificationWatcher: memantau notifikasi jadwal distribusi MBG baru secara berkala dan menampilkan pop-up.
     return DistributionNotificationWatcher(
       dio: DioClient.instance,
       onUnreadChanged: (n) =>
           context.read<NotificationProvider>().setUnread(n),
+      // Scaffold: kerangka utama yang menampung tampilan halaman aktif (child) dan bilah navigasi bawah.
       child: Scaffold(
         body: child,
+        // Container: bilah navigasi bawah berwarna putih dengan bayangan halus agar terpisah dari isi konten.
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -78,7 +83,7 @@ class MainPage extends StatelessWidget {
                     if (!location.startsWith(item.path)) context.go(item.path);
                   }
 
-                  // Special style for Scan button
+                  // Tombol Scan di posisi tengah (index 1) diberi desain khusus gradasi agar menonjol sebagai fitur utama.
                   if (i == 1) {
                     return GestureDetector(
                       onTap: onTap,
@@ -116,6 +121,7 @@ class MainPage extends StatelessWidget {
 
                   final isNotifTab = item.path == '/notifications';
 
+                  // Tombol tab biasa: menampilkan transisi warna latar saat dipilih dan badge notifikasi pada tab notif.
                   return GestureDetector(
                     onTap: onTap,
                     child: AnimatedContainer(
@@ -131,6 +137,7 @@ class MainPage extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Stack: menumpuk ikon tab dan lencana merah jumlah notifikasi yang belum dibaca.
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -141,7 +148,7 @@ class MainPage extends StatelessWidget {
                                     : AppColors.textHint,
                                 size: 22,
                               ),
-                              // Badge jumlah notifikasi belum dibaca
+                              // Consumer<NotificationProvider>: merender badge merah otomatis jika ada notifikasi baru belum dibaca.
                               if (isNotifTab)
                                 Positioned(
                                   top: -4,
@@ -202,6 +209,7 @@ class MainPage extends StatelessWidget {
   }
 }
 
+// Model sederhana untuk menyimpan informasi data item navigasi bilah bawah.
 class _NavItem {
   final String label;
   final IconData icon;

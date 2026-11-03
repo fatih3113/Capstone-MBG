@@ -1,3 +1,5 @@
+// Tab Feedback Makanan: formulir evaluasi mutu makanan MBG (rasa, tekstur, aroma, porsi, kepuasan), status konsumsi makanan, serta masukan/keluhan siswa.
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -16,6 +18,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
   final _service = ReportService();
   final _foodNameController = TextEditingController();
   final _suggestionController = TextEditingController();
+  // GlobalKey<FormState>: kunci pemeriksaan validasi field sebelum laporan masukan dikirim.
   final _formKey = GlobalKey<FormState>();
 
   int? _tasteRating;
@@ -28,11 +31,13 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
 
   @override
   void dispose() {
+    // Membebaskan controller teks agar memori tidak bocor saat tab ditutup.
     _foodNameController.dispose();
     _suggestionController.dispose();
     super.dispose();
   }
 
+  // Mengirim umpan balik kualitas makanan MBG dan status daya terima ke backend.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
@@ -72,6 +77,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
     }
   }
 
+  // Mengosongkan seluruh isian form kembali ke keadaan semula setelah berhasil dikirim.
   void _resetForm() {
     _foodNameController.clear();
     _suggestionController.clear();
@@ -87,14 +93,16 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
 
   @override
   Widget build(BuildContext context) {
+    // SingleChildScrollView: agar form masukan yang memuat banyak opsi bintang dapat digulir ke bawah.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
+      // Form: membungkus seluruh field input untuk validasi nama makanan.
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Catatan penting
+            // Catatan disclaimer bahwa status konsumsi merupakan pilihan persepsi siswa sendiri
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -119,7 +127,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
             ),
             const SizedBox(height: 16),
 
-            // Form card
+            // Kartu formulir feedback utama
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -149,7 +157,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Nama makanan
+                  // TextFormField: nama hidangan yang sedang dievaluasi
                   TextFormField(
                     key: const Key('feedback_food_name_field'),
                     controller: _foodNameController,
@@ -166,7 +174,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Penilaian sensorik
+                  // Penilaian 5 aspek sensorik: Rasa, Tekstur, Aroma, Porsi, Kepuasan
                   Text('Penilaian Sensorik',
                       style: AppTextStyles.titleSmall.copyWith(
                           color: AppColors.primary)),
@@ -208,7 +216,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Status konsumsi
+                  // Opsi pilihan status porsi konsumsi: Habis, Sebagian, atau Hampir Tidak Dimakan
                   Text('Status Konsumsi (pilihan Anda)',
                       style: AppTextStyles.titleSmall.copyWith(
                           color: AppColors.primary)),
@@ -223,7 +231,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
                   _buildConsumptionSelector(),
                   const SizedBox(height: 20),
 
-                  // Saran / keluhan
+                  // TextFormField: saran perbaikan atau keluhan bebas dari siswa
                   TextFormField(
                     key: const Key('feedback_suggestion_field'),
                     controller: _suggestionController,
@@ -238,6 +246,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
                   ),
                   const SizedBox(height: 16),
 
+                  // CustomButton: tombol aksi untuk mengirim feedback ke pengelola MBG
                   SizedBox(
                     width: double.infinity,
                     child: CustomButton(
@@ -263,6 +272,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
     );
   }
 
+  // Baris penilaian satu aspek sensorik menggunakan 5 bintang interaktif.
   Widget _buildRatingRow({
     required String emoji,
     required String label,
@@ -282,6 +292,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
           ),
           ...List.generate(5, (i) {
             final star = i + 1;
+            // GestureDetector: mendeteksi ketukan pada bintang ke-1 hingga ke-5
             return GestureDetector(
               onTap: () => onChanged(star),
               child: Padding(
@@ -308,6 +319,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
     );
   }
 
+  // Pilihan tombol kotak radio untuk status seberapa banyak makanan dihabiskan.
   Widget _buildConsumptionSelector() {
     final options = [
       ('habis', '✅ Habis Dimakan'),
@@ -318,6 +330,7 @@ class _FoodFeedbackTabState extends State<FoodFeedbackTab> {
     return Row(
       children: options.map((opt) {
         final isSelected = _consumptionStatus == opt.$1;
+        // Expanded: membagi rata lebar 3 tombol opsi status konsumsi
         return Expanded(
           child: GestureDetector(
             onTap: () => setState(() => _consumptionStatus = opt.$1),

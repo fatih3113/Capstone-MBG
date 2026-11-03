@@ -1,3 +1,6 @@
+// File ini mendefinisikan model entitas makanan (FoodModel) seperti nama, kategori, gambar, dan deskripsi.
+
+// FoodModel: representasi data bahan atau hidangan makanan yang terdaftar dalam database sistem MBG.
 class FoodModel {
   final String id;
   final String name;
@@ -15,6 +18,7 @@ class FoodModel {
     this.isActive = true,
   });
 
+  // Factory untuk memetakan respons JSON dari server ke dalam objek FoodModel.
   factory FoodModel.fromJson(Map<String, dynamic> json) {
     return FoodModel(
       id: json['id']?.toString() ?? '',
@@ -26,6 +30,7 @@ class FoodModel {
     );
   }
 
+  // Mengubah FoodModel menjadi representasi Map JSON.
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -35,6 +40,7 @@ class FoodModel {
     'is_active': isActive,
   };
 
+  // Membuat salinan objek dengan modifikasi nilai tertentu (immutable update).
   FoodModel copyWith({
     String? id,
     String? name,

@@ -1,3 +1,5 @@
+// Halaman Pratinjau Foto: menampilkan hasil jepretan kamera sebelum dianalisis, lengkap dengan fitur zoom (InteractiveViewer) dan tips pengambilan foto.
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +16,7 @@ class ImagePreviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: berlatar belakang hitam gelap agar foto makanan terlihat kontras dan fokus.
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -26,8 +29,10 @@ class ImagePreviewPage extends StatelessWidget {
           icon: const Icon(Icons.close_rounded, color: Colors.white),
         ),
       ),
+      // Column: membagi layar menjadi area gambar di atas dan panel tombol aksi di bawah.
       body: Column(
         children: [
+          // Expanded + InteractiveViewer: area foto yang bisa dicubit untuk memperbesar (zoom in/out) atau digeser.
           Expanded(
             child: InteractiveViewer(
               child: Center(
@@ -39,12 +44,14 @@ class ImagePreviewPage extends StatelessWidget {
               ),
             ),
           ),
+          // Panel putih bawah berisi tips foto dan tombol konfirmasi identifikasi.
           _buildBottomPanel(context),
         ],
       ),
     );
   }
 
+  // Panel melengkung bawah berisi teks konfirmasi, tips pencahayaan, dan tombol kirim ke model AI.
   Widget _buildBottomPanel(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -64,7 +71,7 @@ class ImagePreviewPage extends StatelessWidget {
               color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
-          // Tips
+          // Kotak informasi tips posisi kamera (top-down view)
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -87,8 +94,10 @@ class ImagePreviewPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+          // Dua tombol sejajar: 'Ganti Foto' dan 'Identifikasi Sekarang'
           Row(
             children: [
+              // CustomButton: kembali ke pemilih kamera/galeri untuk mengambil ulang foto.
               Expanded(
                 child: CustomButton(
                   label: 'Ganti Foto',
@@ -97,6 +106,7 @@ class ImagePreviewPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              // Consumer<ScanProvider>: tombol proses yang menampilkan animasi memuat saat AI menganalisis foto.
               Expanded(
                 child: Consumer<ScanProvider>(
                   builder: (context, scan, _) => CustomButton(
@@ -120,7 +130,7 @@ class ImagePreviewPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          // Status message
+          // Teks pesan status progres inferensi AI (misal: "Mendeteksi objek makanan...")
           Consumer<ScanProvider>(
             builder: (_, scan, __) => scan.isProcessing
                 ? Padding(

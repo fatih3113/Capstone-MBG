@@ -1,3 +1,4 @@
+// Komponen pemilih alergi makanan: widget formulir berupa chip pilihan ganda untuk memilih pantangan makanan siswa (kacang, telur, susu, dll) beserta isian teks jika memilih 'Lainnya'.
 import 'package:flutter/material.dart';
 import '../../core/constants/allergy_constants.dart';
 import '../../core/theme/app_colors.dart';
@@ -68,6 +69,7 @@ class AllergySelection {
 ///
 /// Terhubung dengan [Form] sehingga `formKey.currentState!.validate()`
 /// ikut memeriksa: minimal satu pilihan (jika [required]) dan teks "Lainnya".
+// StatefulWidget: dipakai karena widget ini menampung interaksi pemilihan chip alergi dan input teks dinamis.
 class AllergySelector extends StatefulWidget {
   final AllergySelection initialValue;
   final ValueChanged<AllergySelection> onChanged;
@@ -141,6 +143,7 @@ class _AllergySelectorState extends State<AllergySelector> {
 
   @override
   Widget build(BuildContext context) {
+    // FormField<AllergySelection>: mengintegrasikan pilihan kustom ini ke sistem validasi Form Flutter.
     return FormField<AllergySelection>(
       initialValue: _value,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -150,7 +153,9 @@ class _AllergySelectorState extends State<AllergySelector> {
         }
         return null;
       },
+      // builder: membangun tampilan pilihan alergi dan menampilkan pesan error merah jika belum dipilih.
       builder: (field) {
+        // Column: menyusun label judul, deretan chip, dan kolom input teks 'Lainnya' secara vertikal.
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -162,6 +167,7 @@ class _AllergySelectorState extends State<AllergySelector> {
                   .copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 10),
+            // Wrap: membungkus chip alergi agar otomatis pindah ke baris baru saat ruang horizontal penuh.
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -179,6 +185,7 @@ class _AllergySelectorState extends State<AllergySelector> {
                 ),
               ],
             ),
+            // TextFormField: kolom teks yang muncul otomatis hanya jika opsi 'Lainnya' dicentang pengguna.
             if (_value.hasOther) ...[
               const SizedBox(height: 12),
               TextFormField(
@@ -202,6 +209,7 @@ class _AllergySelectorState extends State<AllergySelector> {
                 },
               ),
             ],
+            // Menampilkan pesan error validasi di bawah chip jika ada kesalahan input.
             if (field.hasError) ...[
               const SizedBox(height: 6),
               Text(
@@ -217,6 +225,7 @@ class _AllergySelectorState extends State<AllergySelector> {
   }
 }
 
+// StatelessWidget: chip tombol interaktif kustom untuk memilih atau membatalkan pilihan alergi tertentu.
 class _AllergyChip extends StatelessWidget {
   final String label;
   final bool selected;
@@ -230,12 +239,15 @@ class _AllergyChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Semantics: mendukung aksesibilitas pembaca layar (screen reader) untuk pengguna berkebutuhan khusus.
     return Semantics(
       button: true,
       selected: selected,
       label: label,
+      // GestureDetector: menangkap ketukan jari pengguna pada chip untuk memilih/batal memilih.
       child: GestureDetector(
         onTap: onTap,
+        // AnimatedContainer: memberikan transisi warna latar dan border yang lembut saat status aktif berubah.
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
@@ -246,6 +258,7 @@ class _AllergyChip extends StatelessWidget {
               color: selected ? AppColors.primary : AppColors.cardBorder,
             ),
           ),
+          // Row: menampilkan ikon centang jika dipilih bersanding dengan label teks nama alergi.
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -268,11 +281,13 @@ class _AllergyChip extends StatelessWidget {
 }
 
 /// Teks persetujuan singkat di bawah form.
+// StatelessWidget: teks catatan privasi bahwa informasi alergi dilindungi dan hanya dipakai untuk operasional MBG.
 class AllergyConsentNote extends StatelessWidget {
   const AllergyConsentNote({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Row: menempatkan ikon gembok kecil di samping paragraf penjelasan privasi data.
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -282,6 +297,7 @@ class AllergyConsentNote extends StatelessWidget {
               size: 16, color: AppColors.textHint),
         ),
         const SizedBox(width: 8),
+        // Expanded: membungkus kalimat penjelasan agar teks panjang membungkus rapi ke bawah.
         Expanded(
           child: Text(
             'Data alergi hanya dipakai untuk keperluan program MBG '

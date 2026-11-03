@@ -228,7 +228,7 @@ export interface UserItem {
   className: string | null; schoolLevel: string | null;
   createdAt: string;
   allergies: string[]; allergyOther: string | null; allergyFilled: boolean;
-  school: { id: string; name: string } | null;
+  school: { id: string; name: string; level?: string } | null;
   sppg: { id: string; nama: string } | null;
 }
 

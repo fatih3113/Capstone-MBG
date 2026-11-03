@@ -1,7 +1,8 @@
-/// Formatters utility - Indonesian locale date/number formatting
+// Utilitas pemformat angka dan tanggal: mengatur tata letak penulisan angka desimal, persentase, kalori, serta tanggal dan waktu relatif (contoh: '2 jam lalu').
 library;
 import 'package:intl/intl.dart';
 
+// Kelas statis penyedia fungsi pemformat teks angka dan tanggal dalam format Indonesia (id_ID).
 class AppFormatters {
   // ─── Number Formatters ─────────────────────────────────────────────
   static String formatDecimal(double value, {int decimals = 1}) {

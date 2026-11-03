@@ -1,9 +1,12 @@
+// State management statistik nutrisi: mengambil dan mengagregasi data asupan gizi hari ini, capaian mingguan, daftar makanan paling sering dikonsumsi, serta rekomendasi kesehatan.
 import 'package:flutter/foundation.dart';
 import '../data/models/daily_nutrition_model.dart';
 import '../data/services/stats_service.dart';
 
+// Enum status pemuatan data statistik gizi.
 enum NutritionLoadState { idle, loading, loaded, error }
 
+// ChangeNotifier: kelas state management untuk grafik dan ringkasan nutrisi harian/mingguan pengguna.
 class NutritionProvider extends ChangeNotifier {
   final StatsService _statsService;
 
@@ -100,6 +103,7 @@ class NutritionProvider extends ChangeNotifier {
     if (res.success) _summary = res.data;
   }
 
+  // Mengosongkan data statistik gizi saat logout atau reset.
   void reset() {
     _state = NutritionLoadState.idle;
     _error = null;

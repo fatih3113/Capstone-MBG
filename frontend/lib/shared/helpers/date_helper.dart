@@ -1,6 +1,7 @@
-/// Helper untuk format tanggal dan waktu dalam Bahasa Indonesia
+// Kumpulan fungsi utilitas tanggal: mengonversi objek DateTime ke teks berbahasa Indonesia (hari, tanggal lengkap, jam, dan waktu relatif lalu).
 library;
 
+// Kelas statis pembantu format penanggalan kalender Indonesia.
 class DateHelper {
   DateHelper._();
 

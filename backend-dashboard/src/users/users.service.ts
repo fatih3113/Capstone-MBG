@@ -35,9 +35,18 @@ export class UsersService {
         ],
       });
     }
+
+    if (p.level) {
+      and.push({
+        OR: [
+          { schoolLevel: p.level },
+          { school: { level: p.level } },
+        ],
+      });
+    }
+
     where.AND = and;
 
-    if (p.level) where.schoolLevel = p.level;
     if (p.gender === 'L' || p.gender === 'P') where.gender = p.gender;
     if (p.schoolId) where.schoolId = p.schoolId;
 
@@ -56,7 +65,7 @@ export class UsersService {
           id: true, name: true, email: true, gender: true, age: true,
           class_: true, schoolLevel: true, createdAt: true,
           allergies: true, allergy_other: true, allergy_filled: true,
-          school: { select: { id: true, name: true } },
+          school: { select: { id: true, name: true, level: true } },
           sppg: { select: { id: true, nama: true } },
         },
       }),
@@ -65,6 +74,7 @@ export class UsersService {
 
     const records = rows.map(({ class_, allergy_other, allergy_filled, ...u }) => ({
       ...u,
+      schoolLevel: u.schoolLevel || u.school?.level || null,
       className: class_,
       allergyOther: allergy_other,
       allergyFilled: allergy_filled,

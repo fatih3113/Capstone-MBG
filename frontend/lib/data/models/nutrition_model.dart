@@ -1,3 +1,6 @@
+// File ini mendefinisikan rincian nilai gizi per 100 gram makanan (makro dan mikronutrisi) serta operasi skala porsi.
+
+// NutritionModel: representasi kandungan nutrisi (kalori, protein, lemak, karbohidrat, vitamin, mineral) untuk satu jenis makanan.
 class NutritionModel {
   final String id;
   final String foodId;
@@ -33,6 +36,7 @@ class NutritionModel {
     this.portionGram = 100,
   });
 
+  // Factory untuk memetakan respons JSON gizi dari backend (mendukung Prisma camelCase & snake_case).
   factory NutritionModel.fromJson(Map<String, dynamic> json) {
     // Backend (Prisma) mengirim camelCase (foodId, vitaminC, ...) dan nama
     // makanan ada di json['food']['name']. Format snake_case tetap didukung.
@@ -82,6 +86,7 @@ class NutritionModel {
       };
 
   /// Scale nutrition values by portion
+  // Menghitung ulang jumlah nutrisi berdasarkan berat porsi aktual yang dikonsumsi (gram).
   NutritionModel scaleByPortion(double gram) {
     final ratio = gram / 100;
     return NutritionModel(
@@ -104,6 +109,7 @@ class NutritionModel {
   }
 
   /// Add two nutrition models together
+  // Operator penjumlahan untuk menggabungkan nutrisi dari beberapa hidangan makanan menjadi total kumulatif.
   NutritionModel operator +(NutritionModel other) {
     return NutritionModel(
       id: 'combined',
@@ -124,6 +130,7 @@ class NutritionModel {
     );
   }
 
+  // Objek nutrisi bernilai nol sebagai inisialisasi awal perhitungan.
   static NutritionModel zero() {
     return const NutritionModel(
       id: 'zero',

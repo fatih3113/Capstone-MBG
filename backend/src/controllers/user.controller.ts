@@ -68,6 +68,27 @@ export class UserController {
         return;
       }
 
+      // Sinkronkan jenjang (schoolLevel) otomatis dari sekolah jika school_id dikirim atau ada perubahan
+      let resolvedSchoolLevel = school_level;
+      if (!resolvedSchoolLevel) {
+        const targetSchoolId = school_id;
+        if (targetSchoolId) {
+          const school = await prisma.school.findUnique({ where: { id: targetSchoolId } });
+          if (school?.level) {
+            resolvedSchoolLevel = school.level;
+          }
+        } else {
+          // Jika tidak mengirim school_id baru, cek apakah user sudah terhubung ke sekolah tapi schoolLevel belum terisi
+          const current = await prisma.user.findUnique({
+            where: { id: req.userId },
+            select: { schoolLevel: true, school: { select: { level: true } } },
+          });
+          if (!current?.schoolLevel && current?.school?.level) {
+            resolvedSchoolLevel = current.school.level;
+          }
+        }
+      }
+
       const user = await prisma.user.update({
         where: { id: req.userId },
         data: {
@@ -75,7 +96,7 @@ export class UserController {
           ...(className !== undefined && { class_: className }),
           ...(gender && { gender }),
           ...(age !== undefined && { age: parseInt(age) }),
-          ...(school_level && { schoolLevel: school_level }),
+          ...(resolvedSchoolLevel && { schoolLevel: resolvedSchoolLevel }),
           ...(school_id && { schoolId: school_id }),
           ...allergyDbFields(allergy),
         },

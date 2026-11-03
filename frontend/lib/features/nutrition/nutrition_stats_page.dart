@@ -1,3 +1,5 @@
+// Halaman Statistik Gizi: visualisasi grafik kalori & protein mingguan, evaluasi rekomendasi target harian (AKG), serta ringkasan makanan yang sering dikonsumsi.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,7 @@ class NutritionStatsPage extends StatefulWidget {
   State<NutritionStatsPage> createState() => _NutritionStatsPageState();
 }
 
+// SingleTickerProviderStateMixin: diperlukan untuk sinkronisasi animasi perpindahan 3 tab (Harian, Rekomendasi, Ringkasan).
 class _NutritionStatsPageState extends State<NutritionStatsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
@@ -26,19 +29,21 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Load nutrition stats from NutritionProvider (live API)
+      // Mengambil seluruh data kalkulasi statistik dan rekomendasi gizi dari API.
       context.read<NutritionProvider>().loadAll();
     });
   }
 
   @override
   void dispose() {
+    // Menghapus TabController agar tidak ada kebocoran memori setelah pengguna meninggalkan halaman.
     _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: kerangka utama berpenampilan AppBar dengan bilah TabBar 3 kategori di bawah judulnya.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -47,6 +52,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
+        // TabBar: bilah tab horizontal untuk beralih antara statistik 'Harian', 'Rekomendasi', dan 'Ringkasan'.
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
@@ -59,17 +65,21 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
           ],
         ),
       ),
+      // Consumer2: mendengarkan perubahan data nutrisi dan riwayat secara bersamaan untuk memperbarui grafik.
       body: Consumer2<NutritionProvider, HistoryProvider>(
         builder: (context, nutrition, history, _) {
+          // Menampilkan animasi loading saat data statistik sedang dihitung dari server.
           if (nutrition.isLoading) {
             return const AppLoadingWidget(message: 'Memuat statistik gizi...');
           }
+          // Menampilkan widget error dan opsi mencoba kembali jika permintaan gagal.
           if (nutrition.state == NutritionLoadState.error) {
             return AppErrorWidget(
               message: nutrition.error ?? 'Gagal memuat data',
               onRetry: () => nutrition.loadAll(),
             );
           }
+          // TabBarView: menampilkan isi halaman berbeda yang sinkron dengan tab yang sedang aktif dipilih.
           return TabBarView(
             controller: _tabController,
             children: [
@@ -85,6 +95,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
 
   // ─── Tab: Harian (7-day charts) ────────────────────────────────────────────
 
+  // Tab pertama: menyajikan kartu pencapaian gizi hari ini, grafik batang kalori, dan grafik garis protein 7 hari.
   Widget _buildDailyTab(NutritionProvider nutrition) {
     final data = nutrition.weeklyNutrition;
     if (data.isEmpty) {
@@ -95,33 +106,38 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
       );
     }
 
+    // SingleChildScrollView: memungkinkan grafik dan daftar data 7 hari dapat digulir ke bawah.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Today summary card
+          // Kartu capaian kalori dan makronutrisi hari ini terhadap target AKG harian
           _buildTodayCard(nutrition),
           const SizedBox(height: 24),
 
           const Text('Kalori 7 Hari Terakhir', style: AppTextStyles.titleLarge),
           const SizedBox(height: 16),
+          // Grafik batang fl_chart untuk asupan kalori 7 hari
           _buildCaloriesChart(data),
           const SizedBox(height: 24),
 
           const Text('Protein 7 Hari Terakhir', style: AppTextStyles.titleLarge),
           const SizedBox(height: 16),
+          // Grafik garis fl_chart untuk tren konsumsi protein 7 hari
           _buildProteinChart(data),
           const SizedBox(height: 24),
 
           const Text('Detail Per Hari', style: AppTextStyles.titleLarge),
           const SizedBox(height: 12),
+          // Daftar baris riwayat rincian per hari
           ...data.take(7).map((d) => _DailyNutritionRow(data: d)),
         ],
       ),
     );
   }
 
+  // Kartu rangkuman gizi hari ini dengan indikator progress bar dan status (Kurang, Cukup, atau Berlebih).
   Widget _buildTodayCard(NutritionProvider nutrition) {
     final pct = nutrition.caloriesPercentage;
     final statusColor = pct < 0.6
@@ -135,6 +151,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
             ? 'Berlebih'
             : 'Cukup';
 
+    // Container: kartu gradasi hijau sebagai penegas status gizi hari ini.
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -167,6 +184,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
                   ],
                 ),
               ),
+              // Badge status kecukupan gizi (Kurang/Cukup/Berlebih)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -181,6 +199,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
             ],
           ),
           const SizedBox(height: 12),
+          // LinearProgressIndicator: batang visual persentase kalori hari ini terhadap target.
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
@@ -191,6 +210,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
             ),
           ),
           const SizedBox(height: 12),
+          // Baris 4 nutrisi makro (Protein, Karbo, Lemak, Serat) hari ini
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -215,6 +235,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
 
   // ─── Tab: Rekomendasi ──────────────────────────────────────────────────────
 
+  // Tab kedua: menyajikan umpan balik AI terkait asupan makanan hari ini serta tabel pembanding target vs konsumsi.
   Widget _buildRecommendationTab(NutritionProvider nutrition) {
     final rec = nutrition.recommendation;
     if (rec == null) {
@@ -250,7 +271,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status card
+          // Kartu status rekomendasi: ikon status, persentase terpenuhi, dan saran tekstual
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(18),
@@ -283,6 +304,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
           const Text('Target vs Konsumsi Hari Ini',
               style: AppTextStyles.titleLarge),
           const SizedBox(height: 12),
+          // Tabel perbandingan nilai target gizi dan nilai yang sudah dikonsumsi
           _NutrientComparisonTable(
             target: target,
             consumed: consumed,
@@ -295,6 +317,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
 
   // ─── Tab: Ringkasan ────────────────────────────────────────────────────────
 
+  // Tab ketiga: statistik kumulatif (total scan, rata-rata kalori, hari dicatat) dan daftar makanan teratas.
   Widget _buildSummaryTab(
       NutritionProvider nutrition, HistoryProvider history) {
     return SingleChildScrollView(
@@ -307,12 +330,14 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
           const Text('Makanan Sering Dikonsumsi',
               style: AppTextStyles.titleLarge),
           const SizedBox(height: 12),
+          // Daftar peringkat makanan yang paling sering dipindai
           _buildTopFoodsFromNutrition(nutrition),
         ],
       ),
     );
   }
 
+  // Kartu statistik global berisi 3 indikator: Total Scan, Rata Kalori/Hari, dan Hari Dicatat.
   Widget _buildSummaryCard(NutritionProvider nutrition) {
     final summary = nutrition.summary;
     final totalScans = summary?['totalScans'] as int? ?? 0;
@@ -352,6 +377,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
     );
   }
 
+  // Merender daftar makanan terpopuler yang paling banyak dimakan pengguna beserta frekuensi kemunculannya.
   Widget _buildTopFoodsFromNutrition(NutritionProvider nutrition) {
     final topFoods = nutrition.topFoods;
     if (topFoods.isEmpty) {
@@ -433,6 +459,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
 
   // ─── Charts ────────────────────────────────────────────────────────────────
 
+  // BarChart: grafik batang visualisasi kalori harian selama 7 hari terakhir dari library fl_chart.
   Widget _buildCaloriesChart(List<DailyNutritionModel> data) {
     final reversed = data.reversed.toList();
     return Container(
@@ -496,6 +523,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
     );
   }
 
+  // LineChart: grafik garis kontinu visualisasi tren asupan protein selama 7 hari terakhir.
   Widget _buildProteinChart(List<DailyNutritionModel> data) {
     final reversed = data.reversed.toList();
     return Container(
@@ -554,6 +582,7 @@ class _NutritionStatsPageState extends State<NutritionStatsPage>
 
 // ─── Helper Widgets ──────────────────────────────────────────────────────────
 
+// Baris daftar ringkasan asupan kalori satu hari kalender dengan mini progress bar.
 class _DailyNutritionRow extends StatelessWidget {
   final DailyNutritionModel data;
   const _DailyNutritionRow({required this.data});
@@ -619,6 +648,7 @@ class _DailyNutritionRow extends StatelessWidget {
   }
 }
 
+// Komponen kecil untuk menampilkan satu metrik statistik vertikal (ikon, angka, label).
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;
@@ -643,6 +673,7 @@ class _StatItem extends StatelessWidget {
   }
 }
 
+// Widget teks nilai nutrisi makro pada kartu gizi hari ini.
 class _NutrientChip extends StatelessWidget {
   final String label;
   final String value;
@@ -661,6 +692,7 @@ class _NutrientChip extends StatelessWidget {
   }
 }
 
+// Tabel perbandingan visual antara angka target nutrisi dan angka yang telah dikonsumsi pengguna.
 class _NutrientComparisonTable extends StatelessWidget {
   final Map<String, dynamic> target;
   final Map<String, dynamic> consumed;

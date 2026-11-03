@@ -1,3 +1,5 @@
+// Halaman Riwayat Scan: menampilkan daftar kronologis hasil pemindaian makanan MBG yang dikelompokkan berdasarkan tanggal.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
+    // Meminta riwayat scan milik pengguna aktif setelah widget siap ditampilkan.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       context.read<HistoryProvider>().loadHistory(auth.user?.id ?? 'user1');
@@ -28,11 +31,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: kerangka halaman riwayat dengan tombol aksi menuju statistik gizi di AppBar.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Riwayat Scan'),
         actions: [
+          // IconButton: tombol pintas menuju halaman grafik statistik gizi lengkap.
           IconButton(
             onPressed: () => context.push('/stats'),
             icon: const Icon(Icons.bar_chart_rounded),
@@ -40,11 +45,14 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
+      // Consumer<HistoryProvider>: merender status loading, error, kosong, atau daftar data riwayat scan secara dinamis.
       body: Consumer<HistoryProvider>(
         builder: (context, history, _) {
+          // Menampilkan animasi loading ketika data riwayat sedang diambil dari server.
           if (history.isLoading) {
             return const AppLoadingWidget(message: 'Memuat riwayat...');
           }
+          // Menampilkan pesan error dan tombol coba lagi jika gagal memuat riwayat.
           if (history.error != null) {
             return AppErrorWidget(
               message: history.error!,
@@ -54,6 +62,7 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             );
           }
+          // Menampilkan tampilan kosong dengan tombol ajakan 'Mulai Scan' jika belum ada data.
           if (history.history.isEmpty) {
             return EmptyStateWidget(
               title: 'Belum ada riwayat',
@@ -63,12 +72,14 @@ class _HistoryPageState extends State<HistoryPage> {
               actionLabel: 'Mulai Scan',
             );
           }
+          // Membangun daftar riwayat yang sudah dikelompokkan berdasarkan tanggal.
           return _buildHistoryList(history.history);
         },
       ),
     );
   }
 
+  // Mengelompokkan item riwayat berdasarkan tanggal kalender dan merendernya dalam ListView.
   Widget _buildHistoryList(List<ScanHistoryModel> historyList) {
     // Group by date
     final grouped = <String, List<ScanHistoryModel>>{};
@@ -77,11 +88,13 @@ class _HistoryPageState extends State<HistoryPage> {
       grouped.putIfAbsent(dateKey, () => []).add(h);
     }
 
+    // ListView: daftar scrollable untuk menampilkan kelompok tanggal dan kartu-kartu riwayat scan.
     return ListView(
       padding: const EdgeInsets.all(20),
       children: grouped.entries.map((entry) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Penanda header tanggal dengan titik hijau di sebelah kirinya
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -97,6 +110,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ],
             ),
           ),
+          // Merender kartu riwayat untuk setiap pemindaian pada tanggal tersebut.
           ...entry.value.map((h) => _HistoryCard(
             history: h,
             onTap: () => context.push('/history/${h.id}', extra: h),
@@ -108,6 +122,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
+// Kartu pratinjau satu sesi pemindaian makanan: thumbnail, nama makanan, ringkasan kalori & protein, dan rating sensorik.
 class _HistoryCard extends StatelessWidget {
   final ScanHistoryModel history;
   final VoidCallback onTap;
@@ -115,8 +130,10 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // GestureDetector: mendeteksi ketukan kartu untuk membuka halaman rincian riwayat scan.
     return GestureDetector(
       onTap: onTap,
+      // Container: kartu putih melengkung dengan bayangan halus untuk membungkus info hasil scan.
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
@@ -132,7 +149,7 @@ class _HistoryCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Image / placeholder
+            // Thumbnail kotak ilustrasi makanan MBG
             Container(
               width: 60, height: 60,
               decoration: BoxDecoration(
@@ -144,6 +161,7 @@ class _HistoryCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
 
+            // Informasi rincian nama makanan, waktu relatif, dan badge kalori
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +181,7 @@ class _HistoryCard extends StatelessWidget {
                     style: AppTextStyles.caption,
                   ),
                   const SizedBox(height: 6),
-                  // Nutrition chips
+                  // Wrap: chip kecil untuk kalori, protein, dan persentase makanan yang dihabiskan.
                   Wrap(
                     spacing: 6,
                     runSpacing: 4,
@@ -185,9 +203,10 @@ class _HistoryCard extends StatelessWidget {
               ),
             ),
 
+            // Indikator rating bintang evaluasi rasa dan ikon centang sukses
             Column(
               children: [
-                // Sensory score stars jika ada
+                // Rating bintang sensorik rasa jika sudah dinilai pengguna
                 if (history.sensoryData != null)
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -221,6 +240,7 @@ class _HistoryCard extends StatelessWidget {
   }
 }
 
+// Badge kecil warna-warni untuk menampilkan nilai kalori, protein, atau persentase konsumsi.
 class _NutritionMini extends StatelessWidget {
   final String value;
   final Color color;

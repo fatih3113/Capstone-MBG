@@ -1,9 +1,11 @@
+// State management riwayat pemindaian: memuat daftar riwayat scan gizi makanan pengguna, menghitung total kalori dan protein, serta menyajikan makanan favorit terbanyak.
 import 'package:flutter/foundation.dart';
 import '../data/models/scan_history_model.dart';
 import '../data/models/daily_nutrition_model.dart';
 import '../data/services/history_service.dart';
 import '../data/services/stats_service.dart';
 
+// ChangeNotifier: mengelola state daftar riwayat scan makanan dan data nutrisi mingguan agar halaman riwayat otomatis diperbarui.
 class HistoryProvider extends ChangeNotifier {
   final HistoryService _historyService;
   final StatsService _statsService;
@@ -45,6 +47,7 @@ class HistoryProvider extends ChangeNotifier {
     return sorted.take(3).toList();
   }
 
+  // Memuat riwayat rekaman pemindaian dan data gizi mingguan secara paralel menggunakan Future.wait.
   Future<void> loadHistory(String userId) async {
     _isLoading = true;
     _error = null;
@@ -74,6 +77,7 @@ class HistoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Mengambil rincian detail makanan dan sensorik untuk satu entri riwayat tertentu.
   Future<void> loadHistoryDetail(String scanId) async {
     _isLoading = true;
     notifyListeners();
@@ -87,6 +91,7 @@ class HistoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Menghapus pesan error saat pengguna mencoba memuat ulang riwayat.
   void clearError() {
     _error = null;
     notifyListeners();

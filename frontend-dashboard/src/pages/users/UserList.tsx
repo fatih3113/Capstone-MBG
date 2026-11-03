@@ -39,49 +39,52 @@ export default function UserList({
                   <Users size={32} /><span>Belum ada pengguna yang cocok.</span>
                 </div>
               </td></tr>
-            ) : records.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <strong>{u.name}</strong>
-                  <div className="row-sub">{u.email}</div>
-                </td>
-                <td>
-                  {u.school
-                    ? <strong style={{ fontWeight: 500 }}>{u.school.name}</strong>
-                    : <span className="badge badge--orange">
+            ) : records.map((u) => {
+              const level = u.schoolLevel || u.school?.level;
+              return (
+                <tr key={u.id}>
+                  <td>
+                    <strong>{u.name}</strong>
+                    <div className="row-sub">{u.email}</div>
+                  </td>
+                  <td>
+                    {u.school
+                      ? <strong style={{ fontWeight: 500 }}>{u.school.name}</strong>
+                      : <span className="badge badge--orange">
                         {isPosyandu ? 'Belum pilih posyandu' : 'Belum pilih sekolah'}
                       </span>}
-                  <div className="row-sub">{u.sppg?.nama ?? '—'}</div>
-                </td>
-                <td>{u.className || '—'}</td>
-                <td>
-                  {u.schoolLevel
-                    ? <span className={`badge ${LEVEL_COLOR[u.schoolLevel] ?? 'badge--default'}`}>{u.schoolLevel}</span>
-                    : '—'}
-                </td>
-                <td>{genderLabel(u.gender)}</td>
-                <td style={{ textAlign: 'center' }}>{u.age ?? '—'}</td>
-                <td>
-                  {!u.allergyFilled ? (
-                    <span className="badge badge--neutral">Belum diisi</span>
-                  ) : u.allergies.length === 0 ? (
-                    <span className="badge badge--green">Tidak ada</span>
-                  ) : (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {u.allergies.map((a) => (
-                        <span key={a} className="badge badge--orange"
-                          title={a === 'lainnya' ? (u.allergyOther ?? '') : undefined}>
-                          {a === 'lainnya' && u.allergyOther
-                            ? `Lainnya: ${u.allergyOther}`
-                            : (ALLERGY_LABEL[a] ?? a)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </td>
-                <td>{fmtDate(u.createdAt)}</td>
-              </tr>
-            ))}
+                    <div className="row-sub">{u.sppg?.nama ?? '—'}</div>
+                  </td>
+                  <td>{u.className || '—'}</td>
+                  <td>
+                    {level
+                      ? <span className={`badge ${LEVEL_COLOR[level] ?? 'badge--default'}`}>{level}</span>
+                      : '—'}
+                  </td>
+                  <td>{genderLabel(u.gender)}</td>
+                  <td style={{ textAlign: 'center' }}>{u.age ?? '—'}</td>
+                  <td>
+                    {!u.allergyFilled ? (
+                      <span className="badge badge--neutral">Belum diisi</span>
+                    ) : u.allergies.length === 0 ? (
+                      <span className="badge badge--green">Tidak ada</span>
+                    ) : (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {u.allergies.map((a) => (
+                          <span key={a} className="badge badge--orange"
+                            title={a === 'lainnya' ? (u.allergyOther ?? '') : undefined}>
+                            {a === 'lainnya' && u.allergyOther
+                              ? `Lainnya: ${u.allergyOther}`
+                              : (ALLERGY_LABEL[a] ?? a)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                  <td>{fmtDate(u.createdAt)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

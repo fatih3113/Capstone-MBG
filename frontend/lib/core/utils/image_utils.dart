@@ -1,10 +1,11 @@
+// Utilitas manipulasi berkas gambar: kompresi foto sebelum diunggah ke server, konversi ke format byte Uint8List untuk machine learning, dan validasi ekstensi gambar.
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../constants/app_constants.dart';
 
+// Kelas statis berisi fungsi bantuan kompresi, pembacaan resolusi, dan pemrosesan gambar.
 class ImageUtils {
   ImageUtils._();
 

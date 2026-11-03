@@ -1,4 +1,4 @@
-/// Validators for form fields
+// Utilitas validasi formulir: memeriksa keabsahan format email, batas panjang kata sandi, kesamaan konfirmasi sandi, format umur, dan teks wajib isi.
 class Validators {
   Validators._();
 

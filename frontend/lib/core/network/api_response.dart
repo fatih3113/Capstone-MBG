@@ -1,3 +1,6 @@
+// File ini mendefinisikan pembungkus (wrapper) standar untuk hasil respons API backend agar penanganan data dan error seragam.
+
+// ApiResponse: kelas generik pembungkus respons backend berisi status sukses, pesan, data payload, dan daftar error jika ada.
 class ApiResponse<T> {
   final bool success;
   final String message;
@@ -13,6 +16,7 @@ class ApiResponse<T> {
     this.errors,
   });
 
+  // Factory untuk memetakan respons JSON dari server ke dalam objek ApiResponse.
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
     T Function(dynamic)? fromJson,
@@ -28,6 +32,7 @@ class ApiResponse<T> {
     );
   }
 
+  // Factory bantuan untuk membuat respons sukses lokal.
   factory ApiResponse.success({
     required T data,
     String message = 'Berhasil',
@@ -39,6 +44,7 @@ class ApiResponse<T> {
     );
   }
 
+  // Factory bantuan untuk membuat respons error lokal.
   factory ApiResponse.error({
     required String message,
     int? statusCode,
@@ -56,7 +62,7 @@ class ApiResponse<T> {
   bool get hasErrors => errors != null && errors!.isNotEmpty;
 }
 
-/// Paginated response wrapper
+/// PaginatedResponse: pembungkus respons untuk data daftar dengan pagination/halaman.
 class PaginatedResponse<T> {
   final List<T> data;
   final int total;
@@ -72,6 +78,7 @@ class PaginatedResponse<T> {
     required this.perPage,
   });
 
+  // Factory untuk memetakan JSON paginasi dari backend ke objek PaginatedResponse.
   factory PaginatedResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJson,

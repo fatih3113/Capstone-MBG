@@ -1,3 +1,4 @@
+// Layanan laporan dan survei MBG: menangani pengiriman usulan menu baru dari siswa, pemberian rating makanan favorit, serta feedback kualitas sensorik hidangan ke backend.
 import 'package:dio/dio.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
@@ -17,6 +18,7 @@ String _backendError(Object e, [String fallback = 'Terjadi kesalahan. Coba lagi.
 /// - Permintaan Menu
 /// - Rating Makanan Favorit
 /// - Feedback Makanan & Status Konsumsi
+// Kelas penyedia fungsi HTTP request untuk fitur pelaporan dan umpan balik siswa.
 class ReportService {
   // Toggle ke false untuk koneksi API nyata
   static const bool _useMock = false;
@@ -25,6 +27,7 @@ class ReportService {
   // MENU REQUESTS
   // ═══════════════════════════════════════════════
 
+  // Mengirim formulir usulan menu baru dari siswa ke tim pengelola MBG.
   Future<ApiResponse<MenuRequestModel>> submitMenuRequest({
     required String menuName,
     String? reason,
@@ -60,6 +63,7 @@ class ReportService {
     }
   }
 
+  // Mengambil daftar riwayat usulan menu yang pernah dikirimkan oleh siswa saat ini.
   Future<ApiResponse<List<MenuRequestModel>>> getMyMenuRequests() async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 400));
@@ -83,6 +87,7 @@ class ReportService {
   // FOOD RATINGS
   // ═══════════════════════════════════════════════
 
+  // Mengirimkan nilai rating bintang (1-5) untuk makanan yang disukai siswa.
   Future<ApiResponse<FoodRatingModel>> submitFoodRating({
     required String foodName,
     required int rating,
@@ -124,6 +129,7 @@ class ReportService {
     }
   }
 
+  // Mengambil peringkat makanan paling favorit se-sekolah berdasarkan akumulasi voting.
   Future<ApiResponse<List<FoodRankingModel>>> getFoodRanking({
     String? startDate,
     String? endDate,
@@ -152,6 +158,7 @@ class ReportService {
     }
   }
 
+  // Mengambil riwayat rating makanan yang telah diberikan oleh pengguna yang sedang masuk.
   Future<ApiResponse<List<FoodRatingModel>>> getMyFoodRatings() async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 400));
@@ -175,6 +182,7 @@ class ReportService {
   // FOOD FEEDBACKS
   // ═══════════════════════════════════════════════
 
+  // Mengirimkan formulir umpan balik terperinci tentang rasa, aroma, tekstur, porsi, dan kepuasan menu.
   Future<ApiResponse<FoodFeedbackModel>> submitFoodFeedback({
     required String foodName,
     String? foodId,

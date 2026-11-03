@@ -1,3 +1,4 @@
+// State management pemindaian makanan: mengatur seluruh tahapan alur scan kamera, pra-pemrosesan gambar, inferensi model AI, pencocokan database gizi, evaluasi sensorik/konsumsi, dan penyimpanan riwayat.
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../data/models/prediction_model.dart';
@@ -9,6 +10,7 @@ import '../ml/ml_service.dart';
 import '../ml/ml_service_mock.dart';
 import '../ml/image_processing_service.dart';
 
+// Enum tahapan status scan mulai dari pemilihan foto hingga analisis selesai.
 enum ScanStatus {
   idle,
   imagePicked,
@@ -21,6 +23,7 @@ enum ScanStatus {
   error,
 }
 
+// ChangeNotifier: penyedia state utama untuk fitur scan makanan cerdas dan kalkulasi nutrisi.
 class ScanProvider extends ChangeNotifier {
   final FoodService _foodService;
   final HistoryService _historyService;
@@ -80,6 +83,7 @@ class ScanProvider extends ChangeNotifier {
   bool get isWaitingEvaluation => _status == ScanStatus.waitingEvaluation;
 
   // ─── Step 1-3: Foto & Identifikasi & Ambil Data Gizi ─────────────────────
+  // Menyimpan file foto yang baru diambil atau dipilih dari galeri.
   void setImage(File image) {
     _selectedImage = image;
     _status = ScanStatus.imagePicked;
@@ -157,11 +161,13 @@ class ScanProvider extends ChangeNotifier {
 
   // ─── Step 4-5: Data Sensorik & Konsumsi ───────────────────────────────────
 
+  // Menyimpan hasil penilaian rasa, aroma, dan tekstur makanan.
   void setSensoryData(SensoryData data) {
     _sensoryData = data;
     notifyListeners();
   }
 
+  // Menyimpan laporan porsi yang dimakan dan sisa makanan di piring.
   void setConsumptionData(ConsumptionData data) {
     _consumptionData = data;
     notifyListeners();
@@ -207,6 +213,7 @@ class ScanProvider extends ChangeNotifier {
     }
   }
 
+  // Mengirim seluruh data hasil pemindaian dan evaluasi ke database backend.
   Future<void> _saveToHistory(String userId) async {
     if (_selectedImage == null || _analysisResult == null) return;
     final result = await _historyService.saveScan(
@@ -227,6 +234,7 @@ class ScanProvider extends ChangeNotifier {
     _isSaved = true;
   }
 
+  // Mereset seluruh variabel hasil pemindaian ke kondisi awal untuk scan baru.
   void reset() {
     _status = ScanStatus.idle;
     _selectedImage = null;
@@ -244,6 +252,7 @@ class ScanProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Memperbarui kode status dan pesan proses yang sedang berjalan.
   void _setStatus(ScanStatus status, String message) {
     _status = status;
     _statusMessage = message;

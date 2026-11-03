@@ -1,3 +1,5 @@
+// Halaman Notifikasi: menampilkan riwayat pemberitahuan jadwal distribusi ompreng MBG dari SPPG serta status telah dibaca.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -16,11 +18,13 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  // Filter lokal untuk menyaring hanya notifikasi yang belum dibaca.
   bool _onlyUnread = false;
 
   @override
   void initState() {
     super.initState();
+    // Meminta daftar notifikasi terbaru dari server sesaat setelah halaman selesai dibangun.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationProvider>().load();
     });
@@ -28,20 +32,25 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: tata letak dasar halaman dengan judul 'Notifikasi MBG' di tengah AppBar.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Notifikasi MBG'),
         centerTitle: true,
       ),
+      // Consumer<NotificationProvider>: merender ulang daftar secara reaktif sesuai status loading, error, atau isi data notifikasi.
       body: Consumer<NotificationProvider>(
         builder: (context, p, _) {
+          // Menampilkan indikator loading saat pertama kali memuat data.
           if (p.isLoading && p.items.isEmpty) {
             return const AppLoadingWidget(message: 'Memuat notifikasi...');
           }
+          // Menampilkan pesan error dan tombol coba lagi jika gagal mengambil notifikasi.
           if (p.error != null && p.items.isEmpty) {
             return AppErrorWidget(message: p.error!, onRetry: () => p.load());
           }
+          // Menampilkan ilustrasi kosong jika pengguna belum pernah menerima notifikasi apapun.
           if (p.items.isEmpty) {
             return RefreshIndicator(
               onRefresh: () => p.load(),
@@ -65,14 +74,18 @@ class _NotificationPageState extends State<NotificationPage> {
           final list =
               _onlyUnread ? p.items.where((e) => !e.isRead).toList() : p.items;
 
+          // RefreshIndicator: mendukung gestur tarik ke bawah untuk memperbarui daftar notifikasi.
           return RefreshIndicator(
             onRefresh: () => p.load(),
+            // ListView: daftar vertikal kartu notifikasi dan filter chip yang bisa di-scroll bebas.
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
+                // Header ringkasan jumlah notifikasi belum dibaca dan tombol 'Tandai dibaca'.
                 _HeaderCard(provider: p),
                 const SizedBox(height: 16),
+                // Pilihan filter chip antara 'Semua' dan 'Belum dibaca'.
                 Row(
                   children: [
                     _FilterChip(
@@ -89,6 +102,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                // Pesan saat filter 'Belum dibaca' aktif namun semua notifikasi sudah terbaca.
                 if (list.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 40),
@@ -101,6 +115,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     ),
                   )
                 else
+                  // Daftar kartu notifikasi per item yang diterima.
                   ...list.map(
                     (n) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
@@ -117,6 +132,8 @@ class _NotificationPageState extends State<NotificationPage> {
 }
 
 // ─── Header hijau (gaya sama dengan kartu tanggal di halaman Menu) ─────────
+
+// Kartu gradasi hijau atas yang menginfokan total notifikasi dan tombol aksi tandai semua dibaca.
 class _HeaderCard extends StatelessWidget {
   final NotificationProvider provider;
   const _HeaderCard({required this.provider});
@@ -124,6 +141,7 @@ class _HeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unread = provider.unreadCount;
+    // Container: kartu gradasi hijau dengan ikon lonceng dan tombol cepat tandai dibaca.
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -159,6 +177,7 @@ class _HeaderCard extends StatelessWidget {
               ],
             ),
           ),
+          // Tombol tandai semua notifikasi menjadi sudah dibaca.
           if (unread > 0)
             TextButton(
               onPressed: provider.markAllRead,
@@ -179,6 +198,7 @@ class _HeaderCard extends StatelessWidget {
   }
 }
 
+// Chip filter untuk menyaring tampilan notifikasi (Semua vs Belum dibaca).
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
@@ -188,8 +208,10 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // GestureDetector: merespons klik pergantian mode filter notifikasi.
     return GestureDetector(
       onTap: onTap,
+      // AnimatedContainer: animasi pergantian warna latar tombol filter saat disentuh.
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -211,6 +233,8 @@ class _FilterChip extends StatelessWidget {
 }
 
 // ─── Item notifikasi ───────────────────────────────────────────────────────
+
+// Kartu pratinjau informasi jadwal distribusi MBG yang bisa diklik untuk detail lengkap.
 class _NotificationTile extends StatelessWidget {
   final NotificationModel item;
   const _NotificationTile({required this.item});
@@ -226,6 +250,7 @@ class _NotificationTile extends StatelessWidget {
         .where((s) => s.isNotEmpty)
         .toList();
 
+    // GestureDetector: saat ditekan, tandai sebagai dibaca dan buka modal detail rincian menu.
     return GestureDetector(
       onTap: () {
         context.read<NotificationProvider>().markRead(item.id);
@@ -245,6 +270,7 @@ class _NotificationTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Ikon ompreng MBG di sisi kiri kartu
             Container(
               width: 52,
               height: 52,
@@ -267,6 +293,7 @@ class _NotificationTile extends StatelessWidget {
                         child: Text(item.title,
                             style: AppTextStyles.titleSmall),
                       ),
+                      // Titik merah kecil penanda pesan belum dibaca
                       if (!item.isRead)
                         Container(
                           width: 8,
@@ -289,6 +316,7 @@ class _NotificationTile extends StatelessWidget {
                   ],
                   if (names.isNotEmpty) ...[
                     const SizedBox(height: 8),
+                    // Wrap: menampilkan cuplikan nama hidangan yang akan dibagikan.
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
@@ -311,8 +339,10 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 
+  // Menampilkan lembar bawah (ModalBottomSheet) dengan rincian hidangan dan takaran porsi gram.
   void _showDetail(BuildContext context) {
     final date = item.scheduleDate;
+    // showModalBottomSheet: membuka dialog lembar bawah agar pengguna bisa melihat daftar menu lengkap tanpa pindah halaman.
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -355,6 +385,7 @@ class _NotificationTile extends StatelessWidget {
   }
 }
 
+// Chip kapsul untuk nama hidangan menu pada kartu notifikasi.
 class _MenuChip extends StatelessWidget {
   final String label;
   const _MenuChip({required this.label});

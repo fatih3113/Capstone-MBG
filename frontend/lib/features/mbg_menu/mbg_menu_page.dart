@@ -1,3 +1,5 @@
+// Halaman Menu MBG Mingguan: menampilkan jadwal hidangan makanan Makan Bergizi Gratis per hari (Senin s/d Sabtu) beserta gramatur porsinya.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
   @override
   void initState() {
     super.initState();
+    // Memuat susunan menu MBG mingguan dari server begitu halaman pertama kali dibuka.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MenuProvider>().loadWeeklyMenu();
     });
@@ -26,27 +29,32 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: fondasi halaman menu mingguan dengan AppBar dan latar belakang abu-abu muda.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Menu MBG Mingguan'),
       ),
+      // Consumer<MenuProvider>: merender status memuat, error, atau susunan menu berdasarkan data di provider.
       body: Consumer<MenuProvider>(
         builder: (context, menu, _) {
+          // Menampilkan indikator loading berputar saat mengambil data menu.
           if (menu.isLoading) {
             return const AppLoadingWidget(message: 'Memuat menu MBG...');
           }
+          // Menampilkan pesan error dan tombol coba lagi jika koneksi gagal.
           if (menu.error != null) {
             return AppErrorWidget(
               message: menu.error!,
               onRetry: () => menu.loadWeeklyMenu(),
             );
           }
+          // Column: menata pemilih tab hari di bagian atas dan daftar hidangan di bawahnya.
           return Column(
             children: [
-              // Day tabs
+              // Bilah tab gulir horizontal untuk memilih hari (Senin - Sabtu).
               _buildDaySelector(menu),
-              // Menu content
+              // Expanded: memberikan seluruh sisa ruang layar untuk menampilkan daftar hidangan menu hari terpilih.
               Expanded(child: _buildMenuContent(context, menu)),
             ],
           );
@@ -55,10 +63,12 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
     );
   }
 
+  // Bilah tab hari horizontal: tombol berbentuk pil untuk beralih antara Senin hingga Sabtu.
   Widget _buildDaySelector(MenuProvider menu) {
     return Container(
       color: AppColors.white,
       padding: const EdgeInsets.symmetric(vertical: 12),
+      // SingleChildScrollView horizontal: memungkinkan tab hari digeser ke samping dengan lancar.
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -66,8 +76,10 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
           children: menu.weeklyMenus.asMap().entries.map((e) {
             final isSelected = e.key == menu.selectedDayIndex;
             final isToday = DateTime.now().weekday == e.key + 1;
+            // GestureDetector: mendeteksi ketukan untuk memilih hari tertentu.
             return GestureDetector(
               onTap: () => menu.selectDay(e.key),
+              // AnimatedContainer: animasi perubahan warna latar tombol saat hari dipilih.
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.only(right: 10),
@@ -87,6 +99,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
                       style: AppTextStyles.labelMedium.copyWith(
                         color: isSelected ? Colors.white : AppColors.textPrimary),
                     ),
+                    // Titik penanda kecil jika hari pada tab cocok dengan hari ini di dunia nyata
                     if (isToday)
                       Container(
                         margin: const EdgeInsets.only(top: 3),
@@ -106,8 +119,10 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
     );
   }
 
+  // Konten rincian hidangan makanan pada hari yang sedang aktif dipilih.
   Widget _buildMenuContent(BuildContext context, MenuProvider menu) {
     final selectedMenu = menu.selectedMenu;
+    // Menampilkan pesan kosong jika pada hari tersebut pihak SPPG belum menyusun menu.
     if (selectedMenu == null) {
       return const EmptyStateWidget(
         title: 'Menu tidak tersedia',
@@ -116,12 +131,13 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
       );
     }
 
+    // SingleChildScrollView: agar daftar makanan pada hari terpilih dapat digeser secara vertikal.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header card
+          // Header kartu gradasi hijau: menampilkan nama hari, tanggal lengkap, dan nama sekolah penerima.
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -157,7 +173,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
           const Text('Menu Hari Ini', style: AppTextStyles.titleLarge),
           const SizedBox(height: 12),
 
-          // Menu items
+          // Daftar kartu makanan per item hidangan (karbohidrat, lauk hewani, nabati, sayur, buah)
           ...selectedMenu.items.map((item) => GestureDetector(
             onTap: () => context.push('/menu/food/${item.food.id}',
               extra: item.food),
@@ -171,6 +187,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
               ),
               child: Row(
                 children: [
+                  // Kotak ikon emoji kategori makanan (nasi, ayam, sayur, dll)
                   Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(
@@ -184,6 +201,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Informasi nama makanan, badge kategori, dan takaran porsi gramatur
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,6 +235,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
     );
   }
 
+  // Memilih kode warna khusus berdasarkan jenis kelompok makanan.
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'Karbohidrat': return AppColors.carbs;
@@ -229,6 +248,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
     }
   }
 
+  // Memilih simbol emoji yang sesuai untuk tiap kelompok makanan.
   String _getCategoryEmoji(String category) {
     switch (category) {
       case 'Karbohidrat': return '🍚';
@@ -242,6 +262,7 @@ class _MbgMenuPageState extends State<MbgMenuPage> {
   }
 }
 
+// Badge kapsul warna-warni untuk menandai kategori kelompok makanan.
 class _CategoryBadge extends StatelessWidget {
   final String label;
   final Color color;

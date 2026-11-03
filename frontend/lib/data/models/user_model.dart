@@ -115,6 +115,7 @@ class UserModel {
     String? provinsi,
     String? kabupatenKota,
     List<String>? allergies,
+    String? allergyOther,
     bool? allergyFilled,
   }) {
     return UserModel(
@@ -136,7 +137,7 @@ class UserModel {
       // allergyOther ikut terbawa; untuk mengubahnya (termasuk menjadi null)
       // gunakan withAllergy().
       allergies: allergies ?? this.allergies,
-      allergyOther: allergyOther,
+      allergyOther: allergyOther ?? this.allergyOther,
       allergyFilled: allergyFilled ?? this.allergyFilled,
     );
   }

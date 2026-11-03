@@ -1,3 +1,4 @@
+// Komponen pemantau notifikasi distribusi: secara berkala mengecek API untuk notifikasi distribusi makanan baru dan menampilkan dialog pop-up konfirmasi penerimaan ompreng MBG.
 import 'dart:async';
 
 import 'package:dio/dio.dart';
@@ -17,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///     onUnreadChanged: (n) => setState(() => unread = n), // opsional, untuk badge
 ///     child: Scaffold(...),
 ///   )
+// StatefulWidget: dipakai karena widget ini memantau siklus hidup aplikasi (lifecycle) dan menjalankan timer polling berkala di latar belakang.
 class DistributionNotificationWatcher extends StatefulWidget {
   const DistributionNotificationWatcher({
     super.key,
@@ -36,6 +38,7 @@ class DistributionNotificationWatcher extends StatefulWidget {
       _DistributionNotificationWatcherState();
 }
 
+// WidgetsBindingObserver: memantau transisi aplikasi saat kembali aktif dari background (resumed) agar langsung memeriksa notifikasi baru.
 class _DistributionNotificationWatcherState
     extends State<DistributionNotificationWatcher> with WidgetsBindingObserver {
   Timer? _timer;
@@ -45,11 +48,13 @@ class _DistributionNotificationWatcherState
 
   static const _kShownKey = 'shown_distribution_notif_ids';
 
+  // Membaca riwayat ID notifikasi yang sudah pernah ditampilkan dari memori lokal SharedPreferences.
   Future<void> _loadShown() async {
     final prefs = await SharedPreferences.getInstance();
     _handled.addAll(prefs.getStringList(_kShownKey) ?? const []);
   }
 
+  // Menyimpan daftar ID notifikasi agar dialog pop-up tidak muncul berulang kali untuk jadwal yang sama.
   Future<void> _saveShown() async {
     final prefs = await SharedPreferences.getInstance();
     final list = _handled.toList();
@@ -64,6 +69,7 @@ class _DistributionNotificationWatcherState
     _loadShown().then((_) {
       if (mounted) _check();
     });
+    // Timer.periodic: memicu pengecekan berkala ke server setiap interval durasi tertentu.
     _timer = Timer.periodic(widget.interval, (_) => _check());
   }
 
@@ -79,6 +85,7 @@ class _DistributionNotificationWatcherState
     if (state == AppLifecycleState.resumed) _check();
   }
 
+  // Fungsi pengecekan data notifikasi yang belum dibaca dari server melalui REST API.
   Future<void> _check() async {
     try {
       final res = await widget.dio
@@ -102,6 +109,7 @@ class _DistributionNotificationWatcherState
     }
   }
 
+  // Mengosongkan antrean pop-up satu per satu secara berurutan agar pesan tidak bertumpuk di layar.
   Future<void> _drainQueue() async {
     if (_dialogOpen) return;
     _dialogOpen = true;
@@ -113,6 +121,7 @@ class _DistributionNotificationWatcherState
     _dialogOpen = false;
   }
 
+  // Fungsi pembuka dialog pop-up pemberitahuan jadwal pembagian makanan bergizi.
   Future<void> _showDialog(Map<String, dynamic> n) {
     final data = (n['data'] is Map) ? Map<String, dynamic>.from(n['data']) : <String, dynamic>{};
     final items = (data['items'] as List? ?? const [])
@@ -122,11 +131,14 @@ class _DistributionNotificationWatcherState
     final body = (n['body'] ?? '').toString();
     final firstLine = body.split('\n').first; // baris pertama = tanggal
 
+    // showDialog: menampilkan jendela dialog modal yang tidak dapat ditutup selain menekan tombol konfirmasi.
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
+      // AlertDialog: kotak dialog Material standar berisi judul, rincian menu makanan, dan tombol aksi.
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        // Row: menyusun ikon makanan ompreng dan teks judul jadwal distribusi secara horizontal.
         title: Row(
           children: [
             const Icon(Icons.lunch_dining, color: Color(0xFF2E7D32)),
@@ -139,7 +151,9 @@ class _DistributionNotificationWatcherState
             ),
           ],
         ),
+        // SingleChildScrollView: mencegah overflow jika daftar menu yang akan dibagikan cukup panjang.
         content: SingleChildScrollView(
+          // Column: menyusun informasi nama sekolah, tanggal, dan rincian menu makanan secara vertikal.
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,6 +186,7 @@ class _DistributionNotificationWatcherState
           ),
         ),
         actions: [
+          // FilledButton: tombol konfirmasi untuk menutup dialog pemberitahuan.
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
             onPressed: () => Navigator.of(ctx).pop(),

@@ -1,3 +1,4 @@
+// Layanan riwayat pemindaian: mengirim data hasil scan dan evaluasi nutrisi ke backend serta mengambil riwayat histori konsumsi siswa.
 import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../core/network/api_response.dart';
@@ -18,10 +19,12 @@ String _backendError(Object e, [String fallback = 'Terjadi kesalahan. Coba lagi.
 }
 
 /// Service for scan history operations
+// Kelas penyedia fungsi API untuk riwayat pemindaian dan penyimpanan analisis gizi.
 class HistoryService {
   /// Ubah ke [true] untuk mode offline/development
   static const bool _useMock = false;
 
+  // Mengambil daftar riwayat pemindaian makanan pengguna secara terpaginasi.
   Future<ApiResponse<List<ScanHistoryModel>>> getScanHistory({
     required String userId,
     int page = 1,
@@ -55,6 +58,7 @@ class HistoryService {
     }
   }
 
+  // Menyimpan hasil deteksi makanan, estimasi nutrisi, data sensorik, dan data konsumsi ke server.
   Future<ApiResponse<ScanHistoryModel>> saveScan({
     required String userId,
     required File imageFile,
@@ -110,6 +114,7 @@ class HistoryService {
     }
   }
 
+  // Mengambil data detail satu rekaman pemindaian berdasarkan ID scan.
   Future<ApiResponse<ScanHistoryModel>> getScanDetail(String scanId) async {
     if (_useMock) {
       await Future.delayed(const Duration(milliseconds: 400));

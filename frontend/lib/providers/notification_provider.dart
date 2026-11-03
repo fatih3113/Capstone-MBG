@@ -1,7 +1,9 @@
+// State management notifikasi: mengelola daftar pemberitahuan jadwal menu MBG, menghitung jumlah pesan belum dibaca, dan sinkronisasi status baca ke backend.
 import 'package:flutter/foundation.dart';
 import '../core/network/dio_client.dart';
 import '../data/models/notification_model.dart';
 
+// ChangeNotifier: mengelola state daftar notifikasi pengguna dan memperbarui tampilan saat ada pemberitahuan baru.
 class NotificationProvider extends ChangeNotifier {
   List<NotificationModel> _items = [];
   int _unreadCount = 0;
@@ -22,6 +24,7 @@ class NotificationProvider extends ChangeNotifier {
     if (increased) load(silent: true);
   }
 
+  // Mengambil daftar notifikasi terbaru dari endpoint API server.
   Future<void> load({bool silent = false}) async {
     if (!silent) {
       _isLoading = true;
@@ -43,6 +46,7 @@ class NotificationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Menandai satu item notifikasi spesifik sebagai telah dibaca.
   Future<void> markRead(String id) async {
     final i = _items.indexWhere((n) => n.id == id);
     if (i == -1 || _items[i].isRead) return;
@@ -54,6 +58,7 @@ class NotificationProvider extends ChangeNotifier {
     } catch (_) {}
   }
 
+  // Menandai seluruh pesan notifikasi sekaligus sebagai telah dibaca.
   Future<void> markAllRead() async {
     if (_unreadCount == 0) return;
     _items = _items.map((n) => n.copyWith(isRead: true)).toList();

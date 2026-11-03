@@ -1,3 +1,5 @@
+// Halaman Hasil Prediksi Makanan: menampilkan daftar hidangan yang berhasil dideteksi AI, estimasi total gizi makro, dan rekomendasi cerdas sebelum masuk evaluasi sensorik.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -14,8 +16,10 @@ class PredictionResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // context.watch: berlangganan data hasil prediksi model AI dari ScanProvider.
     final scan = context.watch<ScanProvider>();
 
+    // Scaffold: tata letak dasar hasil identifikasi foto menu MBG.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -35,10 +39,11 @@ class PredictionResultPage extends StatelessWidget {
           ),
         ],
       ),
+      // SingleChildScrollView: memungkinkan seluruh rincian deteksi makanan dan kartu gizi digulir vertikal.
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Image header
+            // Stack foto header: menampilkan gambar hidangan yang baru saja difoto beserta badge jumlah makanan terdeteksi.
             if (scan.selectedImage != null)
               Stack(
                 children: [
@@ -86,7 +91,7 @@ class PredictionResultPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Step indicator badge
+                  // Badge indikator langkah selanjutnya menuju evaluasi
                   Positioned(
                     bottom: 16, right: 16,
                     child: Container(
@@ -117,7 +122,7 @@ class PredictionResultPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Detected foods
+                  // Daftar hidangan makanan yang terdeteksi AI beserta akurasi persentasenya
                   const Text('Makanan Teridentifikasi',
                     style: AppTextStyles.headlineSmall),
                   const SizedBox(height: 14),
@@ -125,21 +130,22 @@ class PredictionResultPage extends StatelessWidget {
                     _PredictionCard(prediction: pred)),
                   const SizedBox(height: 20),
 
-                  // Total nutrition
+                  // Bagian grid total 6 nutrisi makro makanan
                   _buildTotalNutrition(scan),
                   const SizedBox(height: 20),
 
-                  // Intelligent recommendation
+                  // Rekomendasi nutrisi cerdas berbasis aturan kecukupan gizi
                   _buildSmartRecommendation(scan),
                   const SizedBox(height: 24),
 
-                  // Alur selanjutnya - info banner
+                  // Banner panduan langkah selanjutnya (evaluasi rasa dan sisa makanan)
                   _buildNextStepBanner(),
                   const SizedBox(height: 24),
 
-                  // Actions
+                  // Dua tombol aksi: foto ulang (Scan Lagi) atau lanjut ke form evaluasi makanan
                   Row(
                     children: [
+                      // CustomButton: mereset state dan kembali ke halaman kamera
                       Expanded(
                         child: CustomButton(
                           label: 'Scan Lagi',
@@ -151,6 +157,7 @@ class PredictionResultPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
+                      // CustomButton: menuju tahap kedua (evaluasi sensorik dan porsi konsumsi)
                       Expanded(
                         child: CustomButton(
                           label: 'Evaluasi Makanan →',
@@ -171,6 +178,7 @@ class PredictionResultPage extends StatelessWidget {
     );
   }
 
+  // Menampilkan kisi 6 kartu nutrisi makro (Kalori, Protein, Karbohidrat, Lemak, Serat, Gula) hasil kalkulasi AI.
   Widget _buildTotalNutrition(ScanProvider scan) {
     final total = scan.totalNutrition;
     const targets = NutritionConstants.dailyTargetSMP;
@@ -183,8 +191,7 @@ class PredictionResultPage extends StatelessWidget {
         const Text('Perkiraan untuk satu porsi makan',
           style: AppTextStyles.bodySmall),
         const SizedBox(height: 14),
-        // FIX: pakai tinggi tetap (mainAxisExtent) supaya kartu tidak overflow,
-        // dan padding zero supaya tidak ada jarak kosong di atas grid.
+        // GridView: menampilkan kartu nutrisi dalam 2 kolom dengan batas tinggi tetap agar tidak overflow.
         GridView(
           padding: EdgeInsets.zero,
           shrinkWrap: true,
@@ -249,6 +256,7 @@ class PredictionResultPage extends StatelessWidget {
     );
   }
 
+  // Menganalisis rasio pemenuhan nutrisi dan menyajikan saran cerdas berbasis standar AKG.
   Widget _buildSmartRecommendation(ScanProvider scan) {
     // Intelligent System: rule-based recommendations
     final recommendations = <String>[];
@@ -326,6 +334,7 @@ class PredictionResultPage extends StatelessWidget {
     );
   }
 
+  // Kartu pengingat langkah lanjutan pengisian data evaluasi sensorik dan porsi konsumsi.
   Widget _buildNextStepBanner() {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -369,6 +378,7 @@ class PredictionResultPage extends StatelessWidget {
   }
 }
 
+// Kartu satu baris hidangan terdeteksi: nama makanan, persentase keyakinan (confidence), dan estimasi kalori.
 class _PredictionCard extends StatelessWidget {
   final PredictionModel prediction;
   const _PredictionCard({required this.prediction});

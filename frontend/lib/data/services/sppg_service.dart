@@ -1,4 +1,4 @@
-/// Service untuk mengambil data SPPG dan wilayah dari endpoint publik backend
+// Layanan data SPPG dan wilayah: mengambil data hierarki wilayah (provinsi, kabupaten/kota, kecamatan) yang memiliki unit SPPG aktif serta daftar sekolah mitra.
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_response.dart';
@@ -6,6 +6,7 @@ import '../../core/constants/api_constants.dart';
 import '../models/school_model.dart';
 import '../models/sppg_model.dart';
 
+// Kelas penyedia fungsi HTTP request untuk wilayah, SPPG, dan sekolah.
 class SppgService {
   // ── REGIONS (wilayah bertingkat) ────────────────────────────────────────
 
@@ -24,6 +25,7 @@ class SppgService {
     return _getRegions(level: 'kecamatan', parent: kabupatenKota);
   }
 
+  // Mengambil daftar wilayah administratif bertingkat (provinsi/kabupaten/kecamatan) dari endpoint publik backend.
   Future<ApiResponse<List<String>>> _getRegions({
     required String level,
     String? parent,

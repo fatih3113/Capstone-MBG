@@ -1,3 +1,6 @@
+// File ini mendefinisikan model notifikasi sistem (misalnya informasi jadwal distribusi menu MBG dari SPPG).
+
+// NotificationModel: representasi pesan pemberitahuan yang diterima siswa di halaman notifikasi.
 class NotificationModel {
   final String id;
   final String title;
@@ -17,18 +20,22 @@ class NotificationModel {
     required this.createdAt,
   });
 
+  // Getter nama sekolah terkait jadwal dari payload data notifikasi.
   String get schoolName => (data['schoolName'] ?? '').toString();
 
+  // Getter tanggal distribusi yang dijadwalkan dari data notifikasi.
   DateTime? get scheduleDate {
     final raw = data['date'];
     return raw == null ? null : DateTime.tryParse(raw.toString())?.toLocal();
   }
 
+  // Getter daftar menu atau item yang didistribusikan.
   List<Map<String, dynamic>> get items => (data['items'] as List? ?? const [])
       .whereType<Map>()
       .map((e) => Map<String, dynamic>.from(e))
       .toList();
 
+  // Factory untuk memetakan respons JSON dari server ke objek NotificationModel.
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       id: json['id'].toString(),
@@ -45,6 +52,7 @@ class NotificationModel {
     );
   }
 
+  // Membuat salinan objek notifikasi dengan pembaruan status baca (isRead).
   NotificationModel copyWith({bool? isRead}) => NotificationModel(
         id: id,
         title: title,

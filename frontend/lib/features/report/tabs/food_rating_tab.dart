@@ -1,3 +1,5 @@
+// Tab Rating Makanan: sarana penilaian rasa hidangan (bintang 1-5) dan papan peringkat makanan favorit se-sekolah.
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -17,6 +19,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
   final _service = ReportService();
   final _foodNameController = TextEditingController();
   final _reasonController = TextEditingController();
+  // GlobalKey<FormState>: kunci pemeriksa validasi input nama hidangan yang dinilai.
   final _formKey = GlobalKey<FormState>();
 
   int _selectedRating = 5;
@@ -27,16 +30,19 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
   @override
   void initState() {
     super.initState();
+    // Mengambil data urutan ranking makanan favorit dari backend saat tab dibuka.
     _loadRanking();
   }
 
   @override
   void dispose() {
+    // Membebaskan controller teks agar tidak membebani memori.
     _foodNameController.dispose();
     _reasonController.dispose();
     super.dispose();
   }
 
+  // Mengambil daftar peringkat makanan terfavorit dari ReportService.
   Future<void> _loadRanking() async {
     setState(() => _isLoading = true);
     final result = await _service.getFoodRanking();
@@ -48,6 +54,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
     }
   }
 
+  // Memvalidasi dan mengirim nilai bintang rating makanan ke API.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
@@ -86,19 +93,23 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
 
   @override
   Widget build(BuildContext context) {
+    // SingleChildScrollView: memungkinkan formulir rating dan papan ranking digeser ke bawah.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Kartu formulir input nama makanan dan seleksi bintang
           _buildForm(),
           const SizedBox(height: 24),
+          // Bagian papan peringkat makanan terfavorit
           _buildRankingSection(),
         ],
       ),
     );
   }
 
+  // Formulir penilaian makanan dengan pemilih rating 5 bintang interaktif.
   Widget _buildForm() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -107,6 +118,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.cardBorder),
       ),
+      // Form: mengikat input nama makanan dan alasan agar validasi dapat dilakukan terpusat.
       child: Form(
         key: _formKey,
         child: Column(
@@ -130,6 +142,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
               ],
             ),
             const SizedBox(height: 16),
+            // TextFormField: input nama makanan yang ingin diberi penilaian
             TextFormField(
               key: const Key('food_rating_name_field'),
               controller: _foodNameController,
@@ -147,6 +160,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
             const SizedBox(height: 16),
             Text('Rating', style: AppTextStyles.titleSmall),
             const SizedBox(height: 8),
+            // Deretan 5 ikon bintang yang bisa diklik untuk menentukan tingkat kepuasan rasa
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -176,6 +190,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
               ),
             ),
             const SizedBox(height: 12),
+            // TextFormField: input alasan opsional kenapa menyukai makanan tersebut
             TextFormField(
               key: const Key('food_rating_reason_field'),
               controller: _reasonController,
@@ -189,6 +204,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
               ),
             ),
             const SizedBox(height: 16),
+            // CustomButton: tombol simpan rating ke database
             SizedBox(
               width: double.infinity,
               child: CustomButton(
@@ -211,6 +227,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
     );
   }
 
+  // Bagian leaderboard makanan teratas berdasarkan rata-rata rating suara terbanyak.
   Widget _buildRankingSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,6 +237,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
           children: [
             const Text('🏆 Ranking Makanan Favorit',
                 style: AppTextStyles.headlineSmall),
+            // IconButton: tombol segarkan papan peringkat
             IconButton(
               icon: const Icon(Icons.refresh_rounded),
               onPressed: _loadRanking,
@@ -243,11 +261,13 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
             ),
           )
         else
+          // Daftar kartu peringkat makanan
           ..._ranking.map((item) => _buildRankingCard(item)),
       ],
     );
   }
 
+  // Kartu satu baris peringkat makanan dengan medali warna emas/perak/perunggu untuk top 3.
   Widget _buildRankingCard(FoodRankingModel item) {
     final rankColors = [
       const Color(0xFFFFD700), // Gold
@@ -269,6 +289,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
       ),
       child: Row(
         children: [
+          // Lingkaran medali peringkat angka #1, #2, dst
           Container(
             width: 36,
             height: 36,
@@ -297,6 +318,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
               ],
             ),
           ),
+          // Rata-rata skor bintang makanan
           Row(
             children: [
               const Icon(Icons.star_rounded,
@@ -314,6 +336,7 @@ class _FoodRatingTabState extends State<FoodRatingTab> {
     );
   }
 
+  // Mengubah angka 1-5 menjadi teks keterangan ekspresif.
   String _ratingLabel(int rating) {
     switch (rating) {
       case 1:

@@ -1,3 +1,5 @@
+// Halaman Profil Pengguna: menampilkan ringkasan data akun (sekolah/posyandu, kelas, gender, umur), data alergi makanan, menu navigasi pengaturan, dan tombol logout.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -12,15 +14,19 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // context.watch: memantau objek pengguna yang login agar perubahan data profil langsung terbarui di UI.
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
     // Akun posyandu/puskesmas: tidak punya Kelas & Jenjang sekolah
     final isHealth = const {'Posyandu', 'Puskesmas'}.contains(user?.schoolLevel);
 
+    // Scaffold: fondasi visual halaman profil dengan warna latar serasi tema aplikasi.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // CustomScrollView: menyatukan header avatar melengkung dengan kartu informasi profil yang dapat digulir bersama.
       body: CustomScrollView(
         slivers: [
+          // SliverAppBar: area header atas dengan efek gradasi hijau, inisial avatar pengguna, nama lengkap, dan email.
           SliverAppBar(
             expandedHeight: 220,
             pinned: true,
@@ -39,7 +45,7 @@ class ProfilePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 24),
-                      // Avatar
+                      // Avatar lingkaran putih menampilkan huruf inisial nama pengguna
                       Container(
                         width: 80, height: 80,
                         decoration: BoxDecoration(
@@ -74,13 +80,14 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
 
+          // SliverToBoxAdapter: memasukkan kartu rincian identitas, alergi makanan, menu setting, dan tombol keluar.
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile info card
+                  // Kartu informasi biodata sekolah/posyandu, kelas, jenis kelamin, dan usia
                   _buildInfoCard([
                     _InfoRow(icon: Icons.school_outlined,
                       label: isHealth ? 'Posyandu' : 'Sekolah',
@@ -101,11 +108,11 @@ class ProfilePage extends StatelessWidget {
                   ]),
                   const SizedBox(height: 16),
 
-                  // Alergi makanan
+                  // Kartu penampil status alergi makanan (daftar alergi, tidak ada alergi, atau belum diisi)
                   _buildAllergyCard(context, user),
                   const SizedBox(height: 20),
 
-                  // Actions
+                  // Kartu daftar menu navigasi akun
                   const Text('Menu', style: AppTextStyles.titleLarge),
                   const SizedBox(height: 12),
                   _buildMenuCard([
@@ -136,7 +143,7 @@ class ProfilePage extends StatelessWidget {
                   ]),
                   const SizedBox(height: 20),
 
-                  // Logout
+                  // CustomButton: tombol keluar dari akun (logout) dengan garis tepi merah/hijau.
                   CustomButton(
                     label: 'Keluar',
                     isOutlined: true,
@@ -157,6 +164,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Wadah kartu putih untuk menyajikan deretan baris informasi profil pengguna.
   Widget _buildInfoCard(List<_InfoRow> rows) {
     return Container(
       decoration: BoxDecoration(
@@ -189,11 +197,13 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Menampilkan chip alergi makanan pengguna atau tombol ajakan mengisi jika belum diisi.
   Widget _buildAllergyCard(BuildContext context, UserModel? user) {
     final filled = user?.allergyFilled ?? false;
     final labels = user?.allergyLabels ?? const <String>[];
 
     Widget content;
+    // Jika akun lama belum pernah mengisi data alergi, beri tombol langsung ke Edit Profil.
     if (!filled) {
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,6 +231,7 @@ class ProfilePage extends StatelessWidget {
             AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
       );
     } else {
+      // Wrap: menampilkan daftar chip alergi makanan yang dimiliki pengguna.
       content = Wrap(
         spacing: 8,
         runSpacing: 8,
@@ -270,6 +281,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Menyusun daftar tautan menu navigasi ke halaman lain (Edit Profil, Pengaturan, dsb).
   Widget _buildMenuCard(List<_MenuItem> items) {
     return Container(
       decoration: BoxDecoration(
@@ -280,6 +292,7 @@ class ProfilePage extends StatelessWidget {
       child: Column(
         children: items.map((item) => Column(
           children: [
+            // InkWell: memberikan efek riak sentuhan (ripple) saat baris menu diklik.
             InkWell(
               onTap: item.onTap,
               borderRadius: item == items.first
@@ -318,6 +331,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Menampilkan kotak dialog informasi versi dan deskripsi hak cipta aplikasi.
   void _showAbout(BuildContext context) {
     showDialog(
       context: context,
@@ -349,6 +363,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// Representasi satu baris data info profil (ikon, label nama kolom, nilai data).
 class _InfoRow {
   final IconData icon;
   final String label;
@@ -356,6 +371,7 @@ class _InfoRow {
   const _InfoRow({required this.icon, required this.label, required this.value});
 }
 
+// Model data konfigurasi item menu pengaturan.
 class _MenuItem {
   final IconData icon;
   final String label;

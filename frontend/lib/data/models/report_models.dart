@@ -1,4 +1,7 @@
+// File ini mendefinisikan model-model laporan partisipatif siswa: permintaan menu baru, rating makanan, peringkat favorit, dan umpan balik porsi.
+
 // ─── Menu Request Model ────────────────────────────────────────────────────
+// MenuRequestModel: menyimpan data usulan menu makanan baru yang diajukan oleh siswa beserta status peninjauannya.
 class MenuRequestModel {
   final String id;
   final String userId;
@@ -33,6 +36,7 @@ class MenuRequestModel {
     );
   }
 
+  // Label status berbahasa Indonesia untuk ditampilkan pada antarmuka riwayat usulan menu.
   String get statusLabel {
     switch (status) {
       case 'received':
@@ -52,6 +56,7 @@ class MenuRequestModel {
 }
 
 // ─── Food Rating Model ─────────────────────────────────────────────────────
+// FoodRatingModel: menyimpan nilai rating bintang (1-5) dan ulasan singkat siswa untuk suatu menu makanan.
 class FoodRatingModel {
   final String id;
   final String userId;
@@ -85,6 +90,7 @@ class FoodRatingModel {
 }
 
 // ─── Food Rating Ranking Model ─────────────────────────────────────────────
+// FoodRankingModel: data peringkat makanan paling disukai berdasarkan rata-rata rating dan jumlah pemilih.
 class FoodRankingModel {
   final int rank;
   final String foodName;
@@ -109,6 +115,7 @@ class FoodRankingModel {
 }
 
 // ─── Food Feedback Model ───────────────────────────────────────────────────
+// FoodFeedbackModel: rincian survei kepuasan rasa, tekstur, aroma, porsi, dan status keterhabisan makanan.
 class FoodFeedbackModel {
   final String id;
   final String userId;
@@ -155,6 +162,7 @@ class FoodFeedbackModel {
     );
   }
 
+  // Label status porsi habis atau tersisa untuk ditampilkan pada kartu riwayat umpan balik.
   String get consumptionStatusLabel {
     switch (consumptionStatus) {
       case 'habis':

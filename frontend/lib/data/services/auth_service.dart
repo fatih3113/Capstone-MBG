@@ -138,6 +138,62 @@ class AuthService {
     }
   }
 
+  // ─── UPDATE PROFIL LENGKAP ────────────────────────────────────────
+  /// Simpan profil (nama, umur, gender, kelas, sekolah, SPPG, alergi)
+  /// ke server lewat PUT /users/profile/update.
+  /// Data dikirim dengan key yang sama seperti saat register.
+  Future<ApiResponse<Map<String, dynamic>>> updateProfile({
+    required String name,
+    int? age,
+    String? gender,
+    String? className,
+    String? schoolId,
+    String? sppgId,
+    List<String>? allergies,
+    String? allergyOther,
+  }) async {
+    final payload = <String, dynamic>{
+      'name': name,
+      'age': age,
+      'gender': gender,
+      'class': className,
+      if (schoolId != null) 'school_id': schoolId,
+      if (sppgId != null) 'sppg_id': sppgId,
+      if (allergies != null) ...{
+        'allergies': allergies,
+        'allergy_other': allergyOther,
+        'allergy_filled': true,
+      },
+    };
+    if (_useMock) {
+      return ApiResponse.success(
+        data: payload,
+        message: 'Profil berhasil diperbarui',
+      );
+    }
+
+    try {
+      final response = await DioClient.instance.put(
+        ApiConstants.updateProfile,
+        data: payload,
+      );
+      return ApiResponse.fromJson(
+        response.data,
+        (data) => data is Map
+            ? Map<String, dynamic>.from(data)
+            : <String, dynamic>{},
+      );
+    } on DioException catch (e) {
+      return ApiResponse.error(
+        message: _backendMessage(e) ??
+            e.message ??
+            'Gagal menyimpan profil. Coba lagi.',
+      );
+    } catch (e) {
+      return ApiResponse.error(message: 'Terjadi kesalahan. Silakan coba lagi.');
+    }
+  }
+
   /// Ambil pesan error dari body respons backend (jika ada).
   String? _backendMessage(DioException e) {
     final data = e.response?.data;

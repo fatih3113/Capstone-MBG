@@ -1,3 +1,5 @@
+// Halaman Scan Menu: gerbang pengambilan foto hidangan MBG menggunakan kamera atau galeri untuk identifikasi gizi berbasis AI.
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ class ScanPage extends StatefulWidget {
   State<ScanPage> createState() => _ScanPageState();
 }
 
+// SingleTickerProviderStateMixin: mengendalikan animasi denyut (pulsing) pada lingkaran pemindai.
 class _ScanPageState extends State<ScanPage>
     with SingleTickerProviderStateMixin {
   final _picker = ImagePicker();
@@ -22,6 +25,7 @@ class _ScanPageState extends State<ScanPage>
   @override
   void initState() {
     super.initState();
+    // Animasi denyut berulang maju-mundur pada ilustrasi piring makanan
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -33,10 +37,12 @@ class _ScanPageState extends State<ScanPage>
 
   @override
   void dispose() {
+    // Mematikan controller animasi denyut agar memori tidak bocor.
     _pulseController.dispose();
     super.dispose();
   }
 
+  // Membuka kamera atau galeri perangkat menggunakan plugin ImagePicker lalu menuju halaman pratinjau foto.
   Future<void> _pickImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.pickImage(
@@ -62,12 +68,14 @@ class _ScanPageState extends State<ScanPage>
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold: fondasi layar pemindai dengan AppBar putih bersih.
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Scan Menu MBG'),
         backgroundColor: AppColors.white,
       ),
+      // SafeArea + SingleChildScrollView: menjaga tombol kamera dan panduan tidak terpotong pada berbagai dimensi layar.
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -75,7 +83,7 @@ class _ScanPageState extends State<ScanPage>
             children: [
               const SizedBox(height: 16),
 
-              // Scanner illustration
+              // AnimatedBuilder: merender animasi denyut skala membesar-mengecil pada ilustrasi piring scanner.
               AnimatedBuilder(
                 animation: _pulseAnim,
                 builder: (_, child) => Transform.scale(
@@ -112,7 +120,7 @@ class _ScanPageState extends State<ScanPage>
                           child: Text('🍽️', style: TextStyle(fontSize: 72)),
                         ),
                       ),
-                      // Corner frame decorations
+                      // Ornamen siku bingkai pemindai kamera di 4 sudut
                       const Positioned(top: 30, left: 30,
                         child: const _CornerBracket(alignment: Alignment.topLeft)),
                       const Positioned(top: 30, right: 30,
@@ -127,7 +135,7 @@ class _ScanPageState extends State<ScanPage>
               ),
               const SizedBox(height: 32),
 
-              // Title
+              // Judul dan teks instruksi singkat pemindaian menu
               const Text('Identifikasi Menu MBG',
                 style: AppTextStyles.headlineMedium,
                 textAlign: TextAlign.center),
@@ -140,11 +148,11 @@ class _ScanPageState extends State<ScanPage>
               ),
               const SizedBox(height: 36),
 
-              // How it works
+              // Kartu 6 langkah alur kerja proses identifikasi menu MBG
               _buildHowItWorks(),
               const SizedBox(height: 32),
 
-              // Buttons
+              // CustomButton: tombol utama untuk mengambil foto langsung lewat kamera perangkat.
               CustomButton(
                 label: 'Buka Kamera',
                 onPressed: () => _pickImage(ImageSource.camera),
@@ -152,6 +160,7 @@ class _ScanPageState extends State<ScanPage>
                   color: Colors.white, size: 20),
               ),
               const SizedBox(height: 12),
+              // CustomButton: tombol alternatif untuk mengunggah gambar makanan dari galeri foto.
               CustomButton(
                 label: 'Pilih dari Galeri',
                 onPressed: () => _pickImage(ImageSource.gallery),
@@ -167,6 +176,7 @@ class _ScanPageState extends State<ScanPage>
     );
   }
 
+  // Kartu putih panduan tahapan: foto, identifikasi AI, data gizi, sensorik, konsumsi, dan analisis akhir.
   Widget _buildHowItWorks() {
     final steps = [
       ('1', '📸', 'Foto Makanan', 'Foto atau unggah foto menu MBG Anda'),
@@ -242,6 +252,7 @@ class _ScanPageState extends State<ScanPage>
   }
 }
 
+// Komponen dekorasi garis siku sudut pemindai menggunakan CustomPaint.
 class _CornerBracket extends StatelessWidget {
   final Alignment alignment;
   const _CornerBracket({required this.alignment});
@@ -255,6 +266,7 @@ class _CornerBracket extends StatelessWidget {
   }
 }
 
+// CustomPainter: menggambar dua garis pembentuk siku sudut di canvas Flutter.
 class _BracketPainter extends CustomPainter {
   final Alignment alignment;
   _BracketPainter(this.alignment);

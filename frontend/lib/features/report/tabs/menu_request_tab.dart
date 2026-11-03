@@ -1,3 +1,5 @@
+// Tab Usulan Menu: formulir bagi siswa untuk mengusulkan hidangan MBG baru beserta riwayat status persetujuan dari admin SPPG.
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
@@ -18,6 +20,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
   final _service = ReportService();
   final _menuNameController = TextEditingController();
   final _reasonController = TextEditingController();
+  // GlobalKey<FormState>: memvalidasi kolom nama usulan menu sebelum dikirim ke server.
   final _formKey = GlobalKey<FormState>();
 
   List<MenuRequestModel> _myRequests = [];
@@ -27,16 +30,19 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
   @override
   void initState() {
     super.initState();
+    // Memuat daftar riwayat usulan menu yang pernah diajukan pengguna saat tab dibuka.
     _loadMyRequests();
   }
 
   @override
   void dispose() {
+    // Membebaskan controller teks agar memori tidak bocor.
     _menuNameController.dispose();
     _reasonController.dispose();
     super.dispose();
   }
 
+  // Mengambil data usulan menu milik pengguna dari ReportService.
   Future<void> _loadMyRequests() async {
     setState(() => _isLoading = true);
     final result = await _service.getMyMenuRequests();
@@ -48,6 +54,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
     }
   }
 
+  // Memvalidasi form dan mengirim usulan menu baru ke API backend.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
@@ -85,22 +92,24 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
 
   @override
   Widget build(BuildContext context) {
+    // SingleChildScrollView: memastikan form pengajuan dan daftar riwayat usulan dapat digulir bebas.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Form usulan
+          // Kartu formulir input nama menu dan alasan usulan
           _buildForm(),
           const SizedBox(height: 24),
 
-          // Riwayat usulan
+          // Bagian daftar riwayat usulan menu yang pernah diajukan
           _buildHistorySection(),
         ],
       ),
     );
   }
 
+  // Wadah kartu formulir pengajuan usulan menu makanan baru.
   Widget _buildForm() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -109,6 +118,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.cardBorder),
       ),
+      // Form: membungkus TextFormField nama menu dan alasan untuk validasi input.
       child: Form(
         key: _formKey,
         child: Column(
@@ -132,6 +142,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
               ],
             ),
             const SizedBox(height: 16),
+            // TextFormField: input nama menu hidangan yang diusulkan
             TextFormField(
               key: const Key('menu_request_name_field'),
               controller: _menuNameController,
@@ -146,6 +157,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
                   v == null || v.trim().isEmpty ? 'Nama menu wajib diisi' : null,
             ),
             const SizedBox(height: 12),
+            // TextFormField: input alasan atau keterangan tambahan (opsional)
             TextFormField(
               key: const Key('menu_request_reason_field'),
               controller: _reasonController,
@@ -160,6 +172,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
               ),
             ),
             const SizedBox(height: 16),
+            // CustomButton: tombol kirim usulan dengan indikator progres saat proses kirim
             SizedBox(
               width: double.infinity,
               child: CustomButton(
@@ -182,6 +195,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
     );
   }
 
+  // Bagian daftar riwayat usulan yang telah diajukan pengguna beserta statusnya.
   Widget _buildHistorySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +205,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
           children: [
             const Text('Riwayat Usulan Saya',
                 style: AppTextStyles.headlineSmall),
+            // IconButton: tombol segarkan untuk memperbarui daftar usulan dari server.
             IconButton(
               icon: const Icon(Icons.refresh_rounded),
               onPressed: _loadMyRequests,
@@ -212,6 +227,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
     );
   }
 
+  // Kartu satu usulan menu: menampilkan status verifikasi (diterima, ditinjau, disetujui, ditolak) dan catatan admin.
   Widget _buildRequestCard(MenuRequestModel req) {
     final statusColor = _statusColor(req.status);
     return Container(
@@ -231,6 +247,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
                 child: Text(req.menuName,
                     style: AppTextStyles.titleSmall),
               ),
+              // Badge status usulan dengan warna berbeda sesuai hasil tinjauan admin
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
@@ -258,6 +275,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
             DateFormat('d MMM y, HH:mm', 'id_ID').format(req.submittedAt),
             style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
           ),
+          // Kotak biru catatan tanggapan dari admin SPPG jika ada
           if (req.adminNote != null) ...[
             const SizedBox(height: 8),
             Container(
@@ -288,6 +306,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
     );
   }
 
+  // Memberi warna badge status usulan menu (biru, oranye, hijau, merah).
   Color _statusColor(String status) {
     switch (status) {
       case 'received':
@@ -305,6 +324,7 @@ class _MenuRequestTabState extends State<MenuRequestTab> {
     }
   }
 
+  // Tampilan kartu kosong jika pengguna belum pernah mengajukan usulan menu.
   Widget _buildEmptyState({
     required IconData icon,
     required String message,

@@ -1,3 +1,4 @@
+// Konfigurasi routing aplikasi menggunakan GoRouter: mendaftarkan seluruh path navigasi, alur autentikasi, layout navigasi bawah (ShellRoute), serta halaman error 404.
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -25,24 +26,25 @@ import '../../features/profile/settings_page.dart';
 import '../../features/report/report_page.dart';
 import '../../features/notifications/notification_page.dart';
 
+// Kelas AppRouter: penyedia fungsi statis pembuat router aplikasi.
 class AppRouter {
+  // createRouter: mengembalikan objek GoRouter yang memetakan URL path ke halaman widget yang sesuai.
   static GoRouter createRouter(BuildContext context) {
     return GoRouter(
       initialLocation: '/',
       debugLogDiagnostics: true,
       redirect: (ctx, state) {
-        // Auth guard - check if user is logged in
-        // Skip redirect for splash, login, register, forgot-password
-        return null; // Let splash handle the redirect
+        // Auth guard - memeriksa sesi login pengguna. SplashScreen menangani pemeriksaan token awal.
+        return null;
       },
       routes: [
-        // Splash
+        // GoRoute: rute awal splash screen untuk inisialisasi sesi login dan data awal.
         GoRoute(
           path: '/',
           builder: (_, __) => const SplashScreen(),
         ),
 
-        // Auth routes
+        // GoRoute: kelompok rute autentikasi (login, pendaftaran akun baru, dan lupa password).
         GoRoute(
           path: '/login',
           builder: (_, __) => const LoginPage(),
@@ -56,7 +58,7 @@ class AppRouter {
           builder: (_, __) => const ForgotPasswordPage(),
         ),
 
-        // Main shell with bottom navigation
+        // ShellRoute: pembungkus halaman utama yang memiliki bilah navigasi bawah (BottomNavigationBar pada MainPage).
         ShellRoute(
           builder: (_, __, child) => MainPage(child: child),
           routes: [
@@ -91,7 +93,7 @@ class AppRouter {
           ],
         ),
 
-        // Standalone routes (no bottom nav)
+        // Rute mandiri (standalone routes): halaman yang tampil penuh tanpa bilah navigasi bawah.
         GoRoute(
           path: '/scan/preview',
           builder: (_, state) {
@@ -139,6 +141,7 @@ class AppRouter {
         ),
       ],
 
+      // errorBuilder: halaman penampung saat ada URL atau rute yang tidak ditemukan (404 Not Found).
       errorBuilder: (context, state) => Scaffold(
         body: Center(
           child: Column(

@@ -1,6 +1,9 @@
+// File ini mendefinisikan model rekaman riwayat pemindaian makanan (foto, waktu scan, total gizi, dan evaluasi konsumsi).
+
 import 'prediction_model.dart';
 import 'evaluation_model.dart';
 
+// ScanHistoryModel: menyimpan satu sesi pemindaian makanan lengkap beserta gambar, hasil deteksi, dan data sensorik.
 class ScanHistoryModel {
   final String id;
   final String userId;
@@ -34,6 +37,7 @@ class ScanHistoryModel {
     this.consumptionData,
   });
 
+  // Factory untuk memetakan data riwayat pemindaian dari JSON database ke objek ScanHistoryModel.
   factory ScanHistoryModel.fromJson(Map<String, dynamic> json) {
     return ScanHistoryModel(
       id: json['id']?.toString() ?? '',
@@ -79,6 +83,9 @@ class ScanHistoryModel {
     if (consumptionData != null) 'consumption_data': consumptionData!.toJson(),
   };
 
+  // Mengembalikan path gambar lokal atau URL jaringan untuk ditampilkan pada UI.
   String get displayImagePath => localImagePath ?? imageUrl ?? '';
+
+  // Daftar nama makanan hasil deteksi dalam pemindaian ini.
   List<String> get foodNames => predictions.map((p) => p.foodName).toList();
 }

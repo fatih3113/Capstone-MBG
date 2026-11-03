@@ -1,3 +1,6 @@
+// File ini mendefinisikan model hasil prediksi klasifikasi makanan dari machine learning beserta tingkat keyakinan (confidence) dan estimasi gizinya.
+
+// PredictionModel: menyimpan hasil deteksi makanan dari model ML, termasuk persentase akurasi dan perkiraan berat porsi.
 class PredictionModel {
   final String id;
   final String scanId;
@@ -25,6 +28,7 @@ class PredictionModel {
     this.fat,
   });
 
+  // Factory untuk memetakan JSON hasil prediksi ML dari server ke objek PredictionModel.
   factory PredictionModel.fromJson(Map<String, dynamic> json) {
     return PredictionModel(
       id: json['id']?.toString() ?? '',
@@ -56,9 +60,11 @@ class PredictionModel {
     'fat': fat,
   };
 
+  // Format teks persentase tingkat keyakinan model (contoh: "95%").
   String get confidencePercent =>
       '${(confidence * 100).toStringAsFixed(0)}%';
 
+  // Helper untuk memeriksa apakah tingkat keyakinan tergolong tinggi, sedang, atau rendah.
   bool get isHighConfidence => confidence >= 0.8;
   bool get isMediumConfidence => confidence >= 0.6 && confidence < 0.8;
   bool get isLowConfidence => confidence < 0.6;

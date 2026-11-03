@@ -199,6 +199,36 @@ class SppgProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Muat daftar sekolah untuk SPPG yang sudah diketahui id-nya
+  /// (dipakai Edit Profil, tanpa harus memilih wilayah dari awal).
+  /// [preselectSchoolId] dipilih otomatis jika ada di daftar.
+  Future<void> loadSchoolsBySppgId(
+    String sppgId, {
+    String? preselectSchoolId,
+  }) async {
+    _resetSchool();
+    _schoolState = SppgLoadState.loading;
+    notifyListeners();
+
+    final resp = await _service.getSchools(sppgId: sppgId);
+    if (resp.success && resp.data != null) {
+      _schoolList = resp.data!;
+      _schoolState = SppgLoadState.loaded;
+      if (preselectSchoolId != null) {
+        for (final s in _schoolList) {
+          if (s.id == preselectSchoolId) {
+            _selectedSchool = s;
+            break;
+          }
+        }
+      }
+    } else {
+      _schoolError = resp.message;
+      _schoolState = SppgLoadState.error;
+    }
+    notifyListeners();
+  }
+
   /// Dipanggil saat pengguna memilih sekolah.
   void selectSchool(SchoolModel? school) {
     _selectedSchool = school;

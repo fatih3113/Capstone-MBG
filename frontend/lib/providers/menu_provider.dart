@@ -1,7 +1,9 @@
+// State management menu makanan MBG: mengelola daftar hidangan bergizi mingguan, seleksi hari aktif (Senin - Jumat), dan deteksi otomatis menu hari ini.
 import 'package:flutter/foundation.dart';
 import '../data/models/mbg_menu_model.dart';
 import '../data/services/menu_service.dart';
 
+// ChangeNotifier: kelas pengelola state jadwal menu makanan harian yang memberi tahu widget saat data menu berubah.
 class MenuProvider extends ChangeNotifier {
   final MenuService _menuService;
   MenuProvider(this._menuService);
@@ -18,6 +20,7 @@ class MenuProvider extends ChangeNotifier {
   String? get error => _error;
   int get selectedDayIndex => _selectedDayIndex;
 
+  // Menentukan menu makanan yang berlaku untuk hari ini berdasarkan nomor hari (Senin=1 hingga Jumat=5).
   MbgMenuModel? get todayMenu {
     if (_weeklyMenus.isEmpty) return null;
     final today = DateTime.now().weekday; // 1=Mon, 5=Fri
@@ -27,6 +30,7 @@ class MenuProvider extends ChangeNotifier {
     return _weeklyMenus.isNotEmpty ? _weeklyMenus.first : null;
   }
 
+  // Mengambil daftar menu makanan 5 hari sekolah dari server untuk sekolah yang terdaftar.
   Future<void> loadWeeklyMenu({String? schoolId}) async {
     _isLoading = true;
     _error = null;
@@ -46,6 +50,7 @@ class MenuProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Memilih hari tertentu (misal: Selasa atau Rabu) pada tab pemilih hari di halaman menu.
   void selectDay(int index) {
     _selectedDayIndex = index;
     if (index < _weeklyMenus.length) {

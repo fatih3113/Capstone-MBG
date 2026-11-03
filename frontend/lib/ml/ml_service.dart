@@ -1,3 +1,4 @@
+// Antarmuka layanan Machine Learning: mendefinisikan kontrak abstrak untuk pemuatan model, pra-pemrosesan citra, inferensi klasifikasi makanan, dan pembacaan tensor prediksi.
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -32,6 +33,7 @@ abstract class MLService {
 }
 
 /// Single ML prediction result
+// Kelas data untuk merepresentasikan satu hasil deteksi makanan beserta tingkat keyakinan (confidence score).
 class MLPrediction {
   final String foodId;
   final String foodName;
@@ -55,6 +57,7 @@ class MLPrediction {
 }
 
 /// Output from a complete classification session
+// Kelas data hasil sesi inferensi klasifikasi lengkap beserta durasi waktu proses (inference time).
 class MLClassificationResult {
   final List<MLPrediction> predictions;
   final Duration inferenceTime;
