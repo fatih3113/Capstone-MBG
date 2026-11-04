@@ -5,8 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class FoodRatingsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRanking(startDate?: string, endDate?: string, limit = 10) {
+  async getRanking(startDate?: string, endDate?: string, limit = 10, sppgId?: string) {
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.ratedAt = {};
       if (startDate) where.ratedAt.gte = new Date(startDate);
@@ -40,10 +41,11 @@ export class FoodRatingsService {
     foodName?: string;
     page?: number;
     limit?: number;
-  }) {
+  }, sppgId?: string) {
     const { startDate, endDate, foodName, page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
 
     if (foodName) where.foodName = { contains: foodName, mode: 'insensitive' };
     if (startDate || endDate) {
@@ -68,8 +70,9 @@ export class FoodRatingsService {
     return { records, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async exportCsv(startDate?: string, endDate?: string): Promise<string> {
+  async exportCsv(startDate?: string, endDate?: string, sppgId?: string): Promise<string> {
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.ratedAt = {};
       if (startDate) where.ratedAt.gte = new Date(startDate);

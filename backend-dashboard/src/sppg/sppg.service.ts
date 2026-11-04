@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateSppgDto } from './dto/create-sppg.dto';
 import { UpdateSppgDto } from './dto/update-sppg.dto';
 import { QuerySppgDto } from './dto/query-sppg.dto';
+import { UpdateSppgProfileDto } from './dto/update-sppg-profile.dto';
 
 @Injectable()
 export class SppgService {
@@ -10,11 +11,12 @@ export class SppgService {
 
   // ── CRUD ─────────────────────────────────────────────────────────────────
 
-  async findAll(query: QuerySppgDto) {
+  async findAll(query: QuerySppgDto, sppgId?: string) {
     const { search, provinsi, kabupatenKota, isActive, page = 1, limit = 20 } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
+    if (sppgId) where.id = sppgId; // Admin SPPG: hanya SPPG miliknya
     if (search) {
       where.OR = [
         { nama: { contains: search, mode: 'insensitive' } },
@@ -42,7 +44,9 @@ export class SppgService {
     return { records, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, sppgId?: string) {
+    // Admin SPPG tidak boleh melihat SPPG lain (dijawab 404, bukan 403)
+    if (sppgId && id !== sppgId) throw new NotFoundException('SPPG tidak ditemukan');
     const sppg = await this.prisma.sppg.findUnique({
       where: { id },
       include: {
@@ -60,6 +64,12 @@ export class SppgService {
 
   async update(id: string, dto: UpdateSppgDto) {
     await this.findOne(id); // throws 404 if not found
+    return this.prisma.sppg.update({ where: { id }, data: dto });
+  }
+
+  /** Admin SPPG mengubah profil SPPG-nya sendiri (kontak, alamat, kapasitas). */
+  async updateProfile(id: string, dto: UpdateSppgProfileDto, sppgId?: string) {
+    await this.findOne(id, sppgId); // 404 bila bukan SPPG miliknya
     return this.prisma.sppg.update({ where: { id }, data: dto });
   }
 
@@ -94,10 +104,10 @@ export class SppgService {
    * Mengembalikan semua wilayah yang memiliki SPPG, dikelompokkan per provinsi
    * kemudian per kabupaten/kota, beserta statistik agregat.
    */
-  async getRegionsSummary() {
+  async getRegionsSummary(sppgId?: string) {
     // 1. Ambil semua SPPG beserta agregat user & sekolah
     const sppgs = await this.prisma.sppg.findMany({
-      where: { isActive: true },
+      where: { isActive: true, ...(sppgId ? { id: sppgId } : {}) },
       include: {
         _count: { select: { users: true, schools: true } },
       },
@@ -254,10 +264,11 @@ export class SppgService {
    * GET /sppg/regions/:provinsi
    * Detail per provinsi dengan hierarki lengkap.
    */
-  async getProvinsiDetail(provinsi: string) {
+  async getProvinsiDetail(provinsi: string, sppgId?: string) {
     const sppgs = await this.prisma.sppg.findMany({
       where: {
         isActive: true,
+        ...(sppgId ? { id: sppgId } : {}),
         provinsi: { equals: provinsi, mode: 'insensitive' },
       },
       include: {

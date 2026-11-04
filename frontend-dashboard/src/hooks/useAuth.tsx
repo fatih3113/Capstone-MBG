@@ -6,6 +6,10 @@ interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  /** Super Admin (BGN_ADMIN, atau role lama 'admin') */
+  isSuperAdmin: boolean;
+  /** Admin SPPG Daerah */
+  isSppgAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -49,8 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const isSuperAdmin = user?.role === 'BGN_ADMIN' || user?.role === 'admin';
+  const isSppgAdmin = user?.role === 'SPPG_ADMIN';
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, isSuperAdmin, isSppgAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

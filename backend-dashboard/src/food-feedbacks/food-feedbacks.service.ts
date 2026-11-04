@@ -5,8 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class FoodFeedbacksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getSummary(startDate?: string, endDate?: string) {
+  async getSummary(startDate?: string, endDate?: string, sppgId?: string) {
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.submittedAt = {};
       if (startDate) where.submittedAt.gte = new Date(startDate);
@@ -91,10 +92,11 @@ export class FoodFeedbacksService {
     consumptionStatus?: string;
     page?: number;
     limit?: number;
-  }) {
+  }, sppgId?: string) {
     const { startDate, endDate, foodName, consumptionStatus, page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
 
     if (foodName) where.foodName = { contains: foodName, mode: 'insensitive' };
     if (consumptionStatus) where.consumptionStatus = consumptionStatus;
@@ -120,8 +122,9 @@ export class FoodFeedbacksService {
     return { records, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async exportCsv(startDate?: string, endDate?: string): Promise<string> {
+  async exportCsv(startDate?: string, endDate?: string, sppgId?: string): Promise<string> {
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.submittedAt = {};
       if (startDate) where.submittedAt.gte = new Date(startDate);

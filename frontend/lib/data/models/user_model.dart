@@ -1,4 +1,5 @@
 import '../../core/constants/allergy_constants.dart';
+import '../../core/constants/api_constants.dart';
 
 class UserModel {
   final String id;
@@ -56,7 +57,7 @@ class UserModel {
       className: json['class'] as String?,
       gender: json['gender'] as String?,
       age: json['age'] as int?,
-      profileImageUrl: json['profile_image_url'] as String?,
+      profileImageUrl: (json['profile_image_url'] ?? json['profileImageUrl']) as String?,
       schoolLevel: json['school_level'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
@@ -204,5 +205,19 @@ class UserModel {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  }
+
+  /// Mengembalikan URL lengkap foto profil jika ada.
+  String? get fullProfileImageUrl {
+    if (profileImageUrl == null || profileImageUrl!.trim().isEmpty) return null;
+    final url = profileImageUrl!.trim();
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    final base = ApiConstants.baseUrl.endsWith('/')
+        ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 1)
+        : ApiConstants.baseUrl;
+    final path = url.startsWith('/') ? url : '/$url';
+    return '$base$path';
   }
 }

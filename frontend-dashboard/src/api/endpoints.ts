@@ -8,6 +8,7 @@ import type {
   DistributionSummary, SchoolDistribution, DistributionRecord,
   School, FoodOption, FoodItem, SchoolItem,
   SppgItem, SppgRegionSummary, SppgOption,
+  RegisterSppgPayload, SppgApplication,
   UserItem, UserSummary,
   PaginatedResponse,
 } from '@/types/api.types';
@@ -18,6 +19,23 @@ export const authApi = {
     apiClient.post<{ success: boolean; data: LoginResponse }>('/auth/login', { email, password }),
   profile: () =>
     apiClient.get('/auth/profile'),
+  registerSppg: (body: RegisterSppgPayload) =>
+    apiClient.post<{ success: boolean; message: string }>('/auth/register-sppg', body),
+};
+
+// ── Verifikasi akun SPPG (khusus Super Admin) ────────────────
+export const sppgVerificationApi = {
+  list: (params?: { status?: string; search?: string; page?: number; limit?: number }) =>
+    apiClient.get<{ success: boolean; data: PaginatedResponse<SppgApplication> }>('/sppg-verification', { params }),
+
+  pendingCount: () =>
+    apiClient.get<{ success: boolean; data: { count: number } }>('/sppg-verification/pending-count'),
+
+  approve: (id: string) =>
+    apiClient.patch<{ success: boolean; message: string }>(`/sppg-verification/${id}/approve`),
+
+  reject: (id: string, reason: string) =>
+    apiClient.patch<{ success: boolean; message: string }>(`/sppg-verification/${id}/reject`, { reason }),
 };
 
 // ── Dashboard ────────────────────────────────────────────────
@@ -184,6 +202,16 @@ export const sppgApi = {
 
   findOne: (id: string) =>
     apiClient.get<{ success: boolean; data: SppgItem }>(`/sppg/${id}`),
+
+  /** Profil SPPG milik Admin SPPG yang sedang login */
+  mine: () =>
+    apiClient.get<{ success: boolean; message?: string; data: SppgItem }>('/sppg/me'),
+
+  updateProfile: (id: string, body: {
+    alamat?: string; penanggungjawab?: string; kontak?: string;
+    kapasitasPorsi?: number; latitude?: number; longitude?: number;
+  }) =>
+    apiClient.patch<{ success: boolean; message: string; data: SppgItem }>(`/sppg/${id}/profile`, body),
 
   regionsSummary: () =>
     apiClient.get<{ success: boolean; data: SppgRegionSummary }>('/sppg/regions/summary'),

@@ -1,13 +1,14 @@
+// Middleware Validasi Input: memastikan format data yang dikirim oleh pengguna pada payload request (login, register, update profil, simpan scan) sesuai aturan sebelum diproses controller.
+
 import { body } from 'express-validator';
 
-// Nilai alergi yang diizinkan
+// Daftar nilai alergi makanan yang diizinkan dan diakui oleh sistem.
 const VALID_ALLERGIES = ['kacang', 'telur', 'susu', 'ikan', 'udang', 'gandum', 'kedelai', 'lainnya'];
 
-// Opsi "boleh kosong": undefined, null, "" dianggap tidak diisi.
-// (Kompatibel dengan express-validator v6 dan v7)
+// Opsi "boleh kosong": nilai null, undefined, atau string kosong "" dianggap sah jika field opsional.
 const EMPTY_OK = { nullable: true, checkFalsy: true } as const;
 
-// Validasi field alergi (dipakai di register & update profil)
+// Aturan validasi data alergi makanan: array jenis alergi, teks catatan lainnya, dan status pengisian.
 const allergyValidators = [
   body('allergies')
     .optional({ nullable: true })
@@ -31,6 +32,7 @@ const allergyValidators = [
     .withMessage('allergyFilled harus bernilai boolean'),
 ];
 
+// Validasi formulir login: memastikan format email benar dan password tidak kosong.
 export const validateLogin = [
   body('email')
     .isEmail()
@@ -41,6 +43,7 @@ export const validateLogin = [
     .withMessage('Password tidak boleh kosong'),
 ];
 
+// Validasi formulir registrasi: nama, format email, panjang minimal password, gender, umur, SPPG, dan data alergi.
 export const validateRegister = [
   body('name')
     .trim()
@@ -62,8 +65,7 @@ export const validateRegister = [
     .optional(EMPTY_OK)
     .isInt({ min: 0, max: 100 })
     .withMessage('Umur harus antara 0-100 tahun'),
-  // Sebelumnya isUUID(). Dibuat longgar: keberadaan SPPG tetap dicek ke database
-  // di controller ("SPPG tidak ditemukan"), jadi format ID tidak perlu dikunci di sini.
+  // Keberadaan SPPG dicek ke database di controller
   body('sppg_id')
     .optional(EMPTY_OK)
     .isString()
@@ -80,10 +82,12 @@ export const validateRegister = [
   ...allergyValidators,
 ];
 
+// Validasi pembaruan profil pengguna: memeriksa format data alergi jika dikirim.
 export const validateUpdateProfile = [
   ...allergyValidators,
 ];
 
+// Validasi penyimpanan hasil scan: memeriksa total kalori, protein, dan array hasil deteksi makanan beserta confidence score.
 export const validateSaveScan = [
   body('total_calories').isFloat({ min: 0 }).withMessage('Total kalori tidak valid'),
   body('total_protein').isFloat({ min: 0 }).withMessage('Total protein tidak valid'),

@@ -9,9 +9,11 @@ import '../../data/models/sppg_model.dart';
 import '../../data/services/sppg_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/sppg_provider.dart';
+import '../../shared/helpers/profile_photo_helper.dart';
 import '../../shared/widgets/allergy_selector.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
+import '../../shared/widgets/user_avatar.dart';
 
 /// Level institusi yang dianggap fasilitas kesehatan.
 const _kHealthLevels = {'posyandu', 'puskesmas'};
@@ -33,6 +35,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? _selectedGender;
   String? _selectedLevel;
   bool _isLoading = false;
+  bool _isUploadingPhoto = false;
 
   // Akun posyandu/puskesmas (ditentukan dari data awal, tidak berubah saat edit)
   late final bool _isHealth;
@@ -200,6 +203,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // UserAvatar: menampilkan foto profil saat ini dan memudahkan pengguna mengubah foto langsung dari halaman edit.
+              Center(
+                child: Column(
+                  children: [
+                    UserAvatar(
+                      user: context.watch<AuthProvider>().user,
+                      size: 92,
+                      showBorder: true,
+                      showEditBadge: true,
+                      isLoading: _isUploadingPhoto,
+                      onTap: () => ProfilePhotoHelper.showPhotoPickerSheet(
+                        context,
+                        onLoadingChanged: (loading) {
+                          if (mounted) {
+                            setState(() => _isUploadingPhoto = loading);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Ketuk untuk ubah foto profil',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
               CustomTextField(
                 label: 'Nama Lengkap',
                 controller: _nameController,

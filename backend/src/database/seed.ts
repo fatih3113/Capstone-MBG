@@ -23,7 +23,29 @@ async function main() {
   // ─── DEMO USERS (admin + student) ────────────────────────────────────
   const passwordHash = await bcrypt.hash('password123', 12);
 
-  // Admin pengelola MBG
+  // SPPG Demo (Satuan Pelayanan Pemenuhan Gizi)
+  const sppg = await prisma.sppg.upsert({
+    where: { kode: 'SPPG-3374-001' },
+    update: {},
+    create: {
+      id: 'sppg-jateng-001',
+      kode: 'SPPG-3374-001',
+      nama: 'SPPG Semarang Tengah',
+      provinsi: 'Jawa Tengah',
+      kabupatenKota: 'Kota Semarang',
+      kecamatan: 'Semarang Tengah',
+      kelurahanDesa: 'Jagalan',
+      alamat: 'Jl. Pemuda No. 12, Semarang',
+      latitude: -6.9932,
+      longitude: 110.4229,
+      isActive: true,
+      verificationStatus: 'APPROVED',
+      operationalStatus: 'ACTIVE',
+    },
+  });
+  console.log('✅ SPPG created:', sppg.nama);
+
+  // Admin pengelola MBG Pusat
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@mbg.test' },
     update: { role: 'admin' },
@@ -37,6 +59,26 @@ async function main() {
     },
   });
   console.log('✅ Admin user:', adminUser.email, '/ role: admin');
+
+  // Admin SPPG Daerah (Dapur MBG)
+  const sppgAdminUser = await prisma.user.upsert({
+    where: { email: 'admin.sppg@mbg.test' },
+    update: {
+      role: 'SPPG_ADMIN',
+      sppgId: sppg.id,
+      accountStatus: 'ACTIVE',
+    },
+    create: {
+      id: 'user-sppg-admin-demo-001',
+      name: 'Admin SPPG Semarang',
+      email: 'admin.sppg@mbg.test',
+      passwordHash,
+      role: 'SPPG_ADMIN',
+      sppgId: sppg.id,
+      accountStatus: 'ACTIVE',
+    },
+  });
+  console.log('✅ SPPG Admin user:', sppgAdminUser.email, '/ role: SPPG_ADMIN');
 
   // Siswa demo
   const studentUser = await prisma.user.upsert({
@@ -133,9 +175,10 @@ async function main() {
   console.log('✅ Weekly MBG menu seeded (Senin - Jumat)');
 
   console.log('\n✨ Seeding selesai!');
-  console.log('🔑 Admin login  : admin@mbg.test  / password123  (role: admin)');
+  console.log('🔑 Admin Pusat  : admin@mbg.test  / password123  (role: admin / BGN)');
+  console.log('🔑 Admin SPPG   : admin.sppg@mbg.test / password123 (role: SPPG_ADMIN)');
   console.log('🔑 Siswa login  : siswa@mbg.test  / password123  (role: student)');
-  console.log('🌐 Dashboard    : http://localhost:5500  (buka admin-dashboard/index.html via Live Server atau langsung di browser)');
+  console.log('🌐 Dashboard    : http://localhost:5173  (Frontend Dashboard React + Vite)');
 }
 
 main()

@@ -15,11 +15,59 @@ export interface PaginatedResponse<T> {
 }
 
 // Auth
+export type DashboardRole = 'BGN_ADMIN' | 'SPPG_ADMIN' | 'admin';
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: DashboardRole | string;
+  sppgId?: string | null;
+  sppgName?: string | null;
+}
+
+// ── Registrasi & verifikasi akun SPPG ─────────────────────────────
+export interface RegisterSppgPayload {
+  name: string;
+  email: string;
+  password: string;
+  sppgNama: string;
+  provinsi: string;
+  kabupatenKota: string;
+  kecamatan: string;
+  kelurahanDesa: string;
+  alamat?: string;
+  penanggungJawab: string;
+  kontak: string;
+  kapasitasPorsi?: number;
+  is3t?: boolean;
+}
+
+export type AccountStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
+
+export interface SppgApplication {
+  id: string;
+  name: string;
+  email: string;
+  accountStatus: AccountStatus;
+  createdAt: string;
+  sppg: {
+    id: string;
+    kode: string | null;
+    nama: string;
+    provinsi: string;
+    kabupatenKota: string;
+    kecamatan: string;
+    kelurahanDesa: string;
+    alamat: string | null;
+    penanggungjawab: string | null;
+    kontak: string | null;
+    kapasitasPorsi: number | null;
+    is3t: boolean;
+    verificationStatus: string;
+    rejectionReason: string | null;
+    verifiedAt: string | null;
+  } | null;
 }
 
 export interface LoginResponse {
@@ -261,6 +309,12 @@ export interface SppgItem {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  penanggungjawab?: string | null;
+  kontak?: string | null;
+  kapasitasPorsi?: number | null;
+  is3t?: boolean;
+  verificationStatus?: string;
+  operationalStatus?: string;
   _count: { users: number; schools: number };
 }
 

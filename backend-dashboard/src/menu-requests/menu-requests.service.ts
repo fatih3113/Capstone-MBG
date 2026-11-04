@@ -13,11 +13,12 @@ export class MenuRequestsService {
     endDate?: string;
     page?: number;
     limit?: number;
-  }) {
+  }, sppgId?: string) {
     const { status, search, startDate, endDate, page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
 
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (status) where.status = status;
     if (search) where.menuName = { contains: search, mode: 'insensitive' };
     if (startDate || endDate) {
@@ -52,9 +53,10 @@ export class MenuRequestsService {
     };
   }
 
-  async grouped() {
+  async grouped(sppgId?: string) {
     const grouped = await this.prisma.menuRequest.groupBy({
       by: ['menuName'],
+      where: sppgId ? { user: { sppgId } } : undefined,
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } },
       take: 20,
@@ -84,8 +86,9 @@ export class MenuRequestsService {
     });
   }
 
-  async exportCsv(startDate?: string, endDate?: string): Promise<string> {
+  async exportCsv(startDate?: string, endDate?: string, sppgId?: string): Promise<string> {
     const where: any = {};
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.submittedAt = {};
       if (startDate) where.submittedAt.gte = new Date(startDate);

@@ -1,13 +1,13 @@
 "use strict";
+// Middleware Validasi Input: memastikan format data yang dikirim oleh pengguna pada payload request (login, register, update profil, simpan scan) sesuai aturan sebelum diproses controller.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateSaveScan = exports.validateUpdateProfile = exports.validateRegister = exports.validateLogin = void 0;
 const express_validator_1 = require("express-validator");
-// Nilai alergi yang diizinkan
+// Daftar nilai alergi makanan yang diizinkan dan diakui oleh sistem.
 const VALID_ALLERGIES = ['kacang', 'telur', 'susu', 'ikan', 'udang', 'gandum', 'kedelai', 'lainnya'];
-// Opsi "boleh kosong": undefined, null, "" dianggap tidak diisi.
-// (Kompatibel dengan express-validator v6 dan v7)
+// Opsi "boleh kosong": nilai null, undefined, atau string kosong "" dianggap sah jika field opsional.
 const EMPTY_OK = { nullable: true, checkFalsy: true };
-// Validasi field alergi (dipakai di register & update profil)
+// Aturan validasi data alergi makanan: array jenis alergi, teks catatan lainnya, dan status pengisian.
 const allergyValidators = [
     (0, express_validator_1.body)('allergies')
         .optional({ nullable: true })
@@ -30,6 +30,7 @@ const allergyValidators = [
         .isBoolean()
         .withMessage('allergyFilled harus bernilai boolean'),
 ];
+// Validasi formulir login: memastikan format email benar dan password tidak kosong.
 exports.validateLogin = [
     (0, express_validator_1.body)('email')
         .isEmail()
@@ -39,6 +40,7 @@ exports.validateLogin = [
         .notEmpty()
         .withMessage('Password tidak boleh kosong'),
 ];
+// Validasi formulir registrasi: nama, format email, panjang minimal password, gender, umur, SPPG, dan data alergi.
 exports.validateRegister = [
     (0, express_validator_1.body)('name')
         .trim()
@@ -60,8 +62,7 @@ exports.validateRegister = [
         .optional(EMPTY_OK)
         .isInt({ min: 0, max: 100 })
         .withMessage('Umur harus antara 0-100 tahun'),
-    // Sebelumnya isUUID(). Dibuat longgar: keberadaan SPPG tetap dicek ke database
-    // di controller ("SPPG tidak ditemukan"), jadi format ID tidak perlu dikunci di sini.
+    // Keberadaan SPPG dicek ke database di controller
     (0, express_validator_1.body)('sppg_id')
         .optional(EMPTY_OK)
         .isString()
@@ -77,9 +78,11 @@ exports.validateRegister = [
         .withMessage('Format school_id tidak valid'),
     ...allergyValidators,
 ];
+// Validasi pembaruan profil pengguna: memeriksa format data alergi jika dikirim.
 exports.validateUpdateProfile = [
     ...allergyValidators,
 ];
+// Validasi penyimpanan hasil scan: memeriksa total kalori, protein, dan array hasil deteksi makanan beserta confidence score.
 exports.validateSaveScan = [
     (0, express_validator_1.body)('total_calories').isFloat({ min: 0 }).withMessage('Total kalori tidak valid'),
     (0, express_validator_1.body)('total_protein').isFloat({ min: 0 }).withMessage('Total protein tidak valid'),

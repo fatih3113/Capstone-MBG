@@ -1,12 +1,15 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Mail, Lock, Eye, EyeOff, LogIn, Truck, MessageSquare, BarChart3 } from 'lucide-react';
 import '@/styles/brand.css';
+import '@/styles/sppg-access.css';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const justRegistered = (location.state as { registered?: boolean } | null)?.registered === true;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +61,13 @@ export default function LoginPage() {
           <p className="login-v2__subtitle">
             Masuk ke Foodler, dashboard pengelola program MBG.
           </p>
+
+          {justRegistered && (
+            <div className="lv2-success" role="status">
+              Pendaftaran berhasil dikirim. Akun Anda akan aktif setelah disetujui Super Admin,
+              lalu Anda dapat masuk di sini.
+            </div>
+          )}
 
           <form className="lv2-form" onSubmit={handleSubmit} noValidate>
             <div className="lv2-field">
@@ -127,8 +137,12 @@ export default function LoginPage() {
             </button>
           </form>
 
+          <p className="lv2-switch">
+            Pengelola SPPG daerah? <Link to="/register">Daftarkan SPPG Anda</Link>
+          </p>
+
           <p className="lv2-note">
-            Dashboard ini hanya untuk admin pengelola program Makan Bergizi Gratis (MBG).
+            Dashboard ini hanya untuk pengelola program Makan Bergizi Gratis (MBG).
             Akun siswa tidak dapat masuk ke halaman ini.
           </p>
         </div>

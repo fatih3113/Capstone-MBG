@@ -7,6 +7,9 @@ import { MenuRequestsService } from './menu-requests.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser, sppgScope, ROLE_SUPER_ADMIN } from '../auth/roles';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('menu-requests')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
@@ -16,6 +19,7 @@ export class MenuRequestsController {
   /** GET /api/v1/menu-requests?status=&search=&page=&limit=&startDate=&endDate= */
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('status') status?: string,
     @Query('search') search?: string,
     @Query('startDate') startDate?: string,
@@ -27,14 +31,14 @@ export class MenuRequestsController {
       status, search, startDate, endDate,
       page: page ? +page : 1,
       limit: limit ? +limit : 20,
-    });
+    }, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
   /** GET /api/v1/menu-requests/grouped */
   @Get('grouped')
-  async grouped() {
-    const data = await this.service.grouped();
+  async grouped(@CurrentUser() user: AuthUser) {
+    const data = await this.service.grouped(sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
@@ -42,17 +46,19 @@ export class MenuRequestsController {
   @Get('export')
   async exportCsv(
     @Res() res: Response,
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const csv = await this.service.exportCsv(startDate, endDate);
+    const csv = await this.service.exportCsv(startDate, endDate, sppgScope(user));
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="menu_requests.csv"');
     res.status(HttpStatus.OK).send('\uFEFF' + csv); // BOM for Excel
   }
 
-  /** PATCH /api/v1/menu-requests/:id/status */
+  /** PATCH /api/v1/menu-requests/:id/status — hanya Super Admin */
   @Patch(':id/status')
+  @Roles(ROLE_SUPER_ADMIN)
   async updateStatus(
     @Param('id') id: string,
     @Body() dto: UpdateStatusDto,

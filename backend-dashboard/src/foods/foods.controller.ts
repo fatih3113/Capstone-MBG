@@ -5,9 +5,12 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
 import { FoodsService } from './foods.service';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ROLE_SUPER_ADMIN } from '../auth/roles';
 
 @Controller('foods')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
+@Roles(ROLE_SUPER_ADMIN) // master data makanan: hanya Super Admin
 export class FoodsController {
   constructor(private readonly svc: FoodsService) {}
 

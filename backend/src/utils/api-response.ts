@@ -1,12 +1,17 @@
+// Utilitas Pembungkus Respon API: menyeragamkan format respon JSON (sukses, error, paginasi, dan validasi) di seluruh endpoint controller.
+
 export class ApiResponse {
+  // Format standar respon sukses dengan data muatan dan pesan informasi.
   static success<T>(data: T, message = 'Berhasil', statusCode = 200) {
     return { success: true, message, data, status_code: statusCode };
   }
 
+  // Format standar respon kegagalan dengan pesan kesalahan dan kode status HTTP.
   static error(message: string, statusCode = 400) {
     return { success: false, message, status_code: statusCode };
   }
 
+  // Format respon daftar data berpaginasi (total item, halaman saat ini, dan jumlah per halaman).
   static paginated<T>(
     data: T[],
     total: number,
@@ -24,6 +29,7 @@ export class ApiResponse {
     };
   }
 
+  // Format respon khusus kegagalan validasi formulir (daftar field yang salah dan pesan errornya).
   static validationError(errors: any[]) {
     return {
       success: false,

@@ -22,7 +22,9 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url: string = error.config?.url ?? '';
+    const isAuthForm = url.includes('/auth/login') || url.includes('/auth/register-sppg');
+    if (error.response?.status === 401 && !isAuthForm) {
       localStorage.removeItem('foodler_dashboard_token');
       localStorage.removeItem('foodler_dashboard_user');
       window.location.href = '/login';

@@ -5,8 +5,16 @@ import { PrismaService } from '../prisma/prisma.service';
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getOverview(startDate?: string, endDate?: string) {
+  async getOverview(startDate?: string, endDate?: string, sppgId?: string) {
     const dateFilter = this.buildDateFilter(startDate, endDate);
+
+    // Filter per SPPG (Admin SPPG). Super Admin: sppgId undefined -> tanpa filter.
+    const byUser = sppgId ? { user: { sppgId } } : {};
+    const userScope = sppgId ? { sppgId } : {};
+    const whereMenuRequest = { ...(dateFilter ? { submittedAt: dateFilter } : {}), ...byUser };
+    const whereRating = { ...(dateFilter ? { ratedAt: dateFilter } : {}), ...byUser };
+    const whereFeedback = { ...(dateFilter ? { submittedAt: dateFilter } : {}), ...byUser };
+    const whereScan = { ...(dateFilter ? { scannedAt: dateFilter } : {}), ...byUser };
 
     const [
       totalMenuRequests,
@@ -25,36 +33,28 @@ export class DashboardService {
       posyanduScans,
     ] = await Promise.all([
       // Total usulan menu
-      this.prisma.menuRequest.count({
-        where: dateFilter ? { submittedAt: dateFilter } : undefined,
-      }),
+      this.prisma.menuRequest.count({ where: whereMenuRequest }),
 
       // Total rating
-      this.prisma.foodRating.count({
-        where: dateFilter ? { ratedAt: dateFilter } : undefined,
-      }),
+      this.prisma.foodRating.count({ where: whereRating }),
 
       // Total feedback
-      this.prisma.foodFeedback.count({
-        where: dateFilter ? { submittedAt: dateFilter } : undefined,
-      }),
+      this.prisma.foodFeedback.count({ where: whereFeedback }),
 
       // Total scan
-      this.prisma.scanHistory.count({
-        where: dateFilter ? { scannedAt: dateFilter } : undefined,
-      }),
+      this.prisma.scanHistory.count({ where: whereScan }),
 
       // Rata-rata rating
       this.prisma.foodRating.aggregate({
         _avg: { rating: true },
-        where: dateFilter ? { ratedAt: dateFilter } : undefined,
+        where: whereRating,
       }),
 
       // Distribusi status usulan menu
       this.prisma.menuRequest.groupBy({
         by: ['status'],
         _count: { id: true },
-        where: dateFilter ? { submittedAt: dateFilter } : undefined,
+        where: whereMenuRequest,
         orderBy: { _count: { id: 'desc' } },
       }),
 
@@ -62,7 +62,7 @@ export class DashboardService {
       this.prisma.foodFeedback.groupBy({
         by: ['consumptionStatus'],
         _count: { id: true },
-        where: dateFilter ? { submittedAt: dateFilter } : undefined,
+        where: whereFeedback,
       }),
 
       // Top 5 makanan favorit
@@ -70,7 +70,7 @@ export class DashboardService {
         by: ['foodName'],
         _avg: { rating: true },
         _count: { id: true },
-        where: dateFilter ? { ratedAt: dateFilter } : undefined,
+        where: whereRating,
         orderBy: { _avg: { rating: 'desc' } },
         take: 5,
       }),
@@ -79,7 +79,7 @@ export class DashboardService {
       this.prisma.scanHistory.findMany({
         take: 10,
         orderBy: { scannedAt: 'desc' },
-        where: dateFilter ? { scannedAt: dateFilter } : undefined,
+        where: whereScan,
         include: {
           user: { select: { name: true, email: true, schoolLevel: true } },
           predictions: {
@@ -91,22 +91,22 @@ export class DashboardService {
 
       // ── Ringkasan per lembaga ──────────────────────────────
       // Jumlah lembaga Posyandu
-      this.prisma.school.count({ where: { level: 'Posyandu' } }),
+      this.prisma.school.count({ where: { level: 'Posyandu', ...userScope } }),
 
       // Jumlah lembaga Sekolah (selain Posyandu)
-      this.prisma.school.count({ where: { level: { not: 'Posyandu' } } }),
+      this.prisma.school.count({ where: { level: { not: 'Posyandu' }, ...userScope } }),
 
       // Pengguna Posyandu
-      this.prisma.user.count({ where: { role: 'student', schoolLevel: 'Posyandu' } }),
+      this.prisma.user.count({ where: { role: 'student', schoolLevel: 'Posyandu', ...userScope } }),
 
       // Total pengguna mobile
-      this.prisma.user.count({ where: { role: 'student' } }),
+      this.prisma.user.count({ where: { role: 'student', ...userScope } }),
 
       // Scan oleh pengguna Posyandu
       this.prisma.scanHistory.count({
         where: {
           ...(dateFilter ? { scannedAt: dateFilter } : {}),
-          user: { schoolLevel: 'Posyandu' },
+          user: { schoolLevel: 'Posyandu', ...userScope },
         },
       }),
     ]);

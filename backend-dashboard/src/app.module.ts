@@ -15,6 +15,7 @@ import { FoodsModule } from './foods/foods.module';
 import { SchoolsModule } from './schools/schools.module';
 import { SppgModule } from './sppg/sppg.module';
 import { UsersModule } from './users/users.module';
+import { SppgVerificationModule } from './sppg-verification/sppg-verification.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     SchoolsModule,
     SppgModule,
     UsersModule,
+    SppgVerificationModule,
   ],
   providers: [
     // Global rate-limit guard

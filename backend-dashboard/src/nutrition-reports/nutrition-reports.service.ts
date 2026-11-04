@@ -12,7 +12,7 @@ export class NutritionReportsService {
     schoolLevel?: string;
     page?: number;
     limit?: number;
-  }) {
+  }, sppgId?: string) {
     const { startDate, endDate, akgTarget, schoolLevel, page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
     const where: any = { status: 'success' };
@@ -29,9 +29,10 @@ export class NutritionReportsService {
     }
 
     // Filter by schoolLevel via user relation
-    const userFilter = schoolLevel
-      ? { user: { schoolLevel: { contains: schoolLevel, mode: 'insensitive' as const } } }
-      : {};
+    const userCond: any = {};
+    if (schoolLevel) userCond.schoolLevel = { contains: schoolLevel, mode: 'insensitive' as const };
+    if (sppgId) userCond.sppgId = sppgId;
+    const userFilter = Object.keys(userCond).length > 0 ? { user: userCond } : {};
 
     const [records, total] = await Promise.all([
       this.prisma.scanHistory.findMany({
@@ -73,8 +74,9 @@ export class NutritionReportsService {
     return { records: formatted, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async exportCsv(startDate?: string, endDate?: string): Promise<string> {
+  async exportCsv(startDate?: string, endDate?: string, sppgId?: string): Promise<string> {
     const where: any = { status: 'success' };
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.scannedAt = {};
       if (startDate) where.scannedAt.gte = new Date(startDate);
@@ -118,8 +120,9 @@ export class NutritionReportsService {
     return [header, ...rows, '', disclaimer].join('\n');
   }
 
-  async getAggregateStats(startDate?: string, endDate?: string) {
+  async getAggregateStats(startDate?: string, endDate?: string, sppgId?: string) {
     const where: any = { status: 'success' };
+    if (sppgId) where.user = { sppgId };
     if (startDate || endDate) {
       where.scannedAt = {};
       if (startDate) where.scannedAt.gte = new Date(startDate);

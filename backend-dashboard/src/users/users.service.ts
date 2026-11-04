@@ -23,8 +23,9 @@ export class UsersService {
   async findAll(p: {
     search?: string; level?: string; gender?: string; type?: string;
     allergy?: string; schoolId?: string; page: number; limit: number;
-  }) {
+  }, sppgId?: string) {
     const where: any = { ...this.base };
+    if (sppgId) where.sppgId = sppgId;
     const and: any[] = [this.scope(p.type)];
 
     if (p.search) {
@@ -83,12 +84,17 @@ export class UsersService {
     return { records, total, page: p.page, limit: p.limit, totalPages: Math.ceil(total / p.limit) };
   }
 
-  async summary(type?: string) {
+  async summary(type?: string, sppgId?: string) {
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const w = (extra: any = {}) => ({ ...this.base, ...extra, AND: [this.scope(type)] });
+    const w = (extra: any = {}) => ({
+      ...this.base,
+      ...(sppgId ? { sppgId } : {}),
+      ...extra,
+      AND: [this.scope(type)],
+    });
 
     const [total, newThisMonth, withAllergy, withoutSchool, male, female] = await Promise.all([
       this.prisma.user.count({ where: w() }),

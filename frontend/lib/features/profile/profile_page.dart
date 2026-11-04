@@ -7,10 +7,19 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../shared/helpers/profile_photo_helper.dart';
 import '../../shared/widgets/custom_button.dart';
+import '../../shared/widgets/user_avatar.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  bool _isUploadingPhoto = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,22 +53,21 @@ class ProfilePage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 24),
-                      // Avatar lingkaran putih menampilkan huruf inisial nama pengguna
-                      Container(
-                        width: 80, height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white30, width: 3),
-                        ),
-                        child: Center(
-                          child: Text(
-                            user?.initials ?? '?',
-                            style: AppTextStyles.headlineLarge.copyWith(
-                              color: AppColors.primary),
-                          ),
+                      const SizedBox(height: 20),
+                      // UserAvatar: menampilkan foto profil asli pengguna dari server atau inisial nama, lengkap dengan tombol ubah foto.
+                      UserAvatar(
+                        user: user,
+                        size: 84,
+                        showBorder: true,
+                        showEditBadge: true,
+                        isLoading: _isUploadingPhoto,
+                        onTap: () => ProfilePhotoHelper.showPhotoPickerSheet(
+                          context,
+                          onLoadingChanged: (loading) {
+                            if (mounted) {
+                              setState(() => _isUploadingPhoto = loading);
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(height: 10),

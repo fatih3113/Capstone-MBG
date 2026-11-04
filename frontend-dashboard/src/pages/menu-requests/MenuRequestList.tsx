@@ -1,6 +1,7 @@
 import type { MenuRequest } from '@/types/api.types';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { fmt } from './types';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MenuRequestListProps {
   records: MenuRequest[];
@@ -14,6 +15,7 @@ interface MenuRequestListProps {
 export default function MenuRequestList({
   records, total, page, totalPages, onUpdateStatus, onPageChange,
 }: MenuRequestListProps) {
+  const { isSuperAdmin } = useAuth();
   return (
     <>
       <div className="table-wrapper">
@@ -37,13 +39,15 @@ export default function MenuRequestList({
                 <td>{r.reason ?? '—'}</td>
                 <td><StatusBadge status={r.status} /></td>
                 <td>
-                  <button
-                    id={`update-status-btn-${r.id}`}
-                    className="btn btn--ghost btn--sm"
-                    onClick={() => onUpdateStatus(r)}
-                  >
-                    Update
-                  </button>
+                  {isSuperAdmin ? (
+                    <button
+                      id={`update-status-btn-${r.id}`}
+                      className="btn btn--ghost btn--sm"
+                      onClick={() => onUpdateStatus(r)}
+                    >
+                      Update
+                    </button>
+                  ) : '—'}
                 </td>
               </tr>
             ))}

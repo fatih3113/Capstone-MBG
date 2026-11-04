@@ -4,14 +4,17 @@ import {
   Get,
   Body,
   UseGuards,
-  Request,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterSppgDto } from './dto/register-sppg.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AdminRoleGuard } from './guards/admin-role.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { AuthUser } from './roles';
 
 @Controller('auth')
 export class AuthController {
@@ -19,10 +22,11 @@ export class AuthController {
 
   /**
    * POST /api/v1/auth/login
-   * Login khusus admin dashboard. Mengembalikan JWT dengan secret terpisah.
+   * Login dashboard (Super Admin & Admin SPPG). Dibatasi 10x / 15 menit per IP.
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 15 * 60 * 1000 } })
   async login(@Body() dto: LoginDto) {
     const result = await this.authService.login(dto);
     return {
@@ -33,17 +37,34 @@ export class AuthController {
   }
 
   /**
+   * POST /api/v1/auth/register-sppg
+   * Pendaftaran akun Admin SPPG Daerah (publik). Status awal PENDING sampai
+   * di-ACC Super Admin. Dibatasi 5x / jam per IP.
+   */
+  @Post('register-sppg')
+  @HttpCode(HttpStatus.CREATED)
+  @Throttle({ default: { limit: 5, ttl: 60 * 60 * 1000 } })
+  async registerSppg(@Body() dto: RegisterSppgDto) {
+    const result = await this.authService.registerSppg(dto);
+    return {
+      success: true,
+      message: result.message,
+      data: null,
+    };
+  }
+
+  /**
    * GET /api/v1/auth/profile
-   * Ambil profil admin yang sedang login.
+   * Profil pengguna dashboard yang sedang login.
    */
   @Get('profile')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  async getProfile(@Request() req: any) {
-    const user = await this.authService.getProfile(req.user.id);
+  async getProfile(@CurrentUser() user: AuthUser) {
+    const data = await this.authService.getProfile(user);
     return {
       success: true,
       message: 'Berhasil',
-      data: user,
+      data,
     };
   }
 }

@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { dashboardApi } from '@/api/endpoints';
+import { useAuth } from '@/hooks/useAuth';
 import type { DashboardOverview } from '@/types/api.types';
 import StatCard from '@/components/ui/StatCard';
 import {
@@ -26,6 +27,7 @@ function fmt(d: string) {
 }
 
 export default function DashboardPage() {
+  const { user, isSppgAdmin } = useAuth();
   const [data, setData] = useState<DashboardOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -51,8 +53,12 @@ export default function DashboardPage() {
     <div className="page">
       <div className="page__header">
         <div>
-          <h1 className="page__title">Dashboard MBG</h1>
-          <p className="page__subtitle">Ringkasan data program Makan Bergizi Gratis</p>
+          <h1 className="page__title">{isSppgAdmin ? `Dashboard ${user?.sppgName ?? 'SPPG'}` : 'Dashboard MBG'}</h1>
+          <p className="page__subtitle">
+            {isSppgAdmin
+              ? 'Ringkasan data siswa dan sekolah binaan SPPG Anda'
+              : 'Ringkasan data program Makan Bergizi Gratis'}
+          </p>
         </div>
         {/* Filter tanggal */}
         <div className="date-filter">

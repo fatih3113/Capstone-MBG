@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../data/models/school_model.dart';
 import '../data/models/sppg_model.dart';
@@ -214,6 +215,30 @@ class AuthProvider extends ChangeNotifier {
     }
 
     updateUser(updated);
+    return null;
+  }
+
+  // ─── UPLOAD FOTO PROFIL ───────────────────────────────────────────
+  Future<String?> uploadProfilePhoto(File file) async {
+    final current = _user;
+    if (current == null) return 'Sesi tidak ditemukan. Silakan login kembali.';
+
+    final response = await _authService.uploadProfilePhoto(file);
+    if (!response.success) {
+      return response.message;
+    }
+
+    final raw = response.data ?? const <String, dynamic>{};
+    final data = raw['user'] is Map
+        ? Map<String, dynamic>.from(raw['user'] as Map)
+        : raw;
+    final newUrl = (data['profile_image_url'] ?? data['profileImageUrl']) as String? ??
+        (raw['profile_image_url'] as String?);
+
+    if (newUrl != null && newUrl.isNotEmpty) {
+      final updated = current.copyWith(profileImageUrl: newUrl);
+      updateUser(updated);
+    }
     return null;
   }
 

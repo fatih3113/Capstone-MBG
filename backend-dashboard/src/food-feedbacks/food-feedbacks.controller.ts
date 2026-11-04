@@ -5,6 +5,8 @@ import { Response } from 'express';
 import { FoodFeedbacksService } from './food-feedbacks.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser, sppgScope } from '../auth/roles';
 
 @Controller('food-feedbacks')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
@@ -14,16 +16,18 @@ export class FoodFeedbacksController {
   /** GET /api/v1/food-feedbacks/summary */
   @Get('summary')
   async summary(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const data = await this.service.getSummary(startDate, endDate);
+    const data = await this.service.getSummary(startDate, endDate, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
   /** GET /api/v1/food-feedbacks */
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('foodName') foodName?: string,
@@ -35,7 +39,7 @@ export class FoodFeedbacksController {
       startDate, endDate, foodName, consumptionStatus,
       page: page ? +page : 1,
       limit: limit ? +limit : 20,
-    });
+    }, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
@@ -43,10 +47,11 @@ export class FoodFeedbacksController {
   @Get('export')
   async exportCsv(
     @Res() res: Response,
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const csv = await this.service.exportCsv(startDate, endDate);
+    const csv = await this.service.exportCsv(startDate, endDate, sppgScope(user));
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="food_feedbacks.csv"');
     res.status(HttpStatus.OK).send('\uFEFF' + csv);

@@ -1,5 +1,4 @@
 // Halaman Detail Riwayat Scan: menyajikan rincian lengkap hasil deteksi makanan, total nutrisi makro, evaluasi sensorik, dan data konsumsi sisa makanan.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';

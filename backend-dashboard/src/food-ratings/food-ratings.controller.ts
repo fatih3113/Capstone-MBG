@@ -5,6 +5,8 @@ import { Response } from 'express';
 import { FoodRatingsService } from './food-ratings.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser, sppgScope } from '../auth/roles';
 
 @Controller('food-ratings')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
@@ -14,17 +16,19 @@ export class FoodRatingsController {
   /** GET /api/v1/food-ratings/ranking */
   @Get('ranking')
   async ranking(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('limit') limit?: string,
   ) {
-    const data = await this.service.getRanking(startDate, endDate, limit ? +limit : 10);
+    const data = await this.service.getRanking(startDate, endDate, limit ? +limit : 10, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
   /** GET /api/v1/food-ratings */
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('foodName') foodName?: string,
@@ -35,7 +39,7 @@ export class FoodRatingsController {
       startDate, endDate, foodName,
       page: page ? +page : 1,
       limit: limit ? +limit : 20,
-    });
+    }, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
@@ -43,10 +47,11 @@ export class FoodRatingsController {
   @Get('export')
   async exportCsv(
     @Res() res: Response,
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const csv = await this.service.exportCsv(startDate, endDate);
+    const csv = await this.service.exportCsv(startDate, endDate, sppgScope(user));
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="food_ratings.csv"');
     res.status(HttpStatus.OK).send('\uFEFF' + csv);

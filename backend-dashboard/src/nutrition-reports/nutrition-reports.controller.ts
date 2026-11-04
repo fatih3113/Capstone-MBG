@@ -5,6 +5,8 @@ import { Response } from 'express';
 import { NutritionReportsService } from './nutrition-reports.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser, sppgScope } from '../auth/roles';
 
 @Controller('nutrition-reports')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
@@ -14,10 +16,11 @@ export class NutritionReportsController {
   /** GET /api/v1/nutrition-reports/stats */
   @Get('stats')
   async stats(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const data = await this.service.getAggregateStats(startDate, endDate);
+    const data = await this.service.getAggregateStats(startDate, endDate, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 
@@ -25,10 +28,11 @@ export class NutritionReportsController {
   @Get('export')
   async exportCsv(
     @Res() res: Response,
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const csv = await this.service.exportCsv(startDate, endDate);
+    const csv = await this.service.exportCsv(startDate, endDate, sppgScope(user));
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="nutrition_reports.csv"');
     res.status(HttpStatus.OK).send('\uFEFF' + csv);
@@ -37,6 +41,7 @@ export class NutritionReportsController {
   /** GET /api/v1/nutrition-reports */
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('akgTarget') akgTarget?: string,
@@ -48,7 +53,7 @@ export class NutritionReportsController {
       startDate, endDate, akgTarget, schoolLevel,
       page: page ? +page : 1,
       limit: limit ? +limit : 20,
-    });
+    }, sppgScope(user));
     return { success: true, message: 'Berhasil', data };
   }
 }

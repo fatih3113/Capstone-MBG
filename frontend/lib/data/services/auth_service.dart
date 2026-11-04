@@ -1,12 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../../core/constants/app_constants.dart';
-import '../../core/network/dio_client.dart';
-import '../../core/network/api_response.dart';
 import '../../core/constants/api_constants.dart';
-import '../models/user_model.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/network/api_response.dart';
+import '../../core/network/dio_client.dart';
 import '../dummy/dummy_data.dart';
+import '../models/user_model.dart';
 
 /// Authentication service.
 /// Uses mock data when USE_MOCK = true.
@@ -191,6 +192,44 @@ class AuthService {
       );
     } catch (e) {
       return ApiResponse.error(message: 'Terjadi kesalahan. Silakan coba lagi.');
+    }
+  }
+
+  // ─── UPLOAD FOTO PROFIL ───────────────────────────────────────────
+  /// Mengunggah berkas foto profil ke server (POST /users/profile/photo).
+  Future<ApiResponse<Map<String, dynamic>>> uploadProfilePhoto(File file) async {
+    if (_useMock) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      return ApiResponse.success(
+        data: {'profile_image_url': 'https://picsum.photos/200'},
+        message: 'Foto profil berhasil diperbarui',
+      );
+    }
+
+    try {
+      final fileName = file.path.split(Platform.pathSeparator).last;
+      final formData = FormData.fromMap({
+        'profile_image': await MultipartFile.fromFile(
+          file.path,
+          filename: fileName,
+        ),
+      });
+
+      final response = await DioClient.instance.post(
+        ApiConstants.uploadProfilePhoto,
+        data: formData,
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (data) => data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{},
+      );
+    } on DioException catch (e) {
+      return ApiResponse.error(
+        message: _backendMessage(e) ?? e.message ?? 'Gagal mengunggah foto profil.',
+      );
+    } catch (e) {
+      return ApiResponse.error(message: 'Terjadi kesalahan saat mengunggah foto.');
     }
   }
 

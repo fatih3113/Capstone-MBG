@@ -10,6 +10,8 @@ import '../../providers/auth_provider.dart';
 import '../../providers/history_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../data/models/daily_nutrition_model.dart';
+import '../../data/models/user_model.dart';
+import '../../shared/widgets/user_avatar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -66,7 +68,7 @@ class _HomePageState extends State<HomePage> {
           slivers: [
             // SliverToBoxAdapter: membungkus widget Container header gradasi agar pas berada di dalam CustomScrollView.
             SliverToBoxAdapter(
-              child: _buildHeader(auth.userName),
+              child: _buildHeader(auth.userName, auth.user),
             ),
 
             // SliverPadding: memberi margin horizontal 20dp pada seluruh bagian isi beranda.
@@ -117,7 +119,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Header atas berwarna gradasi hijau berisi ucapan salam, nama pengguna, dan tombol profil.
-  Widget _buildHeader(String userName) {
+  Widget _buildHeader(String userName, UserModel? user) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: const BoxDecoration(
@@ -158,19 +160,14 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              // Tombol pintas avatar untuk langsung menuju tab Profil.
-              GestureDetector(
+              // UserAvatar: menampilkan foto profil pengguna (atau inisial) di header beranda, bisa diketuk untuk membuka halaman profil.
+              UserAvatar(
+                user: user,
+                size: 44,
+                isCircle: false,
+                borderRadius: 14,
+                customBorder: Border.all(color: Colors.white38, width: 1.5),
                 onTap: () => context.go('/profile'),
-                child: Container(
-                  width: 44, height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white30),
-                  ),
-                  child: const Icon(Icons.person_rounded,
-                    color: Colors.white, size: 22),
-                ),
               ),
             ],
           ),

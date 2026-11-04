@@ -14,8 +14,8 @@ export class DistributionService {
   /**
    * Ringkasan distribusi: total sekolah, total jadwal menu, dan range tanggal
    */
-  async getSummary(startDate?: string, endDate?: string) {
-    const where = this._buildWhere(startDate, endDate);
+  async getSummary(startDate?: string, endDate?: string, sppgId?: string) {
+    const where = this._buildWhere(startDate, endDate, sppgId);
 
     const [totalMenus, totalSchools, dateRange] = await Promise.all([
       this.prisma.mbgMenu.count({ where }),
@@ -41,8 +41,8 @@ export class DistributionService {
   /**
    * Distribusi per sekolah: sekolah + jumlah hari menu + daftar makanan
    */
-  async getPerSchool(startDate?: string, endDate?: string) {
-    const where = this._buildWhere(startDate, endDate);
+  async getPerSchool(startDate?: string, endDate?: string, sppgId?: string) {
+    const where = this._buildWhere(startDate, endDate, sppgId);
 
     const menus = await this.prisma.mbgMenu.findMany({
       where,
@@ -110,8 +110,8 @@ export class DistributionService {
   /**
    * Timeline distribusi: jadwal per tanggal (untuk kalender/audit)
    */
-  async getTimeline(startDate?: string, endDate?: string, page = 1, limit = 30) {
-    const where = this._buildWhere(startDate, endDate);
+  async getTimeline(startDate?: string, endDate?: string, page = 1, limit = 30, sppgId?: string) {
+    const where = this._buildWhere(startDate, endDate, sppgId);
     const skip = (page - 1) * limit;
 
     const [records, total] = await Promise.all([
@@ -148,8 +148,8 @@ export class DistributionService {
   /**
    * Export CSV untuk keperluan audit
    */
-  async exportCsv(startDate?: string, endDate?: string): Promise<string> {
-    const where = this._buildWhere(startDate, endDate);
+  async exportCsv(startDate?: string, endDate?: string, sppgId?: string): Promise<string> {
+    const where = this._buildWhere(startDate, endDate, sppgId);
 
     const records = await this.prisma.mbgMenu.findMany({
       where,
@@ -175,8 +175,9 @@ export class DistributionService {
     return [header, ...rows].join('\n');
   }
 
-  private _buildWhere(startDate?: string, endDate?: string) {
+  private _buildWhere(startDate?: string, endDate?: string, sppgId?: string) {
     const where: any = {};
+    if (sppgId) where.school = { sppgId };
     if (startDate || endDate) {
       where.date = {};
       if (startDate) where.date.gte = new Date(startDate);
@@ -192,8 +193,21 @@ export class DistributionService {
   // ─── CRUD ────────────────────────────────────────────────────────────────
 
   /** Semua sekolah (untuk dropdown form) */
-  async getSchools() {
-    return this.prisma.school.findMany({ orderBy: [{ level: 'asc' }, { name: 'asc' }] });
+  async getSchools(sppgId?: string) {
+    return this.prisma.school.findMany({
+      where: sppgId ? { sppgId } : undefined,
+      orderBy: [{ level: 'asc' }, { name: 'asc' }],
+    });
+  }
+
+  /** Admin SPPG hanya boleh mengelola jadwal sekolah binaannya. */
+  private async assertSchoolInScope(schoolId: string, sppgId?: string) {
+    if (!sppgId) return;
+    const school = await this.prisma.school.findFirst({
+      where: { id: schoolId, sppgId },
+      select: { id: true },
+    });
+    if (!school) throw new Error('Sekolah tidak termasuk wilayah SPPG Anda.');
   }
 
   /** Semua makanan aktif (untuk dropdown form) */
@@ -210,7 +224,8 @@ export class DistributionService {
     schoolId: string;
     date: string;
     items: { foodId: string; portionGram: number }[];
-  }) {
+  }, sppgId?: string) {
+    await this.assertSchoolInScope(data.schoolId, sppgId);
     const dateObj = new Date(data.date);
     dateObj.setHours(0, 0, 0, 0);
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -256,9 +271,11 @@ export class DistributionService {
     schoolId?: string;
     date?: string;
     items?: { foodId: string; portionGram: number }[];
-  }) {
+  }, sppgId?: string) {
     const menu = await this.prisma.mbgMenu.findUnique({ where: { id } });
     if (!menu) throw new Error('Jadwal tidak ditemukan.');
+    await this.assertSchoolInScope(menu.schoolId, sppgId);
+    if (data.schoolId) await this.assertSchoolInScope(data.schoolId, sppgId);
 
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const updateData: any = {};
@@ -303,9 +320,10 @@ export class DistributionService {
   }
 
   /** Hapus jadwal beserta semua item-nya */
-  async deleteSchedule(id: string) {
+  async deleteSchedule(id: string, sppgId?: string) {
     const menu = await this.prisma.mbgMenu.findUnique({ where: { id } });
     if (!menu) throw new Error('Jadwal tidak ditemukan.');
+    await this.assertSchoolInScope(menu.schoolId, sppgId);
     await this.prisma.mbgMenuItem.deleteMany({ where: { menuId: id } });
     await this.prisma.mbgMenu.delete({ where: { id } });
     return { deleted: true, id };
