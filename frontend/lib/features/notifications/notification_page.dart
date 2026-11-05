@@ -167,12 +167,14 @@ class _HeaderCard extends StatelessWidget {
               children: [
                 Text(
                   unread > 0 ? '$unread belum dibaca' : 'Semua sudah dibaca',
-                  style: AppTextStyles.titleMedium.copyWith(color: Colors.white),
+                  style:
+                      AppTextStyles.titleMedium.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${provider.items.length} notifikasi distribusi',
-                  style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
+                  style:
+                      AppTextStyles.bodySmall.copyWith(color: Colors.white70),
                 ),
               ],
             ),
@@ -290,8 +292,8 @@ class _NotificationTile extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(item.title,
-                            style: AppTextStyles.titleSmall),
+                        child:
+                            Text(item.title, style: AppTextStyles.titleSmall),
                       ),
                       // Titik merah kecil penanda pesan belum dibaca
                       if (!item.isRead)
