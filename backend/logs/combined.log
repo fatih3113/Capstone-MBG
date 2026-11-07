@@ -1024,3 +1024,8 @@ The column `users.account_status` does not exist in the current database.
 2026-11-05 09:43:31 [info]: User logged in: kicau@gmail.com
 2026-11-05 10:50:35 [info]: User logged in: kicau@gmail.com
 2026-11-05 11:16:50 [info]: User logged in: kicau@gmail.com
+2026-11-05 11:29:23 [info]: User logged in: kicau@gmail.com
+2026-11-05 12:16:39 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-05 12:16:39 [info]: 📖 API docs: http://localhost:3000/health
+2026-11-05 12:37:59 [info]: 🚀 MBG Nutrition API running on port 3000
+2026-11-05 12:37:59 [info]: 📖 API docs: http://localhost:3000/health

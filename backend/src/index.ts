@@ -101,7 +101,7 @@ app.get('/health', (_, res) => {
 });
 
 // ─── API ROUTES ───────────────────────────────────────────────────────
-// Pendaftaran seluruh modul rute API dengan prefix standar /api/v1.
+// Pendaftaran seluruh modul rute API 
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/users`, userRoutes);
 app.use(`${API_PREFIX}/foods`, foodRoutes);
