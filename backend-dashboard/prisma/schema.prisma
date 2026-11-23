@@ -38,6 +38,7 @@ model Sppg {
   productionBatches  ProductionBatch[]
   schools            School[]
   users              User[]
+  foods              Food[]
 
   @@index([provinsi, kabupatenKota])
   @@index([verificationStatus, operationalStatus])
@@ -112,6 +113,7 @@ model School {
 
 model Food {
   id          String         @id @default(uuid())
+  sppgId      String?        @map("sppg_id")
   name        String
   category    String
   imageUrl    String?        @map("image_url")
@@ -122,7 +124,9 @@ model Food {
   menuItems   MbgMenuItem[]
   nutrition   Nutrition?
   predictions Prediction[]
+  sppg        Sppg?          @relation(fields: [sppgId], references: [id], onDelete: Cascade)
 
+  @@index([sppgId])
   @@map("foods")
 }
 

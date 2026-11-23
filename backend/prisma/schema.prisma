@@ -47,6 +47,7 @@ model Sppg {
 
   users               User[]
   schools             School[]
+  foods               Food[]
   procurements        Procurement[]
   productionBatches   ProductionBatch[]
   incidents           FoodSafetyIncident[]
@@ -136,6 +137,7 @@ model School {
 // ─── FOODS ───────────────────────────────────────────────────────────
 model Food {
   id          String  @id @default(uuid())
+  sppgId      String? @map("sppg_id")
   name        String
   category    String  // Karbohidrat | Protein Hewani | Protein Nabati | Sayuran | Buah | Minuman
   imageUrl    String? @map("image_url")
@@ -147,7 +149,9 @@ model Food {
   predictions Prediction[]
   foodRatings FoodRating[]
   feedbacks   FoodFeedback[]
+  sppg        Sppg?   @relation(fields: [sppgId], references: [id], onDelete: Cascade)
 
+  @@index([sppgId])
   @@map("foods")
 }
 
