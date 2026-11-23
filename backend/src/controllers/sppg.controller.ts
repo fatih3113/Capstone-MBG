@@ -111,4 +111,60 @@ export class SppgController {
       next(error);
     }
   };
+
+  /**
+   * GET /api/v1/sppg/by-code/:kode
+   * Endpoint publik untuk validasi kode SPPG saat registrasi bertahap di aplikasi mobile.
+   * Hanya mengembalikan SPPG yang:
+   *   - verificationStatus === 'APPROVED'
+   *   - operationalStatus === 'ACTIVE'
+   *   - isActive === true
+   */
+  findByCode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const rawKode = (req.params.kode || '').trim().toUpperCase();
+
+      if (!rawKode) {
+        res.status(404).json(ApiResponse.error('Kode SPPG tidak ditemukan atau belum aktif', 404));
+        return;
+      }
+
+      const sppg = await prisma.sppg.findFirst({
+        where: {
+          kode: { equals: rawKode, mode: 'insensitive' },
+          verificationStatus: 'APPROVED',
+          operationalStatus: 'ACTIVE',
+          isActive: true,
+        },
+        select: {
+          id: true,
+          kode: true,
+          nama: true,
+          provinsi: true,
+          kabupatenKota: true,
+          kecamatan: true,
+          kelurahanDesa: true,
+        },
+      });
+
+      if (!sppg) {
+        res.status(404).json(ApiResponse.error('Kode SPPG tidak ditemukan atau belum aktif', 404));
+        return;
+      }
+
+      res.json(ApiResponse.success({
+        id: sppg.id,
+        kode: sppg.kode,
+        nama: sppg.nama,
+        provinsi: sppg.provinsi,
+        kabupaten_kota: sppg.kabupatenKota,
+        kabupatenKota: sppg.kabupatenKota,
+        kecamatan: sppg.kecamatan,
+        kelurahan_desa: sppg.kelurahanDesa,
+        kelurahanDesa: sppg.kelurahanDesa,
+      }));
+    } catch (error) {
+      next(error);
+    }
+  };
 }
