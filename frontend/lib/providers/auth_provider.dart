@@ -15,7 +15,6 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus _status = AuthStatus.initial;
   UserModel? _user;
   String? _errorMessage;
-  String? _token;
 
   AuthStatus get status => _status;
   UserModel? get user => _user;
@@ -46,7 +45,6 @@ class AuthProvider extends ChangeNotifier {
     final response = await _authService.login(email: email, password: password);
 
     if (response.success && response.data != null) {
-      _token = response.data!['token'] as String?;
       final userData = response.data!['user'] as Map<String, dynamic>?;
       if (userData != null) {
         _user = UserModel.fromJson(userData);
@@ -70,6 +68,8 @@ class AuthProvider extends ChangeNotifier {
     String? gender,
     int? age,
     String? sppgId,
+    String? sppgCode,
+    Map<String, dynamic>? newInstitution,
     String? schoolId,
     String? className,
     List<String>? allergies,
@@ -87,6 +87,8 @@ class AuthProvider extends ChangeNotifier {
       gender: gender,
       age: age,
       sppgId: sppgId,
+      sppgCode: sppgCode,
+      newInstitution: newInstitution,
       schoolId: schoolId,
       className: className,
       allergies: allergies,
@@ -109,7 +111,6 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
-    _token = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
   }

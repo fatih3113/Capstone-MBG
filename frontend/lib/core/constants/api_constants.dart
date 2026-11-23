@@ -17,6 +17,7 @@ class ApiConstants {
   // baseUrl: getter alamat server utama backend, disesuaikan untuk pengujian lokal.
   static String get baseUrl {
     // Dengan ADB reverse, semua platform pakai localhost
+    // return 'http://192.168.56.101:$_port';
     return 'http://localhost:$_port';
   }
 
@@ -99,7 +100,8 @@ class ApiConstants {
   static const String adminDashboard = '/admin/dashboard';
   static const String adminNutritionReports = '/admin/nutrition-reports';
   static const String adminMenuRequestsAll = '/reports/menu-requests';
-  static const String adminMenuRequestStatus = '/reports/menu-requests/{id}/status';
+  static const String adminMenuRequestStatus =
+      '/reports/menu-requests/{id}/status';
   static const String adminFoodRatingsAll = '/reports/food-ratings';
   static const String adminFeedbacksAll = '/reports/food-feedbacks';
   static const String adminFeedbackSummary = '/reports/food-feedbacks/summary';
