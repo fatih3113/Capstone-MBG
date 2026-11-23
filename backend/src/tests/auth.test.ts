@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../src/index';
+import app from '../index';
 
 describe('Auth API', () => {
   // ─── Register ────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ describe('Auth API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: 'admin@mbg.test',
-          password: 'password123',
+          password: 'admin123',
         });
 
       expect(res.status).toBe(200);

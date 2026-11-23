@@ -13,11 +13,12 @@ const adminMiddleware = async (req, res, next) => {
             where: { id: req.userId },
             select: { role: true },
         });
-        // Menolak akses dengan HTTP 403 Forbidden jika akun tidak ditemukan atau bukan role 'admin'.
-        if (!user || user.role !== 'admin') {
+        // Menolak akses dengan HTTP 403 Forbidden jika akun tidak ditemukan atau bukan role pengelola (admin/SPPG).
+        const allowedRoles = ['admin', 'BGN_ADMIN', 'SPPG_ADMIN'];
+        if (!user || !allowedRoles.includes(user.role)) {
             res.status(403).json({
                 success: false,
-                message: 'Akses ditolak. Halaman ini hanya untuk admin pengelola MBG.',
+                message: 'Akses ditolak. Halaman ini hanya untuk admin pengelola MBG atau SPPG.',
             });
             return;
         }

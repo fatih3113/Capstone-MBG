@@ -76,6 +76,36 @@ exports.validateRegister = [
         .trim()
         .notEmpty()
         .withMessage('Format school_id tidak valid'),
+    // sppg_code: pengganti sppg_id dari alur registrasi bertahap
+    (0, express_validator_1.body)('sppg_code')
+        .optional(EMPTY_OK)
+        .isString()
+        .trim()
+        .notEmpty()
+        .withMessage('Format kode SPPG tidak valid'),
+    // new_institution: lembaga baru jika belum terdaftar
+    (0, express_validator_1.body)('new_institution')
+        .optional({ nullable: true })
+        .isObject()
+        .withMessage('new_institution harus berupa objek'),
+    (0, express_validator_1.body)('new_institution.name')
+        .optional({ nullable: true })
+        .isString()
+        .trim()
+        .isLength({ min: 2, max: 200 })
+        .withMessage('Nama lembaga harus antara 2-200 karakter'),
+    (0, express_validator_1.body)('new_institution.level')
+        .optional({ nullable: true })
+        .isString()
+        .trim()
+        .isIn(['SD', 'SMP', 'SMA', 'SMK', 'Posyandu'])
+        .withMessage('Jenjang lembaga tidak valid. Pilihan: SD, SMP, SMA, SMK, Posyandu'),
+    (0, express_validator_1.body)('new_institution.city')
+        .optional({ nullable: true })
+        .isString()
+        .trim()
+        .isLength({ max: 100 })
+        .withMessage('Kota maksimal 100 karakter'),
     ...allergyValidators,
 ];
 // Validasi pembaruan profil pengguna: memeriksa format data alergi jika dikirim.

@@ -92,7 +92,7 @@ app.get('/health', (_, res) => {
     });
 });
 // ─── API ROUTES ───────────────────────────────────────────────────────
-// Pendaftaran seluruh modul rute API dengan prefix standar /api/v1.
+// Pendaftaran seluruh modul rute API 
 app.use(`${API_PREFIX}/auth`, auth_routes_1.default);
 app.use(`${API_PREFIX}/users`, user_routes_1.default);
 app.use(`${API_PREFIX}/foods`, food_routes_1.default);
@@ -118,10 +118,12 @@ app.use('*', (req, res) => {
 // Middleware penanganan error global terpusat agar server tidak crash jika terjadi exception.
 app.use(error_middleware_1.errorHandler);
 // ─── START SERVER ─────────────────────────────────────────────────────
-// Menjalankan server HTTP pada port yang ditentukan dan mencatat log saat siap menerima request.
-app.listen(PORT, () => {
-    logger_1.logger.info(`🚀 MBG Nutrition API running on port ${PORT}`);
-    logger_1.logger.info(`📖 API docs: http://localhost:${PORT}/health`);
-});
+// Menjalankan server HTTP pada port yang ditentukan dan mencatat log saat siap menerima request (dilewati saat unit test).
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        logger_1.logger.info(`🚀 MBG Nutrition API running on port ${PORT}`);
+        logger_1.logger.info(`📖 API docs: http://localhost:${PORT}/health`);
+    });
+}
 exports.default = app;
 //# sourceMappingURL=index.js.map

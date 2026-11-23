@@ -29,32 +29,48 @@ class AuthController {
          */
         this.register = async (req, res, next) => {
             try {
-                // 422 #1: aturan di validators.ts (validateRegister)
                 const errors = (0, express_validator_1.validationResult)(req);
                 if (!errors.isEmpty()) {
                     logValidationErrors('[REGISTER] Validasi gagal', errors.array());
                     res.status(422).json(api_response_1.ApiResponse.validationError(errors.array()));
                     return;
                 }
-                const { name, email, password, school_id, sppg_id, class: className, gender, age } = req.body;
-                // 422 #2: data alergi
+                const { name, email, password, school_id, sppg_id, sppg_code, class: className, gender, age, new_institution, } = req.body;
+                // Data alergi
                 const allergy = (0, allergy_1.parseAllergyInput)(req.body);
                 if (!allergy.ok) {
                     logger_1.logger.warn(`[REGISTER] Data alergi ditolak: ${allergy.message}`);
                     res.status(422).json(api_response_1.ApiResponse.error(allergy.message, 422));
                     return;
                 }
-                // Check if email already exists
+                // Cek email duplikat
                 const existingUser = await prisma.user.findUnique({ where: { email } });
                 if (existingUser) {
                     res.status(409).json(api_response_1.ApiResponse.error('Email sudah terdaftar', 409));
                     return;
                 }
-                // 422 #3: sppg_id (jika disertakan) harus ada & aktif di database
-                if (sppg_id) {
+                // Resolusi SPPG: sppg_code (baru) atau sppg_id (lama / backward compat)
+                let resolvedSppgId;
+                if (sppg_code) {
+                    const kode = String(sppg_code).trim().toUpperCase();
+                    const sppg = await prisma.sppg.findFirst({
+                        where: {
+                            kode: { equals: kode, mode: 'insensitive' },
+                            verificationStatus: 'APPROVED',
+                            operationalStatus: 'ACTIVE',
+                            isActive: true,
+                        },
+                        select: { id: true },
+                    });
+                    if (!sppg) {
+                        res.status(422).json(api_response_1.ApiResponse.error('Kode SPPG tidak ditemukan atau belum aktif', 422));
+                        return;
+                    }
+                    resolvedSppgId = sppg.id;
+                }
+                else if (sppg_id) {
                     const sppg = await prisma.sppg.findUnique({ where: { id: sppg_id } });
                     if (!sppg) {
-                        logger_1.logger.warn(`[REGISTER] SPPG tidak ditemukan untuk sppg_id: ${sppg_id}`);
                         res.status(422).json(api_response_1.ApiResponse.error('SPPG tidak ditemukan', 422));
                         return;
                     }
@@ -62,48 +78,95 @@ class AuthController {
                         res.status(422).json(api_response_1.ApiResponse.error('SPPG yang dipilih sudah tidak aktif', 422));
                         return;
                     }
+                    resolvedSppgId = sppg.id;
                 }
-                // 422 #4: school_id (jika disertakan) harus ada; jenjang diambil dari sekolah
-                let schoolLevel;
-                if (school_id) {
-                    const school = await prisma.school.findUnique({ where: { id: school_id } });
-                    if (!school) {
-                        logger_1.logger.warn(`[REGISTER] Sekolah tidak ditemukan untuk school_id: ${school_id}`);
-                        res.status(422).json(api_response_1.ApiResponse.error('Sekolah tidak ditemukan', 422));
-                        return;
-                    }
-                    if (sppg_id && school.sppgId && school.sppgId !== sppg_id) {
-                        res.status(422).json(api_response_1.ApiResponse.error('Sekolah tidak terdaftar pada SPPG yang dipilih', 422));
-                        return;
-                    }
-                    schoolLevel = school.level; // SD | SMP | SMA | SMK → tampil di Profil (Jenjang)
-                }
-                // Hash password
                 const passwordHash = await bcryptjs_1.default.hash(password, 12);
-                // Create user
-                const user = await prisma.user.create({
-                    data: {
-                        name,
-                        email,
-                        passwordHash,
-                        schoolId: school_id || undefined,
-                        schoolLevel,
-                        sppgId: sppg_id || undefined,
-                        class_: className,
-                        gender: gender || undefined,
-                        age: age !== undefined && age !== null && age !== '' ? parseInt(age) : null,
-                        ...(0, allergy_1.allergyDbFields)(allergy),
-                    },
-                    select: {
-                        id: true, name: true, email: true,
-                        class_: true, gender: true, age: true,
-                        schoolId: true, schoolLevel: true, createdAt: true,
-                    },
+                // Transaksi: resolusi lembaga + pembuatan user
+                const user = await prisma.$transaction(async (tx) => {
+                    let resolvedSchoolId = school_id || undefined;
+                    let schoolLevel;
+                    if (new_institution && resolvedSppgId) {
+                        const instName = String(new_institution.name).trim();
+                        const instLevel = String(new_institution.level).trim();
+                        const instCity = new_institution.city ? String(new_institution.city).trim() : undefined;
+                        // Validasi level
+                        const validLevels = ['SD', 'SMP', 'SMA', 'SMK', 'Posyandu'];
+                        if (!validLevels.includes(instLevel)) {
+                            throw new Error(`VALIDATION:Jenjang lembaga tidak valid. Pilihan: ${validLevels.join(', ')}`);
+                        }
+                        // Cari sekolah dengan nama sama (case-insensitive) di SPPG ini
+                        const existing = await tx.school.findFirst({
+                            where: {
+                                sppgId: resolvedSppgId,
+                                name: { equals: instName, mode: 'insensitive' },
+                            },
+                            select: { id: true, level: true },
+                        });
+                        if (existing) {
+                            resolvedSchoolId = existing.id;
+                            schoolLevel = existing.level;
+                        }
+                        else {
+                            // Buat sekolah baru
+                            const created = await tx.school.create({
+                                data: {
+                                    name: instName,
+                                    level: instLevel,
+                                    city: instCity,
+                                    sppgId: resolvedSppgId,
+                                },
+                                select: { id: true, level: true },
+                            });
+                            resolvedSchoolId = created.id;
+                            schoolLevel = created.level;
+                        }
+                    }
+                    else if (resolvedSchoolId) {
+                        const school = await tx.school.findUnique({ where: { id: resolvedSchoolId } });
+                        if (!school) {
+                            throw new Error('VALIDATION:Sekolah tidak ditemukan');
+                        }
+                        if (resolvedSppgId && school.sppgId && school.sppgId !== resolvedSppgId) {
+                            throw new Error('VALIDATION:Sekolah tidak terdaftar pada SPPG yang dipilih');
+                        }
+                        // Jika sekolah belum punya sppgId tapi kita punya, tautkan
+                        if (resolvedSppgId && !school.sppgId) {
+                            await tx.school.update({
+                                where: { id: resolvedSchoolId },
+                                data: { sppgId: resolvedSppgId },
+                            });
+                        }
+                        schoolLevel = school.level;
+                    }
+                    return tx.user.create({
+                        data: {
+                            name,
+                            email,
+                            passwordHash,
+                            schoolId: resolvedSchoolId,
+                            schoolLevel,
+                            sppgId: resolvedSppgId,
+                            class_: className,
+                            gender: gender || undefined,
+                            age: age !== undefined && age !== null && age !== '' ? parseInt(age) : null,
+                            ...(0, allergy_1.allergyDbFields)(allergy),
+                        },
+                        select: {
+                            id: true, name: true, email: true,
+                            class_: true, gender: true, age: true,
+                            schoolId: true, schoolLevel: true, createdAt: true,
+                        },
+                    });
                 });
                 logger_1.logger.info(`New user registered: ${email}`);
                 res.status(201).json(api_response_1.ApiResponse.success(user, 'Registrasi berhasil'));
             }
             catch (error) {
+                if (error?.message?.startsWith('VALIDATION:')) {
+                    const msg = error.message.replace('VALIDATION:', '');
+                    res.status(422).json(api_response_1.ApiResponse.error(msg, 422));
+                    return;
+                }
                 next(error);
             }
         };

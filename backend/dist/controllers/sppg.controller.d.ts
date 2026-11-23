@@ -17,5 +17,14 @@ export declare class SppgController {
      * Tidak membocorkan data user.
      */
     findAll: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    /**
+     * GET /api/v1/sppg/by-code/:kode
+     * Endpoint publik untuk validasi kode SPPG saat registrasi bertahap di aplikasi mobile.
+     * Hanya mengembalikan SPPG yang:
+     *   - verificationStatus === 'APPROVED'
+     *   - operationalStatus === 'ACTIVE'
+     *   - isActive === true
+     */
+    findByCode: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 }
 //# sourceMappingURL=sppg.controller.d.ts.map

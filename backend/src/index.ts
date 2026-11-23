@@ -130,10 +130,12 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // ─── START SERVER ─────────────────────────────────────────────────────
-// Menjalankan server HTTP pada port yang ditentukan dan mencatat log saat siap menerima request.
-app.listen(PORT, () => {
-  logger.info(`🚀 MBG Nutrition API running on port ${PORT}`);
-  logger.info(`📖 API docs: http://localhost:${PORT}/health`);
-});
+// Menjalankan server HTTP pada port yang ditentukan dan mencatat log saat siap menerima request (dilewati saat unit test).
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    logger.info(`🚀 MBG Nutrition API running on port ${PORT}`);
+    logger.info(`📖 API docs: http://localhost:${PORT}/health`);
+  });
+}
 
 export default app;
