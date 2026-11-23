@@ -7,6 +7,18 @@ import {
   ROLE_SPPG_ADMIN,
 } from '../auth/roles';
 
+/** Alfabet aman: tanpa karakter ambigu O, 0, I, 1 */
+const SAFE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+/** Generate kode SPPG berformat "SPPG-XXXXXX" (6 karakter acak tanpa ambigu) */
+function generateSppgKode(): string {
+  let code = 'SPPG-';
+  for (let i = 0; i < 6; i++) {
+    code += SAFE_CHARS[Math.floor(Math.random() * SAFE_CHARS.length)];
+  }
+  return code;
+}
+
 const SELECT = {
   id: true,
   name: true,
@@ -85,27 +97,52 @@ export class SppgVerificationService {
     const applicant = await this.findApplicant(userId);
     const now = new Date();
 
-    await this.prisma.$transaction([
-      this.prisma.user.update({
-        where: { id: applicant.id },
-        data: { accountStatus: ACCOUNT_ACTIVE },
-      }),
-      ...(applicant.sppgId
-        ? [
-            this.prisma.sppg.update({
-              where: { id: applicant.sppgId },
-              data: {
-                verificationStatus: 'APPROVED',
-                operationalStatus: 'ACTIVE',
-                isActive: true,
-                rejectionReason: null,
-                verifiedBy: verifierId,
-                verifiedAt: now,
-              },
-            }),
-          ]
-        : []),
-    ]);
+    // Aktifkan akun user
+    await this.prisma.user.update({
+      where: { id: applicant.id },
+      data: { accountStatus: ACCOUNT_ACTIVE },
+    });
+
+    // Aktifkan SPPG dan generate kode jika belum ada
+    if (applicant.sppgId) {
+      // Ambil data SPPG saat ini untuk cek kode
+      const currentSppg = await this.prisma.sppg.findUnique({
+        where: { id: applicant.sppgId },
+        select: { kode: true },
+      });
+
+      let kode = currentSppg?.kode;
+
+      // Generate kode unik jika SPPG belum punya kode
+      if (!kode) {
+        let attempts = 0;
+        while (attempts < 10) {
+          const candidate = generateSppgKode();
+          const conflict = await this.prisma.sppg.findUnique({
+            where: { kode: candidate },
+            select: { id: true },
+          });
+          if (!conflict) {
+            kode = candidate;
+            break;
+          }
+          attempts++;
+        }
+      }
+
+      await this.prisma.sppg.update({
+        where: { id: applicant.sppgId },
+        data: {
+          verificationStatus: 'APPROVED',
+          operationalStatus: 'ACTIVE',
+          isActive: true,
+          rejectionReason: null,
+          verifiedBy: verifierId,
+          verifiedAt: now,
+          ...(kode ? { kode } : {}),
+        },
+      });
+    }
 
     return this.prisma.user.findUnique({ where: { id: applicant.id }, select: SELECT });
   }
