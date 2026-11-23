@@ -12,7 +12,7 @@ import { DistributionService } from './distribution.service';
 @Controller('distribution')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
 export class DistributionController {
-  constructor(private readonly svc: DistributionService) {}
+  constructor(private readonly svc: DistributionService) { }
 
   /** GET /distribution/summary */
   @Get('summary')
@@ -55,8 +55,8 @@ export class DistributionController {
 
   /** GET /distribution/foods — daftar makanan untuk dropdown */
   @Get('foods')
-  async foods() {
-    return { success: true, message: 'Berhasil', data: await this.svc.getFoods() };
+  async foods(@CurrentUser() user: AuthUser) {
+    return { success: true, message: 'Berhasil', data: await this.svc.getFoods(sppgScope(user)) };
   }
 
   // ─── CRUD Jadwal ──────────────────────────────────────────────────────────

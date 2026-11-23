@@ -4,13 +4,12 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/roles';
 import { FoodsService } from './foods.service';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { ROLE_SUPER_ADMIN } from '../auth/roles';
 
 @Controller('foods')
 @UseGuards(JwtAuthGuard, AdminRoleGuard)
-@Roles(ROLE_SUPER_ADMIN) // master data makanan: hanya Super Admin
 export class FoodsController {
   constructor(private readonly svc: FoodsService) {}
 
@@ -20,26 +19,36 @@ export class FoodsController {
     return { success: true, data: this.svc.getCategories() };
   }
 
-  /** GET /foods?category=&search=&isActive=&page=&limit= */
+  /** GET /foods?category=&search=&isActive=&scope=&page=&limit= */
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('category') category?: string,
     @Query('search') search?: string,
     @Query('isActive') isActive?: string,
+    @Query('scope') scope?: 'all' | 'sppg' | 'master',
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ) {
     return {
       success: true, message: 'Berhasil',
-      data: await this.svc.findAll({ category, search, isActive, page: +page, limit: +limit }),
+      data: await this.svc.findAll({
+        user,
+        category,
+        search,
+        isActive,
+        scope,
+        page: +page,
+        limit: +limit,
+      }),
     };
   }
 
   /** GET /foods/:id */
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     try {
-      return { success: true, data: await this.svc.findOne(id) };
+      return { success: true, data: await this.svc.findOne(id, user) };
     } catch (err: any) {
       return { success: false, message: err.message };
     }
@@ -47,9 +56,9 @@ export class FoodsController {
 
   /** POST /foods */
   @Post()
-  async create(@Body() body: any) {
+  async create(@CurrentUser() user: AuthUser, @Body() body: any) {
     try {
-      return { success: true, message: 'Makanan berhasil ditambahkan', data: await this.svc.create(body) };
+      return { success: true, message: 'Makanan berhasil ditambahkan', data: await this.svc.create(body, user) };
     } catch (err: any) {
       return { success: false, message: err.message };
     }
@@ -57,9 +66,9 @@ export class FoodsController {
 
   /** PUT /foods/:id */
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: any) {
+  async update(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() body: any) {
     try {
-      return { success: true, message: 'Makanan berhasil diperbarui', data: await this.svc.update(id, body) };
+      return { success: true, message: 'Makanan berhasil diperbarui', data: await this.svc.update(id, body, user) };
     } catch (err: any) {
       return { success: false, message: err.message };
     }
@@ -67,9 +76,9 @@ export class FoodsController {
 
   /** PATCH /foods/:id/toggle — aktif / nonaktif */
   @Patch(':id/toggle')
-  async toggle(@Param('id') id: string) {
+  async toggle(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     try {
-      return { success: true, message: 'Status berhasil diubah', data: await this.svc.toggleActive(id) };
+      return { success: true, message: 'Status berhasil diubah', data: await this.svc.toggleActive(id, user) };
     } catch (err: any) {
       return { success: false, message: err.message };
     }
@@ -78,9 +87,9 @@ export class FoodsController {
   /** DELETE /foods/:id */
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async remove(@Param('id') id: string) {
+  async remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     try {
-      return { success: true, message: 'Makanan berhasil dihapus', data: await this.svc.delete(id) };
+      return { success: true, message: 'Makanan berhasil dihapus', data: await this.svc.delete(id, user) };
     } catch (err: any) {
       return { success: false, message: err.message };
     }

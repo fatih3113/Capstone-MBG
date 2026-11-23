@@ -22,11 +22,11 @@ export class AuthController {
 
   /**
    * POST /api/v1/auth/login
-   * Login dashboard (Super Admin & Admin SPPG). Dibatasi 10x / 15 menit per IP.
+   * Login dashboard (Super Admin & Admin SPPG).
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 10, ttl: 15 * 60 * 1000 } })
+  @Throttle({ default: { limit: 100, ttl: 60 * 1000 } })
   async login(@Body() dto: LoginDto) {
     const result = await this.authService.login(dto);
     return {

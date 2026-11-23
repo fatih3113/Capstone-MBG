@@ -22,8 +22,8 @@ import { SppgVerificationModule } from './sppg-verification/sppg-verification.mo
     // Load .env
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // Rate limiting: max 100 req per 15 menit per IP
-    ThrottlerModule.forRoot([{ ttl: 60000 * 15, limit: 100 }]),
+    // Rate limiting: max 500 req per 15 menit per IP (global)
+    ThrottlerModule.forRoot([{ ttl: 60000 * 15, limit: 500 }]),
 
     // Shared Prisma client (global)
     PrismaModule,

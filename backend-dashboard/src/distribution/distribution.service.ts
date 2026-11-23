@@ -211,9 +211,16 @@ export class DistributionService {
   }
 
   /** Semua makanan aktif (untuk dropdown form) */
-  async getFoods() {
+  async getFoods(sppgId?: string) {
+    const where: any = { isActive: true };
+    if (sppgId) {
+      where.OR = [
+        { sppgId: null },
+        { sppgId },
+      ];
+    }
     return this.prisma.food.findMany({
-      where: { isActive: true },
+      where,
       select: { id: true, name: true, category: true },
       orderBy: [{ category: 'asc' }, { name: 'asc' }],
     });
