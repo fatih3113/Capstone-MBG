@@ -34,10 +34,10 @@ export default function App() {
             <Route path="feedback" element={<FeedbackPage />} />
             <Route path="nutrition" element={<NutritionPage />} />
             <Route path="distribution" element={<DistributionPage />} />
+            <Route path="foods" element={<FoodsPage />} />
             <Route path="institutions" element={<InstitutionsPage />} />
 
             {/* Hanya Super Admin */}
-            <Route path="foods" element={<RequireRole role="super"><FoodsPage /></RequireRole>} />
             <Route path="sppg" element={<RequireRole role="super"><SppgRegionsPage /></RequireRole>} />
             <Route
               path="sppg-verification"

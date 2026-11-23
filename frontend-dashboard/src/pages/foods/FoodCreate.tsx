@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { foodsApi } from '@/api/endpoints';
+import { useAuth } from '@/hooks/useAuth';
 import { X, Check } from 'lucide-react';
 import { emptyFoodForm } from './types';
 import type { FoodForm } from './types';
@@ -12,6 +13,7 @@ interface FoodCreateProps {
 }
 
 export default function FoodCreate({ categories, onSuccess, onClose }: FoodCreateProps) {
+  const { user, isSppgAdmin } = useAuth();
   const [form, setForm] = useState<FoodForm>(emptyFoodForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -32,14 +34,21 @@ export default function FoodCreate({ categories, onSuccess, onClose }: FoodCreat
     } finally { setSaving(false); }
   };
 
+  const modalTitle = isSppgAdmin ? 'Tambah Menu Makanan SPPG' : 'Tambah Menu Master MBG';
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal modal--lg" onClick={(e) => e.stopPropagation()} role="dialog">
         <div className="modal__header">
-          <h2 className="modal__title">Tambah Makanan Baru</h2>
+          <h2 className="modal__title">{modalTitle}</h2>
           <button className="modal__close" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="modal__body">
+          {isSppgAdmin && (
+            <div className="alert alert--info" style={{ marginBottom: '.75rem', fontSize: '0.82rem' }}>
+              Menu ini akan tersimpan sebagai menu milik <strong>{user?.sppgName ?? 'SPPG Anda'}</strong> dan dapat dipilih saat membuat Jadwal Distribusi MBG.
+            </div>
+          )}
           {error && <div className="alert alert--error" style={{ marginBottom: '.75rem' }}>{error}</div>}
           <FoodFormFields form={form} setForm={setForm} categories={categories} />
         </div>

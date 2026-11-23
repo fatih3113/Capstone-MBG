@@ -81,7 +81,43 @@ export default function SppgProfilePage() {
         <div className="table-card" style={{ padding: 24 }}>
           <dl className="verif-detail">
             <dt>Nama SPPG</dt><dd>{sppg.nama}</dd>
-            <dt>Kode</dt><dd>{sppg.kode ?? '—'}</dd>
+            <dt>Kode SPPG</dt>
+            <dd>
+              {sppg.kode ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <code style={{
+                    background: 'hsl(251,89%,96%)',
+                    color: 'hsl(251,89%,45%)',
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    fontWeight: 700,
+                    fontSize: 15,
+                    letterSpacing: 1,
+                    border: '1px solid hsl(251,89%,80%)',
+                  }}>
+                    {sppg.kode}
+                  </code>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--sm"
+                    title="Salin kode"
+                    onClick={() => {
+                      navigator.clipboard.writeText(sppg.kode!).then(() => {
+                        setSuccess('Kode SPPG berhasil disalin!');
+                        setTimeout(() => setSuccess(''), 2000);
+                      });
+                    }}
+                  >
+                    📋 Salin
+                  </button>
+                  <span style={{ fontSize: 12, color: 'hsl(220,13%,55%)', display: 'block', width: '100%', marginTop: 4 }}>
+                    Bagikan kode ini ke sekolah/posyandu binaan untuk mendaftar di aplikasi.
+                  </span>
+                </div>
+              ) : (
+                <span style={{ color: 'hsl(220,13%,55%)' }}>Belum ada kode — akan dibuat saat akun disetujui</span>
+              )}
+            </dd>
             <dt>Provinsi</dt><dd>{sppg.provinsi}</dd>
             <dt>Kabupaten / Kota</dt><dd>{sppg.kabupatenKota}</dd>
             <dt>Kecamatan</dt><dd>{sppg.kecamatan}</dd>

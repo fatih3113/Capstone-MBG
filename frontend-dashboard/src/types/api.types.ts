@@ -264,6 +264,8 @@ export interface FoodNutrition {
 export interface FoodItem {
   id: string; name: string; category: string;
   description: string | null; imageUrl: string | null; isActive: boolean;
+  sppgId?: string | null;
+  sppg?: { id: string; nama: string; kode?: string | null } | null;
   nutrition: FoodNutrition | null;
 }
 

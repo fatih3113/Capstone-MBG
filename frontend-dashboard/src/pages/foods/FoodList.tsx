@@ -1,5 +1,6 @@
 import type { FoodItem } from '@/types/api.types';
-import { Pencil, Trash2, ToggleLeft, ToggleRight, Utensils } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Pencil, Trash2, ToggleLeft, ToggleRight, Utensils, Lock } from 'lucide-react';
 import { CAT_BADGE, catLabel } from './types';
 
 interface FoodListProps {
@@ -16,6 +17,8 @@ interface FoodListProps {
 export default function FoodList({
   records, total, page, totalPages, onEdit, onDelete, onToggle, onPageChange,
 }: FoodListProps) {
+  const { user, isSuperAdmin } = useAuth();
+
   return (
     <div>
       <div className="table-wrapper">
@@ -40,45 +43,81 @@ export default function FoodList({
                   <Utensils size={32} /><span>Tidak ada makanan. Klik "Tambah Makanan".</span>
                 </div>
               </td></tr>
-            ) : records.map((food) => (
-              <tr key={food.id} style={{ opacity: food.isActive ? 1 : 0.5 }}>
-                <td>
-                  <strong>{food.name}</strong>
-                  {food.description && <div className="row-sub">{food.description}</div>}
-                </td>
-                <td>
-                  <span className={`badge ${CAT_BADGE[food.category] ?? 'badge--default'}`}>
-                    {catLabel(food.category)}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>{food.nutrition?.calories.toFixed(0) ?? '—'}</td>
-                <td style={{ textAlign: 'right' }}>{food.nutrition?.protein.toFixed(1) ?? '—'}</td>
-                <td style={{ textAlign: 'right' }}>{food.nutrition?.carbs.toFixed(1) ?? '—'}</td>
-                <td style={{ textAlign: 'right' }}>{food.nutrition?.fat.toFixed(1) ?? '—'}</td>
-                <td style={{ fontSize: '.78rem', color: 'var(--color-text-3)' }}>
-                  {food.nutrition?.dataSource ?? '—'}
-                </td>
-                <td style={{ textAlign: 'center' }}>
-                  <button
-                    className={`toggle-btn ${food.isActive ? 'toggle-btn--on' : 'toggle-btn--off'}`}
-                    onClick={() => onToggle(food)}
-                    title={food.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                  >
-                    {food.isActive ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
-                  </button>
-                </td>
-                <td>
-                  <div className="row-actions">
-                    <button className="icon-btn" title="Edit" onClick={() => onEdit(food)}>
-                      <Pencil size={15} />
-                    </button>
-                    <button className="icon-btn icon-btn--danger" title="Hapus" onClick={() => onDelete(food)}>
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            ) : records.map((food) => {
+              // Admin SPPG hanya bisa mengubah/menghapus menu milik SPPG-nya sendiri
+              const isOwner = Boolean(user?.sppgId) && food.sppgId === user?.sppgId;
+              const canManage = isSuperAdmin || isOwner;
+
+              return (
+                <tr key={food.id} style={{ opacity: food.isActive ? 1 : 0.5 }}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <strong>{food.name}</strong>
+                      {!food.sppgId ? (
+                        <span className="badge badge--default" style={{ fontSize: '0.72rem', padding: '0.15rem 0.45rem' }}>
+                          Master MBG
+                        </span>
+                      ) : isOwner ? (
+                        <span className="badge badge--primary" style={{ fontSize: '0.72rem', padding: '0.15rem 0.45rem' }}>
+                          SPPG Saya
+                        </span>
+                      ) : (
+                        <span className="badge badge--info" style={{ fontSize: '0.72rem', padding: '0.15rem 0.45rem' }}>
+                          {food.sppg?.nama ?? 'SPPG Lain'}
+                        </span>
+                      )}
+                    </div>
+                    {food.description && <div className="row-sub">{food.description}</div>}
+                  </td>
+                  <td>
+                    <span className={`badge ${CAT_BADGE[food.category] ?? 'badge--default'}`}>
+                      {catLabel(food.category)}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>{food.nutrition?.calories.toFixed(0) ?? '—'}</td>
+                  <td style={{ textAlign: 'right' }}>{food.nutrition?.protein.toFixed(1) ?? '—'}</td>
+                  <td style={{ textAlign: 'right' }}>{food.nutrition?.carbs.toFixed(1) ?? '—'}</td>
+                  <td style={{ textAlign: 'right' }}>{food.nutrition?.fat.toFixed(1) ?? '—'}</td>
+                  <td style={{ fontSize: '.78rem', color: 'var(--color-text-3)' }}>
+                    {food.nutrition?.dataSource ?? '—'}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    {canManage ? (
+                      <button
+                        className={`toggle-btn ${food.isActive ? 'toggle-btn--on' : 'toggle-btn--off'}`}
+                        onClick={() => onToggle(food)}
+                        title={food.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                      >
+                        {food.isActive ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
+                      </button>
+                    ) : (
+                      <span className={`badge ${food.isActive ? 'badge--success' : 'badge--default'}`} style={{ fontSize: '0.75rem' }}>
+                        {food.isActive ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    )}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    {canManage ? (
+                      <div className="row-actions">
+                        <button className="icon-btn" title="Edit" onClick={() => onEdit(food)}>
+                          <Pencil size={15} />
+                        </button>
+                        <button className="icon-btn icon-btn--danger" title="Hapus" onClick={() => onDelete(food)}>
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        style={{ fontSize: '0.75rem', color: 'var(--color-text-3)', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                        title="Menu Master MBG bersifat umum dan hanya dapat diubah oleh Super Admin"
+                      >
+                        <Lock size={12} /> Master
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
   { to: '/feedback', label: 'Feedback Siswa', icon: MessageSquare },
   { to: '/nutrition', label: 'Laporan Gizi', icon: BarChart3 },
   { to: '/distribution', label: 'Distribusi MBG', icon: Truck },
-  { to: '/foods', label: 'Data Makanan', icon: UtensilsCrossed, only: 'super' },
+  { to: '/foods', label: 'Menu Makanan', icon: UtensilsCrossed },
   { to: '/institutions', label: 'Data Lembaga', icon: Building2 },
   { to: '/sppg', label: 'Wilayah SPPG', icon: MapPin, only: 'super' },
   { to: '/sppg-verification', label: 'Verifikasi Akun SPPG', icon: UserCheck, only: 'super', badge: 'pending' },

@@ -143,7 +143,7 @@ export const foodsApi = {
     apiClient.get<{ success: boolean; data: string[] }>('/foods/categories'),
 
   list: (params?: {
-    category?: string; search?: string; isActive?: string; page?: number; limit?: number;
+    category?: string; search?: string; isActive?: string; scope?: 'all' | 'sppg' | 'master'; page?: number; limit?: number;
   }) =>
     apiClient.get<{ success: boolean; data: PaginatedResponse<FoodItem> }>('/foods', { params }),
 
